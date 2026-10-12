@@ -1885,15 +1885,16 @@ class TimetableApp {
       const color = this.getSubjectColor(sub);
       const studentIds = this.courseEnrollments[sub] || [];
       const schedules = this.courseSchedules[sub] || [];
+      const safeSub = sub.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
       html += `
-        <div class="draggable-palette-subject p-3 rounded-xl border transition-all hover:scale-[1.01] shadow-2xs"
+        <div class="draggable-palette-subject p-3 rounded-xl border transition-all hover:scale-[1.01] shadow-2xs cursor-grab active:cursor-grabbing select-none"
              style="background-color: ${color.bg}; border-color: ${color.border};"
              draggable="true"
-             ondragstart="window.app.handlePaletteDragStart(event, '${sub}')"
+             ondragstart="window.app.handlePaletteDragStart(event, '${safeSub}')"
              ondragend="window.app.handlePaletteDragEnd(event)">
           
-          <div class="flex items-center justify-between gap-1 mb-1.5">
+          <div class="flex items-center justify-between gap-1 mb-1.5 pointer-events-none">
             <div class="flex items-center gap-1.5 min-w-0">
               <i data-lucide="grip-vertical" class="w-3.5 h-3.5 shrink-0" style="color: ${color.text};"></i>
               <span class="font-bold text-xs truncate" style="color: ${color.text};">${sub}</span>
@@ -1903,15 +1904,17 @@ class TimetableApp {
             </span>
           </div>
 
-          <div class="flex items-center justify-between text-[11px] text-slate-600">
+          <div class="flex items-center justify-between text-[11px] text-slate-600 pointer-events-none">
             <span>
               ${schedules.length > 0 ? `
-                <strong class="text-indigo-700">${schedules.length}시간</strong> 배치됨
+                <strong class="text-indigo-700 font-bold">${schedules.length}시간</strong> 배치됨
               ` : `
                 <span class="text-amber-600 font-semibold">미배치</span>
               `}
             </span>
-            <span class="text-[10px] text-slate-500">시간표로 드래그 &rarr;</span>
+            <span class="text-[10px] text-slate-500 font-medium flex items-center gap-0.5">
+              <span>시간표로 드래그</span> &rarr;
+            </span>
           </div>
 
         </div>
@@ -1927,14 +1930,17 @@ class TimetableApp {
       type: 'palette-subject',
       subjectName: subjectName
     };
-    e.dataTransfer.setData('text/plain', JSON.stringify(this.dragData));
-    e.dataTransfer.effectAllowed = 'copy';
+    try {
+      e.dataTransfer.setData('text/plain', JSON.stringify(this.dragData));
+      e.dataTransfer.setData('application/json', JSON.stringify(this.dragData));
+    } catch (err) {}
+    e.dataTransfer.effectAllowed = 'copyMove';
     e.currentTarget.classList.add('is-dragging');
   }
 
   handlePaletteDragEnd(e) {
     this.dragData = null;
-    e.currentTarget.classList.remove('is-dragging');
+    if (e.currentTarget) e.currentTarget.classList.remove('is-dragging');
     document.querySelectorAll('.timetable-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
   }
 
@@ -2035,6 +2041,7 @@ class TimetableApp {
               const symHtml = ExcelService.getStatusHtml(status);
               const isCanceled = status === 'canceled';
               const isAdjust = status === 'adjust';
+              const safeSub = subject.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
               // 학생 텍스트 요약
               let rosterSummary = '편제 학생 없음';
@@ -2049,20 +2056,20 @@ class TimetableApp {
               }
 
               bodyHtml += `
-                <div class="subject-card p-2 rounded-lg border text-xs transition-all relative ${
+                <div class="subject-card p-2 rounded-lg border text-xs transition-all relative select-none cursor-grab active:cursor-grabbing ${
                   isCanceled ? 'is-canceled' : ''
                 } ${isAdjust ? 'is-adjust' : ''}"
                      style="background-color: ${isCanceled ? '#E2E8F0' : color.bg}; border-color: ${isCanceled ? '#CBD5E1' : color.border};"
                      draggable="true"
-                     ondragstart="window.app.handleTimetableCardDragStart(event, '${subject}', '${day.id}', '${period.id}')"
+                     ondragstart="window.app.handleTimetableCardDragStart(event, '${safeSub}', '${day.id}', '${period.id}')"
                      ondragend="window.app.handleTimetableCardDragEnd(event)">
                   
                   <!-- 카드 상단: 상태 기호 + 과목명 + 삭제 버튼 -->
-                  <div class="flex items-center justify-between gap-1 mb-1">
+                  <div class="flex items-center justify-between gap-1 mb-1 pointer-events-auto">
                     <div class="flex items-center gap-1 min-w-0">
                       <!-- 상태 토글 버튼 (확정 -> 조정 -> 폐강) -->
                       <button type="button" 
-                              onclick="event.stopPropagation(); window.app.toggleCourseScheduleStatus('${subject}', '${schedule.id || (day.id + '_' + period.id)}')"
+                              onclick="event.stopPropagation(); window.app.toggleCourseScheduleStatus('${safeSub}', '${schedule.id || (day.id + '_' + period.id)}')"
                               class="hover:scale-110 transition shrink-0" title="클릭하여 상태 전환 (🟢확정 -> ▲조정 -> ✖️폐강)">
                         ${symHtml}
                       </button>
@@ -2073,16 +2080,16 @@ class TimetableApp {
 
                     <!-- 이 시간표 셀에서만 삭제 -->
                     <button type="button" 
-                            onclick="event.stopPropagation(); window.app.handleRemoveCourseScheduleSlot('${subject}', '${schedule.id || (day.id + '_' + period.id)}')"
+                            onclick="event.stopPropagation(); window.app.handleRemoveCourseScheduleSlot('${safeSub}', '${schedule.id || (day.id + '_' + period.id)}')"
                             class="text-slate-400 hover:text-red-600 font-bold px-1 transition" title="이 시간 배치 취소">
                       &times;
                     </button>
                   </div>
 
                   <!-- 카드 하단: 학생 명단 칩 & 명단 팝업 버튼 -->
-                  <div class="flex items-center justify-between text-[11px]">
+                  <div class="flex items-center justify-between text-[11px] pointer-events-auto">
                     <button type="button" 
-                            onclick="event.stopPropagation(); window.app.openCourseRosterModal('${subject}', '${day.id}', '${period.id}')"
+                            onclick="event.stopPropagation(); window.app.openCourseRosterModal('${safeSub}', '${day.id}', '${period.id}')"
                             class="text-slate-700 hover:text-blue-700 font-semibold truncate hover:underline flex items-center gap-1"
                             title="전체 수강 학생 명단 보기">
                       <i data-lucide="users" class="w-3 h-3 text-slate-500"></i>
@@ -2125,8 +2132,11 @@ class TimetableApp {
       isCtrlCopy: isCopy
     };
 
-    e.dataTransfer.setData('text/plain', JSON.stringify(this.dragData));
-    e.dataTransfer.effectAllowed = isCopy ? 'copy' : 'copyMove';
+    try {
+      e.dataTransfer.setData('text/plain', JSON.stringify(this.dragData));
+      e.dataTransfer.setData('application/json', JSON.stringify(this.dragData));
+    } catch (err) {}
+    e.dataTransfer.effectAllowed = 'copyMove';
     e.currentTarget.classList.add('is-dragging');
 
     if (isCopy) {
@@ -2137,16 +2147,17 @@ class TimetableApp {
 
   handleTimetableCardDragEnd(e) {
     this.dragData = null;
-    e.currentTarget.classList.remove('is-dragging');
+    if (e.currentTarget) e.currentTarget.classList.remove('is-dragging');
     document.querySelectorAll('.timetable-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
   }
 
   handleTimetableCellDragOver(e) {
     e.preventDefault();
-    const isCopy = e.ctrlKey || e.metaKey || this.isCtrlPressed || (this.dragData && this.dragData.isCtrlCopy);
+    const isPalette = this.dragData && this.dragData.type === 'palette-subject';
+    const isCopy = isPalette || e.ctrlKey || e.metaKey || this.isCtrlPressed || (this.dragData && this.dragData.isCtrlCopy);
     e.dataTransfer.dropEffect = isCopy ? 'copy' : 'move';
     const cell = e.currentTarget;
-    if (!cell.classList.contains('drag-over')) {
+    if (cell && !cell.classList.contains('drag-over')) {
       cell.classList.add('drag-over');
     }
   }
@@ -2157,28 +2168,32 @@ class TimetableApp {
 
   handleTimetableCellDrop(e, targetDay, targetPeriodId) {
     e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
+    if (e.currentTarget) e.currentTarget.classList.remove('drag-over');
+    document.querySelectorAll('.timetable-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
 
     let data = this.dragData;
     if (!data) {
       try {
-        const raw = e.dataTransfer.getData('text/plain');
+        const raw = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('application/json');
         if (raw) data = JSON.parse(raw);
       } catch (err) {}
     }
 
     if (!data) return;
 
-    const isCopyMode = e.ctrlKey || e.metaKey || this.isCtrlPressed || data.isCtrlCopy;
+    const isCopyMode = (data.type === 'palette-subject') || e.ctrlKey || e.metaKey || this.isCtrlPressed || data.isCtrlCopy;
     const targetPeriod = this.periods.find(p => p.id === targetPeriodId);
     const dayName = ExcelService.dayIdToName(targetDay);
-    const periodName = targetPeriod ? targetPeriod.name : '';
+    const periodName = targetPeriod ? targetPeriod.name : `${targetPeriodId}교시`;
 
     // 1. 좌측 과목 팔레트에서 새 과목을 끌고 온 경우
     if (data.type === 'palette-subject') {
-      this.addCourseSchedule(data.subjectName, targetDay, targetPeriodId, 'confirmed');
-      const studentCount = (this.courseEnrollments[data.subjectName] || []).length;
-      this.showToast(`'${data.subjectName}' 과목 (학생 ${studentCount}명)이 ${dayName} ${periodName}에 배치되었습니다.`);
+      const added = this.addCourseSchedule(data.subjectName, targetDay, targetPeriodId, 'confirmed');
+      if (added) {
+        const studentCount = (this.courseEnrollments[data.subjectName] || []).length;
+        this.showToast(`'${data.subjectName}' 과목 (학생 ${studentCount}명)이 ${dayName} ${periodName}에 배치되었습니다.`);
+      }
+      this.dragData = null;
       return;
     }
 
@@ -2188,18 +2203,22 @@ class TimetableApp {
 
       // 같은 위치로 드롭한 경우 무시
       if (fromDay === targetDay && fromPeriodId === targetPeriodId) {
+        this.dragData = null;
         return;
       }
 
       if (isCopyMode) {
         // [복사 (Copy)]: 기존 슬롯은 유지하고 새 슬롯 추가!
-        this.addCourseSchedule(subjectName, targetDay, targetPeriodId, 'confirmed');
-        this.showToast(`[복사 완료] '${subjectName}' 과목이 ${dayName} ${periodName}에 추가 배치되었습니다.`);
+        const added = this.addCourseSchedule(subjectName, targetDay, targetPeriodId, 'confirmed');
+        if (added) {
+          this.showToast(`[복사 완료] '${subjectName}' 과목이 ${dayName} ${periodName}에 추가 배치되었습니다.`);
+        }
       } else {
         // [이동 (Move)]: 기존 위치 슬롯을 새 위치로 변경!
         this.moveCourseSchedule(subjectName, fromDay, fromPeriodId, targetDay, targetPeriodId);
         this.showToast(`'${subjectName}' 과목이 ${dayName} ${periodName}으로 이동되었습니다.`);
       }
+      this.dragData = null;
     }
   }
 
@@ -2208,26 +2227,43 @@ class TimetableApp {
     const periodObj = this.periods.find(p => p.id === periodId);
 
     // 중복 체크
-    const exists = this.courseSchedules[subjectName].some(sch => sch.day === day && sch.periodId === periodId);
-    if (!exists) {
-      this.courseSchedules[subjectName].push({
-        id: `sch_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-        day: day,
-        periodId: periodId,
-        period: periodObj ? periodObj.period : null,
-        status: status
-      });
-      this.rebuildStudentAssignments();
-      this.saveState();
-      this.render();
+    const exists = this.courseSchedules[subjectName].some(sch => 
+      sch.day === day && (sch.periodId === periodId || (!sch.periodId && sch.period === (periodObj ? periodObj.period : null)))
+    );
+    if (exists) {
+      this.showToast(`'${subjectName}' 과목은 이미 해당 교시에 배치되어 있습니다.`);
+      return false;
     }
+
+    this.courseSchedules[subjectName].push({
+      id: `sch_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+      day: day,
+      periodId: periodId,
+      period: periodObj ? periodObj.period : null,
+      status: status
+    });
+    this.rebuildStudentAssignments();
+    this.saveState();
+    this.render();
+    return true;
   }
 
   moveCourseSchedule(subjectName, fromDay, fromPeriodId, toDay, toPeriodId) {
     if (!this.courseSchedules[subjectName]) return;
     const periodObj = this.periods.find(p => p.id === toPeriodId);
 
-    const slot = this.courseSchedules[subjectName].find(sch => sch.day === fromDay && sch.periodId === fromPeriodId);
+    // 대상 위치에 이미 동일 과목이 있는지 확인
+    const exists = this.courseSchedules[subjectName].some(sch => 
+      sch.day === toDay && (sch.periodId === toPeriodId || (!sch.periodId && sch.period === (periodObj ? periodObj.period : null)))
+    );
+    if (exists) {
+      this.showToast(`'${subjectName}' 과목은 이미 해당 교시에 배치되어 있습니다.`);
+      return false;
+    }
+
+    const slot = this.courseSchedules[subjectName].find(sch => 
+      sch.day === fromDay && (sch.periodId === fromPeriodId || (!sch.periodId && sch.period === (this.periods.find(p => p.id === fromPeriodId)?.period)))
+    );
     if (slot) {
       slot.day = toDay;
       slot.periodId = toPeriodId;
@@ -2235,7 +2271,9 @@ class TimetableApp {
       this.rebuildStudentAssignments();
       this.saveState();
       this.render();
+      return true;
     }
+    return false;
   }
 
   handleRemoveCourseScheduleSlot(subjectName, scheduleId) {
