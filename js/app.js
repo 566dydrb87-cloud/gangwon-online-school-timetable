@@ -1708,7 +1708,11 @@ class TimetableApp {
       const safeSub = encodeURIComponent(sub);
 
       html += `
-        <div id="bucket-card-${safeSub}" class="bucket-card w-full shrink-0 bg-white rounded-2xl border-2 border-slate-200/90 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36">
+        <div id="bucket-card-${safeSub}" 
+             class="bucket-card w-full shrink-0 bg-white rounded-2xl border-2 border-slate-200/90 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36"
+             ondragover="window.app.handleBucketDragOver(event)"
+             ondragleave="window.app.handleBucketDragLeave(event)"
+             ondrop="window.app.handleBucketDrop(event, decodeURIComponent('${safeSub}'))">
           
           <!-- 바구니 상단 헤더 -->
           <div class="p-4 border-b flex items-center justify-between shrink-0"
@@ -1718,7 +1722,7 @@ class TimetableApp {
                     style="background-color: ${color.text}; border-color: ${color.border};"></span>
               <h3 class="font-black text-base" style="color: ${color.text};">${sub}</h3>
               <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/90 border text-slate-800 shadow-2xs">
-                ${studentIds.length}명 편제
+                ${studentIds.length}명 수강
               </span>
             </div>
 
@@ -1741,36 +1745,25 @@ class TimetableApp {
             </div>
           </div>
 
-          <!-- 바구니 본문 (2배 커진 여유로운 영역) -->
-          <div class="p-5 flex flex-col gap-4">
+          <!-- 바구니 본문: 수강생 명단 & 시간표 설정 (드래그 영역 박스 제거) -->
+          <div class="p-4 sm:p-5 flex flex-col gap-4">
             
-            <!-- 드롭존 (학생을 여기로 드래그 앤 드롭) -->
-            <div class="bucket-drop-zone py-7 px-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer min-h-[110px]"
-                 ondragover="window.app.handleBucketDragOver(event)"
-                 ondragleave="window.app.handleBucketDragLeave(event)"
-                 ondrop="window.app.handleBucketDrop(event, decodeURIComponent('${safeSub}'))">
-              <div class="flex items-center gap-2 text-blue-700 font-black text-sm">
-                <i data-lucide="user-plus" class="w-6 h-6 text-blue-600"></i>
-                <span>학생을 이 영역으로 드래그하여 편제 (Drop)</span>
-              </div>
-              <span class="text-xs text-blue-600/80 font-medium">좌측 학생 명단에서 카드를 끌어다 놓으세요 (복수 선택 일괄 드롭 지원)</span>
-            </div>
-
-            <!-- 편제된 학생 태그/칩 목록 (2배 넓어진 컨테이너) -->
+            <!-- 편제된 학생 명단 칩 목록 -->
             <div>
-              <div class="flex items-center justify-between text-xs font-bold text-slate-800 mb-2">
+              <div class="flex items-center justify-between text-xs font-bold text-slate-800 mb-2.5">
                 <span class="flex items-center gap-1.5">
                   <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
-                  <span>편제된 수강생 목록 (${studentIds.length}명)</span>
+                  <span>수강 학생 명단 (${studentIds.length}명)</span>
                 </span>
                 ${studentIds.length > 0 ? `
-                  <button type="button" onclick="window.app.handleClearBucketStudents(decodeURIComponent('${safeSub}'))" class="text-xs text-slate-400 hover:text-red-600 font-medium transition">
-                    전체 비우기
+                  <button type="button" onclick="window.app.handleClearBucketStudents(decodeURIComponent('${safeSub}'))" class="text-xs text-slate-400 hover:text-red-600 font-medium transition flex items-center gap-1">
+                    <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                    <span>전체 비우기</span>
                   </button>
                 ` : ''}
               </div>
 
-              <div class="flex flex-wrap content-start gap-2 min-h-[130px] max-h-72 overflow-y-auto p-3 bg-slate-50/90 rounded-xl border border-slate-200">
+              <div class="flex flex-wrap content-start gap-2 min-h-[64px] max-h-72 overflow-y-auto p-3.5 bg-slate-50/90 rounded-xl border border-slate-200">
                 ${studentIds.length > 0 ? studentIds.map(stId => {
                   const m = masterMap.get(stId);
                   if (!m) return '';
@@ -1781,13 +1774,13 @@ class TimetableApp {
                       <span class="font-bold text-slate-900">${m.name}</span>
                       <button type="button" 
                               onclick="window.app.handleRemoveStudentFromCourse(decodeURIComponent('${safeSub}'), '${m.id}')" 
-                              class="text-slate-400 hover:text-red-600 ml-1 text-sm font-bold" title="편제 제외">&times;</button>
+                              class="text-slate-400 hover:text-red-600 ml-1 text-sm font-bold leading-none" title="수강 제외">&times;</button>
                     </span>
                   `;
                 }).join('') : `
-                  <div class="text-xs text-slate-400 p-6 flex flex-col items-center justify-center w-full gap-1">
-                    <i data-lucide="user-x" class="w-6 h-6 opacity-30"></i>
-                    <span>아직 편제된 학생이 없습니다. 상단 드롭존으로 학생을 드래그하세요.</span>
+                  <div class="text-xs text-slate-400 py-3 px-4 flex items-center justify-center w-full gap-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4 text-indigo-400"></i>
+                    <span>좌측 <strong>과목 목록</strong>으로 학생 카드를 드래그하여 편제하세요.</span>
                   </div>
                 `}
               </div>
