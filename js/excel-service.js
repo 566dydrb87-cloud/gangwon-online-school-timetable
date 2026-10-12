@@ -311,9 +311,10 @@ const ExcelService = {
   },
 
   // 5. 결괏값 형태 1: 학급 시간표 형태 (파스텔톤 디자인 멀티시트 엑셀)
-  async exportTimetableExcel(periods, days, students, subjectColorMap, academicYear = '2026', schoolName = '강원온라인학교') {
+  async exportTimetableExcel(periods, days, students, subjectColorMap, academicYear = '2026', semester = '1', schoolName = '강원온라인학교') {
     const workbook = new ExcelJS.Workbook();
-    const yearLabel = academicYear ? `${academicYear}학년도` : '';
+    const yearLabel = `${academicYear}학년도 ${semester}학기`;
+    const filePrefix = `${academicYear}학년도_${semester}학기_${schoolName}`;
     workbook.creator = `${schoolName} 시간표 시스템`;
 
     // 5-1. 종합 시간표 시트 생성
@@ -350,7 +351,7 @@ const ExcelService = {
     }
 
     const buffer = await workbook.xlsx.writeBuffer();
-    this.saveFile(buffer, `${yearLabel}_${schoolName}_학급_시간표_${this.getTimestamp()}.xlsx`);
+    this.saveFile(buffer, `${filePrefix}_학급_시간표_${this.getTimestamp()}.xlsx`);
   },
 
   // 개별 시간표 시트 디자인 생성 헬퍼
@@ -495,11 +496,12 @@ const ExcelService = {
   },
 
   // 6. 결괏값 형태 2: 엑셀데이터 형태 (원천 데이터 테이블)
-  async exportDataExcel(students, periods, days, academicYear = '2026', schoolName = '강원온라인학교') {
+  async exportDataExcel(students, periods, days, academicYear = '2026', semester = '1', schoolName = '강원온라인학교') {
     const workbook = new ExcelJS.Workbook();
-    const yearLabel = academicYear ? `${academicYear}학년도` : '';
+    const yearLabel = `${academicYear}학년도 ${semester}학기`;
+    const filePrefix = `${academicYear}학년도_${semester}학기_${schoolName}`;
     workbook.creator = `${schoolName} 시간표 시스템`;
-    const worksheet = workbook.addWorksheet(`${yearLabel}_수강배정_원천데이터`.trim(), { views: [{ showGridLines: true }] });
+    const worksheet = workbook.addWorksheet(`${academicYear}학년도_${semester}학기_원천데이터`, { views: [{ showGridLines: true }] });
 
     worksheet.columns = [
       { header: '순번', key: 'index', width: 8 },
@@ -581,7 +583,7 @@ const ExcelService = {
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
-    this.saveFile(buffer, `${yearLabel}_${schoolName}_수강데이터_원천목록_${this.getTimestamp()}.xlsx`.replace(/^_/, ''));
+    this.saveFile(buffer, `${filePrefix}_수강데이터_원천목록_${this.getTimestamp()}.xlsx`);
   },
 
   applyBorder(cell) {

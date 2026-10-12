@@ -124,7 +124,216 @@
           "isWeekend": true
         }
       ],
-      "students": [],
+      "students": [
+        {
+          "id": "s_1791802064312_208",
+          "grade": 2,
+          "classNum": 1,
+          "studentNum": 1,
+          "studentCode": "20101",
+          "name": "김소민",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804426894_496",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 13,
+          "studentCode": "10113",
+          "name": "윤지우",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804436474_561",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 17,
+          "studentCode": "10117",
+          "name": "정수민",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804444826_626",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 15,
+          "studentCode": "10115",
+          "name": "장시우",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804475930_900",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 8,
+          "studentCode": "10108",
+          "name": "박은비",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804484091_85",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 5,
+          "studentCode": "10105",
+          "name": "김민진",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804544843_365",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 9,
+          "studentCode": "10109",
+          "name": "박재윤",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804557698_453",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 6,
+          "studentCode": "10106",
+          "name": "김승준",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804581563_516",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 20,
+          "studentCode": "10120",
+          "name": "최리",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804609498_847",
+          "grade": 1,
+          "classNum": 1,
+          "studentNum": 21,
+          "studentCode": "10121",
+          "name": "최현서",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804627003_977",
+          "grade": 1,
+          "classNum": 2,
+          "studentNum": 21,
+          "studentCode": "10221",
+          "name": "현표",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804635834_719",
+          "grade": 1,
+          "classNum": 2,
+          "studentNum": 22,
+          "studentCode": "10222",
+          "name": "홍준서",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804645090_76",
+          "grade": 1,
+          "classNum": 2,
+          "studentNum": 13,
+          "studentCode": "10213",
+          "name": "이성준",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804674788_154",
+          "grade": 1,
+          "classNum": 2,
+          "studentNum": 15,
+          "studentCode": "10215",
+          "name": "이지효",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804747610_75",
+          "grade": 2,
+          "classNum": 1,
+          "studentNum": 5,
+          "studentCode": "20105",
+          "name": "김승찬",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        },
+        {
+          "id": "s_1791804756707_289",
+          "grade": 2,
+          "classNum": 1,
+          "studentNum": 6,
+          "studentCode": "20106",
+          "name": "김예빈",
+          "subject": "",
+          "day": null,
+          "period": null,
+          "periodId": null,
+          "status": "confirmed"
+        }
+      ],
       "offeredSubjects": [
         "세포와 물질대사",
         "물질과 에너지"
@@ -272,7 +481,29 @@
         "빅데이터 분석",
         "프로그래밍"
       ],
-      "subjectColorMap": {},
+      "subjectColorMap": {
+        "인공지능": {
+          "bg": "#E0F2FE",
+          "text": "#0369A1",
+          "border": "#BAE6FD",
+          "excelBg": "E0F2FE",
+          "excelText": "0369A1"
+        },
+        "빅데이터 분석": {
+          "bg": "#D1FAE5",
+          "text": "#047857",
+          "border": "#A7F3D0",
+          "excelBg": "D1FAE5",
+          "excelText": "047857"
+        },
+        "프로그래밍": {
+          "bg": "#EDE9FE",
+          "text": "#6D28D9",
+          "border": "#DDD6FE",
+          "excelBg": "EDE9FE",
+          "excelText": "6D28D9"
+        }
+      },
       "showWeekends": true
     }
   },
@@ -394,7 +625,216 @@
       "isWeekend": true
     }
   ],
-  "students": [],
+  "students": [
+    {
+      "id": "s_1791802064312_208",
+      "grade": 2,
+      "classNum": 1,
+      "studentNum": 1,
+      "studentCode": "20101",
+      "name": "김소민",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804426894_496",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 13,
+      "studentCode": "10113",
+      "name": "윤지우",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804436474_561",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 17,
+      "studentCode": "10117",
+      "name": "정수민",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804444826_626",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 15,
+      "studentCode": "10115",
+      "name": "장시우",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804475930_900",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 8,
+      "studentCode": "10108",
+      "name": "박은비",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804484091_85",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 5,
+      "studentCode": "10105",
+      "name": "김민진",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804544843_365",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 9,
+      "studentCode": "10109",
+      "name": "박재윤",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804557698_453",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 6,
+      "studentCode": "10106",
+      "name": "김승준",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804581563_516",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 20,
+      "studentCode": "10120",
+      "name": "최리",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804609498_847",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 21,
+      "studentCode": "10121",
+      "name": "최현서",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804627003_977",
+      "grade": 1,
+      "classNum": 2,
+      "studentNum": 21,
+      "studentCode": "10221",
+      "name": "현표",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804635834_719",
+      "grade": 1,
+      "classNum": 2,
+      "studentNum": 22,
+      "studentCode": "10222",
+      "name": "홍준서",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804645090_76",
+      "grade": 1,
+      "classNum": 2,
+      "studentNum": 13,
+      "studentCode": "10213",
+      "name": "이성준",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804674788_154",
+      "grade": 1,
+      "classNum": 2,
+      "studentNum": 15,
+      "studentCode": "10215",
+      "name": "이지효",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804747610_75",
+      "grade": 2,
+      "classNum": 1,
+      "studentNum": 5,
+      "studentCode": "20105",
+      "name": "김승찬",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "s_1791804756707_289",
+      "grade": 2,
+      "classNum": 1,
+      "studentNum": 6,
+      "studentCode": "20106",
+      "name": "김예빈",
+      "subject": "",
+      "day": null,
+      "period": null,
+      "periodId": null,
+      "status": "confirmed"
+    }
+  ],
   "offeredSubjects": [
     "세포와 물질대사",
     "물질과 에너지"
@@ -416,5 +856,5 @@
     }
   },
   "showWeekends": true,
-  "lastUpdated": "2026-10-12T10:28:06.797Z"
+  "lastUpdated": "2026-10-12T11:32:36.713Z"
 }
