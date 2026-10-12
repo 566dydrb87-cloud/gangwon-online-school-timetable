@@ -346,6 +346,7 @@
           "게임 프로그래밍": [],
           "국제 경제": []
         },
+        "courseStatus": {},
         "students": [
           {
             "id": "assign_행성우주과학_sch_1791806993954_paluc4_s_1791806694369_3",
@@ -1030,14 +1031,6 @@
             "name": "김승준"
           },
           {
-            "id": "sm_1791807771363_nl3iuu",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 20,
-            "studentCode": "10120",
-            "name": "최리"
-          },
-          {
             "id": "sm_1791807862451_4sbs1m",
             "grade": 1,
             "classNum": 1,
@@ -1060,13 +1053,22 @@
             "studentNum": 15,
             "studentCode": "10215",
             "name": "이지효"
+          },
+          {
+            "id": "sm_1791809590548_nnu3d2",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 21,
+            "studentCode": "10221",
+            "name": "현표"
           }
         ],
         "courseEnrollments": {
           "화학 반응의 세계": [
             "sm_1791807241988_qhetnx",
             "sm_1791807394378_wuovxn",
-            "sm_1791807628138_6expsa"
+            "sm_1791807628138_6expsa",
+            "sm_1791808761853_rkjww6"
           ],
           "인공지능 기초": [
             "sm_1791807615364_rm3wdg",
@@ -1084,6 +1086,9 @@
           "고급 생명과학": [
             "sm_1791807394378_wuovxn",
             "sm_1791808761853_rkjww6"
+          ],
+          "고급 지구과학": [
+            "sm_1791809590548_nnu3d2"
           ]
         },
         "courseSchedules": {
@@ -1113,7 +1118,11 @@
           ],
           "문예 창작의 이해": [],
           "문학 감상과 비평": [],
-          "고급 생명과학": []
+          "고급 생명과학": [],
+          "고급 지구과학": []
+        },
+        "courseStatus": {
+          "문예 창작의 이해": "open"
         },
         "students": [
           {
@@ -1152,6 +1161,20 @@
             "studentNum": 5,
             "studentCode": "10105",
             "name": "김승준",
+            "subject": "화학 반응의 세계",
+            "day": null,
+            "periodId": null,
+            "period": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "assign_화학 반응의 세계_unassigned_sm_1791808761853_rkjww6",
+            "studentMasterId": "sm_1791808761853_rkjww6",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 22,
+            "studentCode": "10222",
+            "name": "홍준서",
             "subject": "화학 반응의 세계",
             "day": null,
             "periodId": null,
@@ -1409,14 +1432,14 @@
             "status": "confirmed"
           },
           {
-            "id": "master_pure_sm_1791807771363_nl3iuu",
-            "studentMasterId": "sm_1791807771363_nl3iuu",
+            "id": "assign_고급 지구과학_unassigned_sm_1791809590548_nnu3d2",
+            "studentMasterId": "sm_1791809590548_nnu3d2",
             "grade": 1,
-            "classNum": 1,
-            "studentNum": 20,
-            "studentCode": "10120",
-            "name": "최리",
-            "subject": "",
+            "classNum": 2,
+            "studentNum": 21,
+            "studentCode": "10221",
+            "name": "현표",
+            "subject": "고급 지구과학",
             "day": null,
             "periodId": null,
             "period": null,
@@ -1428,7 +1451,8 @@
           "인공지능 기초",
           "문예 창작의 이해",
           "문학 감상과 비평",
-          "고급 생명과학"
+          "고급 생명과학",
+          "고급 지구과학"
         ],
         "subjectColorMap": {
           "인공지능": {
@@ -1495,6 +1519,13 @@
             "excelText": "B45309"
           },
           "고급 생명과학": {
+            "bg": "#FFEDD5",
+            "text": "#C2410C",
+            "border": "#FED7AA",
+            "excelBg": "FFEDD5",
+            "excelText": "C2410C"
+          },
+          "고급 지구과학": {
             "bg": "#FFEDD5",
             "text": "#C2410C",
             "border": "#FED7AA",
@@ -2666,5 +2697,5 @@
     }
   },
   "showWeekends": true,
-  "lastUpdated": "2026-10-12T12:48:36.789Z"
+  "lastUpdated": "2026-10-12T12:55:24.327Z"
 }

@@ -1655,22 +1655,26 @@ class TimetableApp {
   }
 
   // ==========================================
-  // 과목 개설 / 폐강 상태 관리
+  // 과목 상태 관리 (개설 / 조정 / 폐강)
   // ==========================================
   getSubjectStatus(subjectName) {
     if (!this.courseStatus) this.courseStatus = {};
     return this.courseStatus[subjectName] || 'open';
   }
 
-  toggleSubjectStatus(subjectName) {
+  cycleSubjectStatus(subjectName) {
     if (!this.courseStatus) this.courseStatus = {};
     const current = this.getSubjectStatus(subjectName);
-    const next = current === 'closed' ? 'open' : 'closed';
+    let next = 'open';
+    if (current === 'open') next = 'adjust';
+    else if (current === 'adjust') next = 'closed';
+    else next = 'open';
+
     this.courseStatus[subjectName] = next;
     this.saveState();
     this.render();
-    const label = next === 'open' ? '개설' : '폐강';
-    this.showToast(`'${subjectName}' 과목이 [${label}] 상태로 변경되었습니다.`);
+    const labels = { open: '개설', adjust: '조정', closed: '폐강' };
+    this.showToast(`'${subjectName}' 과목이 [${labels[next]}] 상태로 변경되었습니다.`);
   }
 
   setSubjectStatus(subjectName, status) {
@@ -1678,8 +1682,8 @@ class TimetableApp {
     this.courseStatus[subjectName] = status;
     this.saveState();
     this.render();
-    const label = status === 'open' ? '개설' : (status === 'closed' ? '폐강' : '대기');
-    this.showToast(`'${subjectName}' 과목이 [${label}] 상태로 설정되었습니다.`);
+    const labels = { open: '개설', adjust: '조정', closed: '폐강' };
+    this.showToast(`'${subjectName}' 과목이 [${labels[status] || status}] 상태로 설정되었습니다.`);
   }
 
   renderSubjectBuckets() {
@@ -1691,7 +1695,7 @@ class TimetableApp {
       sideCountBadge.textContent = `${this.offeredSubjects.length}개`;
     }
 
-    // [좌측]: 세로 과목 목록 렌더링 (과목명, 인원수, 개설/폐강 상태 배지 표시 및 클릭 스크롤)
+    // [좌측]: 세로 과목 목록 렌더링 (과목명, 인원수, 개설/조정/폐강 상태 배지 표시 및 클릭 스크롤)
     if (sideListContainer) {
       if (this.offeredSubjects.length === 0) {
         sideListContainer.innerHTML = `
@@ -1708,13 +1712,31 @@ class TimetableApp {
           const status = this.getSubjectStatus(sub);
           const isSelected = this.activeSelectedSubject === sub;
 
+          // 상태별 배지 스타일 및 텍스트
+          let statusBadgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400';
+          let statusSymbol = '🟢';
+          let statusLabel = '개설';
+          let itemStyleClass = 'border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/40';
+
+          if (status === 'adjust') {
+            statusBadgeClass = 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100 hover:border-amber-400';
+            statusSymbol = '▲';
+            statusLabel = '조정';
+            itemStyleClass = 'border-amber-200 bg-amber-50/30 hover:border-amber-400 hover:bg-amber-50/60';
+          } else if (status === 'closed') {
+            statusBadgeClass = 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100 hover:border-rose-400';
+            statusSymbol = '✖️';
+            statusLabel = '폐강';
+            itemStyleClass = 'border-slate-300 bg-slate-100/90 text-slate-400';
+          }
+
+          if (isSelected) {
+            itemStyleClass += ' ring-2 ring-indigo-300 border-indigo-500';
+          }
+
           return `
             <div id="side-item-${safeSub}"
-                 class="side-subject-item group flex items-center justify-between gap-1.5 px-2.5 py-2 rounded-xl border transition-all cursor-pointer shadow-2xs ${
-                   status === 'closed' 
-                     ? 'border-slate-300 bg-slate-100/90 text-slate-400' 
-                     : (isSelected ? 'border-indigo-500 bg-indigo-50/80 ring-2 ring-indigo-200' : 'border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/40')
-                 }"
+                 class="side-subject-item group flex items-center justify-between gap-1.5 px-2.5 py-2 rounded-xl border transition-all cursor-pointer shadow-2xs ${itemStyleClass}"
                  draggable="false"
                  onclick="window.app.scrollToBucket(decodeURIComponent('${safeSub}'))"
                  ondragover="window.app.handleBucketDragOver(event)"
@@ -1723,7 +1745,7 @@ class TimetableApp {
                  title="클릭하여 해당 과목 바구니로 이동 / 학생을 여기에 드롭하여 편제">
               <div class="flex items-center gap-1.5 min-w-0">
                 <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" 
-                      style="background-color: ${status === 'closed' ? '#94A3B8' : color.text};"></span>
+                      style="background-color: ${status === 'closed' ? '#94A3B8' : (status === 'adjust' ? '#F59E0B' : color.text)};"></span>
                 <span class="text-xs font-bold whitespace-nowrap truncate ${status === 'closed' ? 'line-through text-slate-400' : 'text-slate-800 group-hover:text-indigo-900'}">
                   ${sub}
                 </span>
@@ -1732,22 +1754,18 @@ class TimetableApp {
               <div class="flex items-center gap-1 shrink-0">
                 <!-- 인원수 배지 -->
                 <span class="text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-2xs ${
-                  status === 'closed' ? 'bg-slate-200 text-slate-500' : (count > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-400')
+                  status === 'closed' ? 'bg-slate-200 text-slate-500' : (status === 'adjust' ? 'bg-amber-100 text-amber-800' : (count > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-400'))
                 }">
                   (${count}명)
                 </span>
 
-                <!-- 개설 / 폐강 상태 토글 배지 버튼 -->
+                <!-- 개설 / 조정 / 폐강 3단 순환 토글 배지 버튼 -->
                 <button type="button" 
-                        onclick="event.stopPropagation(); window.app.toggleSubjectStatus(decodeURIComponent('${safeSub}'))"
-                        class="px-1.5 py-0.5 text-[10px] font-black rounded border transition-all shadow-2xs flex items-center gap-0.5 ${
-                          status === 'open' 
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400' 
-                            : 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100 hover:border-rose-400'
-                        }"
-                        title="클릭 시 '${status === 'open' ? '폐강' : '개설'}'(으)로 상태 변경">
-                  <span class="w-1.5 h-1.5 rounded-full ${status === 'open' ? 'bg-emerald-500' : 'bg-rose-500'}"></span>
-                  <span>${status === 'open' ? '개설' : '폐강'}</span>
+                        onclick="event.stopPropagation(); window.app.cycleSubjectStatus(decodeURIComponent('${safeSub}'))"
+                        class="px-1.5 py-0.5 text-[10px] font-black rounded border transition-all shadow-2xs flex items-center gap-0.5 ${statusBadgeClass}"
+                        title="클릭하여 상태 순환 (개설 ➔ 조정 ➔ 폐강 ➔ 개설)">
+                  <span class="text-[9px]">${statusSymbol}</span>
+                  <span>${statusLabel}</span>
                 </button>
               </div>
             </div>
@@ -1782,38 +1800,71 @@ class TimetableApp {
       const safeSub = encodeURIComponent(sub);
       const status = this.getSubjectStatus(sub);
 
+      let cardBorder = 'border-slate-200/90';
+      let headerBg = color.bg;
+      let headerBorder = color.border;
+
+      if (status === 'adjust') {
+        cardBorder = 'border-amber-300 border-dashed';
+        headerBg = '#FEF3C7';
+        headerBorder = '#FDE68A';
+      } else if (status === 'closed') {
+        cardBorder = 'border-slate-300 opacity-90';
+        headerBg = '#F1F5F9';
+        headerBorder = '#CBD5E1';
+      }
+
       html += `
         <div id="bucket-card-${safeSub}" 
-             class="bucket-card w-full shrink-0 bg-white rounded-2xl border-2 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36 ${
-               status === 'closed' ? 'border-slate-300 opacity-90' : 'border-slate-200/90'
-             }"
+             class="bucket-card w-full shrink-0 bg-white rounded-2xl border-2 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36 ${cardBorder}"
              ondragover="window.app.handleBucketDragOver(event)"
              ondragleave="window.app.handleBucketDragLeave(event)"
              ondrop="window.app.handleBucketDrop(event, decodeURIComponent('${safeSub}'))">
           
           <!-- 바구니 상단 헤더 -->
           <div class="p-4 border-b flex items-center justify-between shrink-0"
-               style="background-color: ${status === 'closed' ? '#F1F5F9' : color.bg}; border-color: ${status === 'closed' ? '#CBD5E1' : color.border};">
+               style="background-color: ${headerBg}; border-color: ${headerBorder};">
             <div class="flex items-center gap-2.5 flex-wrap">
               <span class="w-4 h-4 rounded-full border shadow-2xs" 
-                    style="background-color: ${status === 'closed' ? '#94A3B8' : color.text}; border-color: ${color.border};"></span>
+                    style="background-color: ${status === 'closed' ? '#94A3B8' : (status === 'adjust' ? '#F59E0B' : color.text)}; border-color: ${headerBorder};"></span>
               <h3 class="font-black text-base ${status === 'closed' ? 'line-through text-slate-500' : ''}" style="color: ${status === 'closed' ? '#64748B' : color.text};">${sub}</h3>
               <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/90 border text-slate-800 shadow-2xs">
                 ${studentIds.length}명 수강
               </span>
 
-              <!-- 개설 / 폐강 상태 토글 버튼 (우측 카드에서도 바로 변경 가능) -->
-              <button type="button" 
-                      onclick="window.app.toggleSubjectStatus(decodeURIComponent('${safeSub}'))"
-                      class="px-2.5 py-0.5 text-xs font-black rounded-lg border transition-all shadow-2xs flex items-center gap-1.5 ${
-                        status === 'open'
-                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200'
-                          : 'bg-rose-100 text-rose-800 border-rose-300 hover:bg-rose-200'
-                      }"
-                      title="클릭하여 개설/폐강 상태 전환">
-                <span class="w-2 h-2 rounded-full ${status === 'open' ? 'bg-emerald-600' : 'bg-rose-600'}"></span>
-                <span>${status === 'open' ? '개설 상태' : '폐강 상태'}</span>
-              </button>
+              <!-- [개설 / 조정 / 폐강] 3단 선택 버튼 그룹 (직관적인 원클릭 변경) -->
+              <div class="inline-flex p-0.5 rounded-lg bg-white/90 border border-slate-200 shadow-2xs gap-0.5 text-xs font-bold ml-1">
+                <button type="button" 
+                        onclick="window.app.setSubjectStatus(decodeURIComponent('${safeSub}'), 'open')" 
+                        class="px-2 py-0.5 rounded-md transition flex items-center gap-1 ${
+                          status === 'open' 
+                            ? 'bg-emerald-600 text-white shadow-2xs' 
+                            : 'text-slate-600 hover:bg-slate-100'
+                        }"
+                        title="개설 상태로 설정">
+                  <span>🟢</span><span>개설</span>
+                </button>
+                <button type="button" 
+                        onclick="window.app.setSubjectStatus(decodeURIComponent('${safeSub}'), 'adjust')" 
+                        class="px-2 py-0.5 rounded-md transition flex items-center gap-1 ${
+                          status === 'adjust' 
+                            ? 'bg-amber-500 text-white shadow-2xs' 
+                            : 'text-slate-600 hover:bg-slate-100'
+                        }"
+                        title="조정 상태로 설정">
+                  <span>▲</span><span>조정</span>
+                </button>
+                <button type="button" 
+                        onclick="window.app.setSubjectStatus(decodeURIComponent('${safeSub}'), 'closed')" 
+                        class="px-2 py-0.5 rounded-md transition flex items-center gap-1 ${
+                          status === 'closed' 
+                            ? 'bg-rose-600 text-white shadow-2xs' 
+                            : 'text-slate-600 hover:bg-slate-100'
+                        }"
+                        title="폐강 상태로 설정">
+                  <span>✖️</span><span>폐강</span>
+                </button>
+              </div>
             </div>
 
             <div class="flex items-center gap-1.5">
@@ -2091,8 +2142,10 @@ class TimetableApp {
             </div>
             <div class="flex items-center gap-1">
               ${status === 'closed' ? `
-                <span class="text-[10px] font-black px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 border border-rose-300">폐강</span>
-              ` : ''}
+                <span class="text-[10px] font-black px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 border border-rose-300">✖️ 폐강</span>
+              ` : (status === 'adjust' ? `
+                <span class="text-[10px] font-black px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-300">▲ 조정</span>
+              ` : '')}
               <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/90 border text-slate-700 shadow-2xs">
                 ${studentIds.length}명
               </span>
