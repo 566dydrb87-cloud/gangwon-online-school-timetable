@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>강원온라인학교 시간표 시스템 | 상지대관령고등학교</title>
+  <link rel="icon" type="image/png" href="assets/school_logo.png">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- ExcelJS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+
+  <!-- ==================== 상단 네비게이션 헤더 ==================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs no-print">
+    <div class="max-w-[1780px] mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- 학교 로고 및 타이틀 -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full border border-blue-200 overflow-hidden bg-white shadow-xs p-0.5 flex items-center justify-center">
+          <img src="assets/school_logo.png" alt="상지대관령고등학교 마크" class="w-full h-full object-contain">
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold text-slate-900 tracking-tight">강원온라인학교 시간표 시스템</h1>
+            <span class="text-[11px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-semibold border border-blue-200">
+              상지대관령고
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">수강신청 연계 종합 시간표 편성 & 엑셀 양식 관리</p>
+        </div>
+      </div>
+
+      <!-- 상단 액션 버튼 그룹 -->
+      <div id="header-actions" class="flex flex-wrap items-center gap-2">
+
+        <!-- 1. 양식 다운로드 드롭다운 -->
+        <div class="relative group">
+          <button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5 text-slate-600"></i>
+            <span>양식 다운로드</span>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500"></i>
+          </button>
+          <div class="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 hidden group-hover:block z-40">
+            <button id="btn-dl-period-template" class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i> 일과표 설정 양식
+            </button>
+            <button id="btn-dl-student-template" class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 border-t border-slate-100">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i> 편성학생 명단 양식
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. 엑셀 업로드 드롭다운 -->
+        <div class="relative group">
+          <button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-300 transition">
+            <i data-lucide="upload" class="w-3.5 h-3.5 text-blue-600"></i>
+            <span>엑셀 업로드</span>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-blue-500"></i>
+          </button>
+          <div class="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-slate-200 py-1 hidden group-hover:block z-40">
+            <label class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 cursor-pointer">
+              <i data-lucide="file-up" class="w-3.5 h-3.5 text-blue-600"></i>
+              <span>편성 학생 엑셀 업로드</span>
+              <input type="file" id="file-upload-student" accept=".xlsx, .xls" class="hidden">
+            </label>
+            <label class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 cursor-pointer border-t border-slate-100">
+              <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-600"></i>
+              <span>일과표 엑셀 업로드</span>
+              <input type="file" id="file-upload-period" accept=".xlsx, .xls" class="hidden">
+            </label>
+          </div>
+        </div>
+
+        <!-- 3. 개설 과목 관리 버튼 -->
+        <button id="btn-manage-subjects" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition" title="개설 과목 추가 및 관리">
+          <i data-lucide="book-open" class="w-3.5 h-3.5 text-indigo-600"></i>
+          <span>과목 관리</span>
+        </button>
+
+        <div class="h-5 w-px bg-slate-200"></div>
+
+        <!-- 4. 결과 엑셀 다운로드 (2종) -->
+        <button id="btn-export-timetable" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition" title="파스텔톤 디자인 멀티시트 학급 시간표 다운로드">
+          <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+          <span>학급 시간표 엑셀</span>
+        </button>
+
+        <button id="btn-export-data" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition" title="원천 데이터 목록 엑셀 다운로드">
+          <i data-lucide="table" class="w-3.5 h-3.5"></i>
+          <span>원천 데이터 엑셀</span>
+        </button>
+
+        <!-- 5. 인쇄 및 기타 -->
+        <button id="btn-print" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 transition" title="시간표 인쇄 (A4 가로 최적화)">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+          <span>인쇄</span>
+        </button>
+
+        <button id="btn-reset-data" class="inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition" title="데이터 초기화">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          <span>초기화</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== 상태 요약 바 ==================== -->
+  <section class="bg-white border-b border-slate-200 px-4 sm:px-6 py-2 no-print">
+    <div class="max-w-[1780px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <i data-lucide="users" class="w-3.5 h-3.5 text-blue-500"></i>
+          <span>등록 학생:</span>
+          <strong id="stat-total-students" class="text-slate-900 font-bold">0</strong>명
+        </div>
+        <div class="h-3 w-px bg-slate-200"></div>
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i>
+          <span>배정 완료:</span>
+          <strong id="stat-assigned-students" class="text-emerald-700 font-bold">0</strong>명
+        </div>
+        <div class="h-3 w-px bg-slate-200"></div>
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-500"></i>
+          <span>미배정 대기:</span>
+          <strong id="stat-unassigned-students" class="text-amber-700 font-bold">0</strong>명
+        </div>
+        <div class="h-3 w-px bg-slate-200"></div>
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-500"></i>
+          <span>운영 교시:</span>
+          <strong id="stat-period-count" class="text-indigo-700 font-bold">8</strong>개
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-2 text-slate-500 text-[11px]">
+        <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+          <i data-lucide="tag" class="w-3 h-3 text-blue-500"></i>
+          시간표 표기: <strong>과목명(학번이름)</strong> 예: <code>인공지능(10101홍길동)</code>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 메인 콘텐츠 레이아웃 ==================== -->
+  <main id="main-container" class="flex-1 max-w-[1780px] w-full mx-auto p-4 sm:p-5 flex flex-col lg:flex-row gap-5 items-start">
+
+    <!-- ==================== 좌측: 수강신청 학생 명단 & 일괄 배정 패널 ==================== -->
+    <aside id="sidebar-container" class="w-full lg:w-[450px] shrink-0 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col max-h-[calc(100vh-140px)] sticky top-20 no-print">
+      
+      <!-- 패널 헤더 -->
+      <div class="p-3.5 border-b border-slate-200 bg-slate-50/70 rounded-t-xl">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-blue-600"></i>
+            <h2 class="text-sm font-bold text-slate-900">수강 신청 학생 명단</h2>
+          </div>
+          <button id="btn-open-add-student-modal" class="text-xs px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-xs transition flex items-center gap-1">
+            <i data-lucide="plus" class="w-3 h-3"></i> 학생 등록
+          </button>
+        </div>
+
+        <!-- 검색 및 필터 -->
+        <div class="space-y-2">
+          <div class="relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
+            <input type="text" id="search-input" placeholder="학번, 성명, 과목명 검색..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+          <div class="grid grid-cols-3 gap-1.5">
+            <select id="filter-grade" class="px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <option value="all">전체 학년</option>
+              <option value="1">1학년</option>
+              <option value="2">2학년</option>
+              <option value="3">3학년</option>
+            </select>
+            <select id="filter-subject" class="px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <option value="all">전체 과목</option>
+              <!-- JS 동적 생성 -->
+            </select>
+            <select id="filter-status" class="px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <option value="all">전체 상태</option>
+              <option value="assigned">배정완료</option>
+              <option value="unassigned">미배정</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 일괄 배정 컨트롤 바 -->
+      <div class="p-3 bg-blue-50/70 border-b border-blue-100 flex flex-col gap-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-blue-900 flex items-center gap-1">
+            <i data-lucide="check-square" class="w-3.5 h-3.5 text-blue-600"></i>
+            선택 학생 시간표 일괄 배정
+          </span>
+          <span id="selected-count-badge" class="px-2 py-0.5 rounded-full bg-blue-200 text-blue-900 font-bold text-[11px]">
+            0명 선택됨
+          </span>
+        </div>
+
+        <!-- 1. 배정할 과목 선택/입력 -->
+        <div class="flex items-center gap-1.5">
+          <select id="assign-subject-select" class="flex-1 px-2 py-1.5 text-xs bg-white border border-blue-200 rounded-md font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400" onchange="document.getElementById('assign-subject-custom').classList.toggle('hidden', this.value !== '__custom__')">
+            <!-- JS 동적 생성 -->
+          </select>
+          <input type="text" id="assign-subject-custom" placeholder="과목명 직접 입력" class="hidden flex-1 px-2 py-1.5 text-xs bg-white border border-blue-300 rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+
+        <!-- 2. 배정 요일 및 교시 선택 -->
+        <div class="flex items-center gap-1.5">
+          <select id="assign-day-select" class="flex-1 px-2 py-1.5 text-xs bg-white border border-blue-200 rounded-md font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <!-- JS 동적 생성 -->
+          </select>
+
+          <select id="assign-period-select" class="flex-1 px-2 py-1.5 text-xs bg-white border border-blue-200 rounded-md font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <!-- JS 동적 생성 -->
+          </select>
+        </div>
+
+        <!-- 3. 액션 버튼들 -->
+        <div class="flex items-center gap-1.5">
+          <button id="btn-batch-assign" disabled class="flex-1 py-1.5 px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold text-xs rounded-md shadow-xs transition flex items-center justify-center gap-1">
+            <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+            <span>시간표에 배정</span>
+          </button>
+          <button id="btn-batch-unassign" disabled class="py-1.5 px-2.5 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed text-slate-700 font-medium text-xs rounded-md transition flex items-center gap-1" title="선택한 학생 배정 해제">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            <span>해제</span>
+          </button>
+          <button id="btn-batch-delete" disabled class="py-1.5 px-2 bg-red-100 hover:bg-red-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed text-red-700 font-medium text-xs rounded-md transition flex items-center gap-1" title="선택한 학생 삭제">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 학생 목록 테이블 -->
+      <div class="flex-1 overflow-y-auto min-h-0">
+        <table class="w-full border-collapse">
+          <thead class="bg-slate-100/90 sticky top-0 z-10 text-[11px] font-semibold text-slate-600 border-b border-slate-200">
+            <tr>
+              <th class="py-2 px-2 w-8 text-center">
+                <input type="checkbox" id="select-all-students" title="전체 선택/해제">
+              </th>
+              <th class="py-2 px-1 text-center w-14">학번</th>
+              <th class="py-2 px-2 text-left">성명</th>
+              <th class="py-2 px-2 text-left">과목명</th>
+              <th class="py-2 px-1 text-center w-24">배정</th>
+              <th class="py-2 px-1 text-center w-8">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="student-list-tbody" class="divide-y divide-slate-100">
+            <!-- JS 동적 생성 -->
+          </tbody>
+        </table>
+      </div>
+
+    </aside>
+
+    <!-- ==================== 우측: 종합 시간표 그리드 패널 ==================== -->
+    <section class="flex-1 min-w-0 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col p-4 sm:p-5">
+      
+      <!-- 시간표 툴바 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <i data-lucide="calendar" class="w-5 h-5 text-blue-600"></i>
+          <h2 class="text-base font-bold text-slate-900">강원온라인학교 종합 시간표</h2>
+          <span class="text-xs text-slate-500 font-normal ml-1">
+            (교시별 시간 직접 수정 가능 / 정렬: 교시 &rarr; 시작시간 순)
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- 사용자 지정 교시 추가 버튼 -->
+          <button id="btn-add-period" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition flex items-center gap-1.5">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-blue-400"></i>
+            <span>교시 추가</span>
+          </button>
+
+          <!-- 주말 표시/숨김 토글 -->
+          <button id="btn-toggle-weekends" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 hover:bg-slate-100 transition flex items-center gap-1 text-slate-700">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>주말 숨기기(월~금)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 인쇄용 타이틀 -->
+      <div class="hidden print:block text-center mb-4">
+        <h1 class="text-2xl font-bold text-slate-900">강원온라인학교 전체 종합 시간표</h1>
+        <p class="text-xs text-slate-500 mt-1">상지대관령고등학교 운영 | 온라인 공동교육과정</p>
+      </div>
+
+      <!-- 시간표 테이블 래퍼 -->
+      <div class="timetable-wrapper overflow-x-auto border border-slate-200 rounded-lg shadow-2xs bg-white">
+        <table class="w-full border-collapse text-left text-xs">
+          <thead id="timetable-thead">
+            <!-- JS 동적 생성 -->
+          </thead>
+          <tbody id="timetable-tbody" class="divide-y divide-slate-200">
+            <!-- JS 동적 생성 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 하단 안내 바 -->
+      <div class="mt-4 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 no-print">
+        <div class="flex items-center gap-2">
+          <i data-lucide="info" class="w-4 h-4 text-blue-500"></i>
+          <span>같은 교시라도 시간이 다를 경우 <strong>[교시 번호]</strong> 순, 그 다음 <strong>[시작 시간]</strong> 순으로 자동 정렬됩니다.</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-400">
+          <i data-lucide="move" class="w-3.5 h-3.5 text-slate-500"></i>
+          <span>카드를 드래그하여 다른 교시/요일로 이동할 수 있습니다.</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== 사용자 지정 교시 추가 모달 ==================== -->
+  <div id="period-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-sm w-full border border-slate-200 overflow-hidden">
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="clock" class="w-4 h-4 text-blue-600"></i>
+          사용자 지정 교시 추가
+        </h3>
+        <button type="button" id="btn-close-period-modal" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="form-add-period" class="p-5 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">구분</label>
+          <select id="modal-period-type" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500" onchange="document.getElementById('period-num-container').classList.toggle('hidden', this.value === 'break')">
+            <option value="class">정규 수업 교시</option>
+            <option value="break">휴식 / 점심시간</option>
+          </select>
+        </div>
+
+        <div id="period-num-container" class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">교시 번호</label>
+            <input type="number" id="modal-period-num" value="9" min="1" max="24" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">교시 명칭</label>
+            <input type="text" id="modal-period-name" value="9교시" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">시작 시간 (HH:mm) *</label>
+            <input type="text" id="modal-period-start" placeholder="예: 09:00" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">종료 시간 (HH:mm) *</label>
+            <input type="text" id="modal-period-end" placeholder="예: 09:50" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-400 bg-slate-50 p-2 rounded border border-slate-100">
+          * 같은 교시 번호라도 시간이 다르면 '교시 &rarr; 시작시간' 순서로 정렬됩니다.
+        </p>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="window.app.closeAddPeriodModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition">
+            취소
+          </button>
+          <button type="submit" class="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg shadow-xs transition">
+            교시 등록
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== 개설 과목 관리 모달 ==================== -->
+  <div id="subject-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-sm w-full border border-slate-200 overflow-hidden">
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-indigo-600"></i>
+          개설 과목 관리
+        </h3>
+        <button type="button" id="btn-close-subject-modal" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <!-- 과목 추가 입력 -->
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">새 과목 등록</label>
+          <div class="flex items-center gap-1.5">
+            <input type="text" id="modal-new-subject-input" placeholder="과목명 입력 (예: 데이터 과학)" class="flex-1 px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+            <button type="button" id="btn-add-new-subject" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-xs transition">
+              추가
+            </button>
+          </div>
+        </div>
+
+        <!-- 등록된 과목 목록 -->
+        <div>
+          <label class="block font-medium text-slate-700 mb-1.5">등록된 개설 과목 목록</label>
+          <div id="subject-modal-list" class="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+            <!-- JS 동적 생성 -->
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex justify-end">
+          <button type="button" onclick="window.app.closeSubjectModal()" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition">
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 개별 학생 등록 모달 ==================== -->
+  <div id="student-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full border border-slate-200 overflow-hidden">
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-4 h-4 text-blue-600"></i>
+          개별 학생 수동 등록
+        </h3>
+        <button type="button" id="btn-close-modal" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="form-add-student" class="p-5 space-y-3.5 text-xs">
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">학년 *</label>
+            <select id="modal-grade" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+              <option value="1">1학년</option>
+              <option value="2">2학년</option>
+              <option value="3">3학년</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">반 *</label>
+            <input type="number" id="modal-class" value="1" min="1" max="50" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">번호</label>
+            <input type="number" id="modal-number" value="1" min="1" max="99" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">학생 성명 *</label>
+          <input type="text" id="modal-name" placeholder="예: 홍길동" required class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">과목명 (선택 또는 입력)</label>
+          <input type="text" id="modal-subject" list="modal-subject-list" placeholder="예: 인공지능, 빅데이터 분석 등" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+          <datalist id="modal-subject-list">
+            <!-- JS 동적 생성 -->
+          </datalist>
+        </div>
+
+        <p class="text-[11px] text-slate-400">
+          * 1학년 1반 1번 홍길동 &rarr; 학번: <strong>10101</strong>, 시간표 표기: <strong>과목(10101홍길동)</strong>
+        </p>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="window.app.closeStudentModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition">
+            취소
+          </button>
+          <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition">
+            등록하기
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="bg-white border-t border-slate-200 py-3 px-4 text-center text-xs text-slate-500 no-print mt-auto">
+    <div class="max-w-[1780px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <img src="assets/school_logo.png" alt="마크" class="w-4 h-4 object-contain inline-block">
+        <span>강원온라인학교 & 상지대관령고등학교 시간표 관리 시스템</span>
+      </div>
+      <div class="text-[11px] text-slate-400">
+        자동 저장 활성화됨 | NEIS 수강편성 엑셀 호환 | A4 가로 인쇄 지원
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/sample-data.js"></script>
+  <script src="js/excel-service.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
