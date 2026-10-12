@@ -41,6 +41,9 @@ class TimetableApp {
       grade: 'all',
       enroll: 'all'
     };
+    this.studentSortKey = 'code'; // 'code' | 'name' | 'subject'
+    this.excelPoolStorageKey = 'gw_excel_student_pool_directory_v1';
+    this.excelStudentPool = []; // 업로드된 전체 학생 명부 풀 (검색 및 선택 등록용)
     this.isCtrlPressed = false;
     this.dragData = null; // { type, studentId, studentIds, subjectName, fromDay, fromPeriodId }
 
@@ -49,6 +52,7 @@ class TimetableApp {
 
   async init() {
     this.loadState();
+    this.loadExcelStudentPool();
     this.sortPeriods();
     this.syncOfferedSubjects();
     this.buildSubjectColorMap();
@@ -672,43 +676,10 @@ class TimetableApp {
       this.renderStep1StudentList();
     });
 
-    // 6. 엑셀 학생 업로드
+    // 6. 엑셀 학생 명부 업로드 (전체 일괄 등록 금지 -> 엑셀 풀에 보관 후 검색 선택 등록)
     const handleStudentUpload = async (file) => {
       if (!file) return;
-      try {
-        const newStudents = await ExcelService.parseStudentExcel(file);
-        const action = confirm(
-          `총 ${newStudents.length}명의 학생을 불러왔습니다!\n\n` +
-          `[확인]: 기존 학생 목록을 유지하고 새로 불러온 학생 추가\n` +
-          `[취소]: 작업 취소`
-        );
-        if (action) {
-          const seen = new Set(this.masterStudents.map(s => `${s.studentCode}_${s.name}`));
-          let added = 0;
-          newStudents.forEach(st => {
-            const code = st.studentCode || ExcelService.getStudentCode(st);
-            const key = `${code}_${st.name}`;
-            if (!seen.has(key)) {
-              seen.add(key);
-              this.masterStudents.push({
-                id: `sm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-                grade: st.grade,
-                classNum: st.classNum,
-                studentNum: st.studentNum,
-                studentCode: code,
-                name: st.name
-              });
-              added++;
-            }
-          });
-          this.rebuildStudentAssignments();
-          this.saveState();
-          this.render();
-          this.showToast(`${added}명의 학생이 새로 등록되었습니다.`);
-        }
-      } catch (err) {
-        alert('학생 명단 파일 처리 실패: ' + err.message);
-      }
+      await this.handleExcelPoolUpload(file);
     };
 
     document.getElementById('file-upload-student')?.addEventListener('change', (e) => {
@@ -718,6 +689,47 @@ class TimetableApp {
     document.getElementById('step1-file-upload-student')?.addEventListener('change', (e) => {
       handleStudentUpload(e.target.files[0]);
       e.target.value = '';
+    });
+
+    // 6-1. 엑셀 풀 실시간 학생명 검색 & 엔터 등록
+    const inputSearchPool = document.getElementById('input-search-student-pool');
+    const btnClearSearch = document.getElementById('btn-clear-pool-search');
+
+    inputSearchPool?.addEventListener('input', (e) => {
+      this.handleSearchPoolInput(e.target.value);
+    });
+
+    inputSearchPool?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.handleSearchPoolEnter(e.target.value);
+      }
+    });
+
+    btnClearSearch?.addEventListener('click', () => {
+      if (inputSearchPool) {
+        inputSearchPool.value = '';
+        this.handleSearchPoolInput('');
+        inputSearchPool.focus();
+      }
+    });
+
+    // 바깥 클릭 시 검색 추천창 닫기
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('pool-search-results-dropdown');
+      if (dropdown && !dropdown.contains(e.target) && e.target !== inputSearchPool) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // 6-2. 학년도/학기 전송 모달 라디오 변경 시 과목 선택 드롭다운 토글
+    document.querySelectorAll('input[name="transfer-scope"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const sel = document.getElementById('transfer-subject-select');
+        if (sel) {
+          sel.disabled = e.target.value !== 'subject';
+        }
+      });
     });
 
     // 7. 교시 추가 모달
@@ -1025,8 +1037,268 @@ class TimetableApp {
     this.showToast(`'${studentCode} ${name}' 학생이 등록되었습니다.`);
   }
 
+  // ==========================================
+  // [학생 명부 엑셀 풀 & 성명 검색 & 선택 등록]
+  // ==========================================
+  loadExcelStudentPool() {
+    try {
+      const saved = localStorage.getItem(this.excelPoolStorageKey);
+      if (saved) {
+        this.excelStudentPool = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Failed to load excel student pool:', e);
+      this.excelStudentPool = [];
+    }
+    // 풀이 아직 비어있고 현재 등록된 학생(masterStudents)이 있다면 초기 풀로 자동 등록
+    if ((!this.excelStudentPool || this.excelStudentPool.length === 0) && this.masterStudents && this.masterStudents.length > 0) {
+      this.excelStudentPool = this.masterStudents.map(s => ({
+        grade: s.grade,
+        classNum: s.classNum,
+        studentNum: s.studentNum,
+        studentCode: s.studentCode || ExcelService.getStudentCode(s),
+        name: s.name
+      }));
+      this.saveExcelStudentPool();
+    }
+    this.updateExcelPoolUI();
+  }
+
+  saveExcelStudentPool() {
+    try {
+      localStorage.setItem(this.excelPoolStorageKey, JSON.stringify(this.excelStudentPool || []));
+    } catch (e) {
+      console.error('Failed to save excel student pool:', e);
+    }
+    this.updateExcelPoolUI();
+  }
+
+  updateExcelPoolUI() {
+    const statusEl = document.getElementById('excel-pool-status');
+    if (!statusEl) return;
+    const count = (this.excelStudentPool || []).length;
+    if (count > 0) {
+      statusEl.textContent = `명부 등록 완료: 총 ${count}명 검색 가능`;
+      statusEl.className = 'text-[10px] text-emerald-700 font-bold';
+    } else {
+      statusEl.textContent = '명단 파일을 업로드해주세요';
+      statusEl.className = 'text-[10px] text-blue-700 font-medium';
+    }
+  }
+
+  async handleExcelPoolUpload(file) {
+    if (!file) return;
+    try {
+      const parsed = await ExcelService.parseStudentExcel(file);
+      if (!parsed || parsed.length === 0) {
+        alert('엑셀 파일에서 학생 명단을 찾을 수 없습니다.');
+        return;
+      }
+
+      // 학생 명부 풀에 보관 (중복 학번/이름 정리)
+      const map = new Map();
+      parsed.forEach(st => {
+        const code = st.studentCode || ExcelService.getStudentCode(st);
+        const key = `${code}_${st.name}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            grade: st.grade,
+            classNum: st.classNum,
+            studentNum: st.studentNum,
+            studentCode: code,
+            name: st.name
+          });
+        }
+      });
+
+      this.excelStudentPool = Array.from(map.values());
+      this.saveExcelStudentPool();
+      this.showToast(`총 ${this.excelStudentPool.length}명의 학생 명부가 엑셀 풀에 등록되었습니다. 성명을 검색하여 선택 등록하세요.`);
+
+      // 검색창에 포커스
+      const searchInput = document.getElementById('input-search-student-pool');
+      if (searchInput) {
+        searchInput.focus();
+        if (searchInput.value.trim()) {
+          this.handleSearchPoolInput(searchInput.value);
+        }
+      }
+    } catch (err) {
+      alert('학생 명단 엑셀 처리 실패: ' + err.message);
+    }
+  }
+
+  handleSearchPoolInput(rawQuery) {
+    const q = (rawQuery || '').trim();
+    const dropdown = document.getElementById('pool-search-results-dropdown');
+    const clearBtn = document.getElementById('btn-clear-pool-search');
+
+    if (clearBtn) {
+      if (q) clearBtn.classList.remove('hidden');
+      else clearBtn.classList.add('hidden');
+    }
+
+    if (!dropdown) return;
+    if (!q) {
+      dropdown.classList.add('hidden');
+      dropdown.innerHTML = '';
+      return;
+    }
+
+    const lowerQ = q.toLowerCase();
+    const matches = (this.excelStudentPool || []).filter(s => {
+      const name = (s.name || '').toLowerCase();
+      const code = (s.studentCode || '').toLowerCase();
+      return name.includes(lowerQ) || code.includes(lowerQ);
+    });
+
+    this.renderPoolSearchResults(matches, q);
+  }
+
+  handleSearchPoolEnter(rawQuery) {
+    const q = (rawQuery || '').trim().toLowerCase();
+    if (!q) return;
+    const matches = (this.excelStudentPool || []).filter(s => {
+      const name = (s.name || '').toLowerCase();
+      const code = (s.studentCode || '').toLowerCase();
+      return name.includes(q) || code.includes(q);
+    });
+
+    // 아직 등록되지 않은 첫 번째 학생 바로 등록
+    const unimported = matches.find(s => !this.isMasterStudentEnrolled(s));
+    if (unimported) {
+      this.importStudentFromPool(unimported);
+    }
+  }
+
+  isMasterStudentEnrolled(poolStudent) {
+    const pCode = poolStudent.studentCode || ExcelService.getStudentCode(poolStudent);
+    return this.masterStudents.some(ms => {
+      const mCode = ms.studentCode || ExcelService.getStudentCode(ms);
+      return mCode === pCode && ms.name === poolStudent.name;
+    });
+  }
+
+  renderPoolSearchResults(matches, query) {
+    const dropdown = document.getElementById('pool-search-results-dropdown');
+    if (!dropdown) return;
+
+    if (matches.length === 0) {
+      dropdown.innerHTML = `
+        <div class="p-3 text-center text-xs text-slate-500">
+          <p class="font-medium">'${query}' 검색 결과가 없습니다.</p>
+          <p class="text-[10px] text-slate-400 mt-0.5">엑셀 명부에 없으면 상단의 <strong>[수기 등록]</strong>을 이용하세요.</p>
+        </div>
+      `;
+      dropdown.classList.remove('hidden');
+      return;
+    }
+
+    // 최대 30명 표출
+    const slice = matches.slice(0, 30);
+    const html = slice.map(s => {
+      const isEnrolled = this.isMasterStudentEnrolled(s);
+      const code = s.studentCode || ExcelService.getStudentCode(s);
+      const encoded = encodeURIComponent(JSON.stringify(s));
+
+      return `
+        <div class="px-3 py-2 flex items-center justify-between gap-2 hover:bg-blue-50/70 transition cursor-pointer"
+             onclick="window.app.handlePoolItemClick('${encoded}')">
+          <div class="min-w-0 flex items-center gap-2">
+            <span class="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 shrink-0">
+              ${code}
+            </span>
+            <div class="min-w-0">
+              <span class="font-bold text-xs text-slate-900">${s.name}</span>
+              <span class="text-[11px] text-slate-500 ml-1.5">(${s.grade}학년 ${s.classNum}반 ${s.studentNum || '-'}번)</span>
+            </div>
+          </div>
+
+          <div class="shrink-0">
+            ${isEnrolled ? `
+              <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-500">
+                <i data-lucide="check" class="w-3 h-3 text-emerald-600"></i> 등록완료
+              </span>
+            ` : `
+              <button type="button" 
+                      onclick="event.stopPropagation(); window.app.handlePoolItemClick('${encoded}')" 
+                      class="px-2.5 py-1 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-2xs transition flex items-center gap-1">
+                <i data-lucide="plus" class="w-3 h-3"></i>
+                <span>선택 등록</span>
+              </button>
+            `}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    dropdown.innerHTML = html;
+    dropdown.classList.remove('hidden');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  handlePoolItemClick(encodedStudent) {
+    try {
+      const student = JSON.parse(decodeURIComponent(encodedStudent));
+      this.importStudentFromPool(student);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  importStudentFromPool(poolStudent) {
+    if (this.isMasterStudentEnrolled(poolStudent)) {
+      this.showToast(`'${poolStudent.name}' 학생은 이미 등록되어 있습니다.`);
+      return;
+    }
+
+    const code = poolStudent.studentCode || ExcelService.getStudentCode(poolStudent);
+    const newStudent = {
+      id: `sm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+      grade: poolStudent.grade,
+      classNum: poolStudent.classNum,
+      studentNum: poolStudent.studentNum,
+      studentCode: code,
+      name: poolStudent.name
+    };
+
+    this.masterStudents.push(newStudent);
+    this.rebuildStudentAssignments();
+    this.saveState();
+    this.render();
+
+    // 검색 드롭다운 상태 실시간 갱신
+    const inputSearch = document.getElementById('input-search-student-pool');
+    if (inputSearch && inputSearch.value.trim()) {
+      this.handleSearchPoolInput(inputSearch.value);
+    }
+
+    this.showToast(`'${code} ${poolStudent.name}' 학생이 시간표 편제 목록에 등록되었습니다.`);
+  }
+
+  // ==========================================
+  // [학생 명단 정렬 (학번순 / 이름순 / 과목명순)]
+  // ==========================================
+  setStudentSort(sortKey) {
+    this.studentSortKey = sortKey;
+
+    const keys = ['code', 'name', 'subject'];
+    keys.forEach(k => {
+      const btn = document.getElementById(`sort-btn-${k}`);
+      if (btn) {
+        if (k === sortKey) {
+          btn.className = 'px-2 py-0.5 rounded text-[11px] font-bold bg-blue-600 text-white shadow-2xs transition';
+        } else {
+          btn.className = 'px-2 py-0.5 rounded text-[11px] font-medium bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition';
+        }
+      }
+    });
+
+    this.renderStep1StudentList();
+  }
+
   getFilteredMasterStudents() {
-    return this.masterStudents.filter(student => {
+    const filtered = this.masterStudents.filter(student => {
       // 1. 학년 필터
       if (this.step1Filter.grade !== 'all') {
         if (String(student.grade) !== String(this.step1Filter.grade)) return false;
@@ -1049,6 +1321,33 @@ class TimetableApp {
 
       return true;
     });
+
+    // 정렬 (학번순 / 이름순 / 과목명순)
+    filtered.sort((a, b) => {
+      const codeA = a.studentCode || ExcelService.getStudentCode(a);
+      const codeB = b.studentCode || ExcelService.getStudentCode(b);
+
+      if (this.studentSortKey === 'name') {
+        const nameCompare = (a.name || '').localeCompare(b.name || '', 'ko');
+        if (nameCompare !== 0) return nameCompare;
+        return codeA.localeCompare(codeB, undefined, { numeric: true });
+      }
+
+      if (this.studentSortKey === 'subject') {
+        const subsA = this.getStudentEnrolledCourses(a.id);
+        const subsB = this.getStudentEnrolledCourses(b.id);
+        const subAStr = subsA.length > 0 ? subsA.sort().join(', ') : 'zzz_미편제';
+        const subBStr = subsB.length > 0 ? subsB.sort().join(', ') : 'zzz_미편제';
+        const subCompare = subAStr.localeCompare(subBStr, 'ko');
+        if (subCompare !== 0) return subCompare;
+        return (a.name || '').localeCompare(b.name || '', 'ko');
+      }
+
+      // 기본: 학번순 (code)
+      return codeA.localeCompare(codeB, undefined, { numeric: true });
+    });
+
+    return filtered;
   }
 
   getStudentEnrolledCourses(studentId) {
@@ -1328,115 +1627,135 @@ class TimetableApp {
       const schedules = this.courseSchedules[sub] || [];
 
       html += `
-        <div class="bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col overflow-hidden transition-all hover:shadow-md">
+        <div class="bg-white rounded-2xl border-2 border-slate-200/90 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg">
           
           <!-- 바구니 상단 헤더 -->
-          <div class="p-3 border-b flex items-center justify-between"
+          <div class="p-4 border-b flex items-center justify-between"
                style="background-color: ${color.bg}; border-color: ${color.border};">
-            <div class="flex items-center gap-2">
-              <span class="w-3.5 h-3.5 rounded-full border shadow-2xs" 
+            <div class="flex items-center gap-2.5">
+              <span class="w-4 h-4 rounded-full border shadow-2xs" 
                     style="background-color: ${color.text}; border-color: ${color.border};"></span>
-              <h3 class="font-bold text-sm" style="color: ${color.text};">${sub}</h3>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white/80 border text-slate-700 shadow-2xs">
+              <h3 class="font-black text-base" style="color: ${color.text};">${sub}</h3>
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/90 border text-slate-800 shadow-2xs">
                 ${studentIds.length}명 편제
               </span>
             </div>
-            <button type="button" 
-                    onclick="window.app.handleDeleteSubjectBucket('${sub}')" 
-                    class="text-slate-400 hover:text-red-600 p-1 transition" title="과목 바구니 삭제">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
+
+            <div class="flex items-center gap-1.5">
+              <!-- 학년도/학기 변경 및 이전 버튼 -->
+              <button type="button" 
+                      onclick="window.app.openSemesterTransferModal('${sub}')" 
+                      class="px-2.5 py-1 text-xs font-bold rounded-lg bg-white/90 hover:bg-white text-indigo-700 border border-indigo-200 shadow-2xs transition flex items-center gap-1" 
+                      title="'${sub}' 과목을 다른 학기/학년도로 복사 또는 이동">
+                <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-indigo-600"></i>
+                <span class="hidden sm:inline">학기 이전/복사</span>
+              </button>
+
+              <!-- 과목 바구니 삭제 -->
+              <button type="button" 
+                      onclick="window.app.handleDeleteSubjectBucket('${sub}')" 
+                      class="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-white/80 transition" title="과목 바구니 삭제">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
           </div>
 
-          <!-- 바구니 본문 -->
-          <div class="p-3.5 flex-1 flex flex-col gap-3">
+          <!-- 바구니 본문 (2배 커진 여유로운 영역) -->
+          <div class="p-5 flex-1 flex flex-col gap-4">
             
             <!-- 드롭존 (학생을 여기로 드래그 앤 드롭) -->
-            <div class="bucket-drop-zone p-2.5 rounded-lg flex flex-col items-center justify-center gap-1 text-center cursor-pointer"
+            <div class="bucket-drop-zone py-7 px-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer min-h-[110px]"
                  ondragover="window.app.handleBucketDragOver(event)"
                  ondragleave="window.app.handleBucketDragLeave(event)"
                  ondrop="window.app.handleBucketDrop(event, '${sub}')">
-              <div class="flex items-center gap-1.5 text-blue-600 font-bold text-xs">
-                <i data-lucide="user-plus" class="w-4 h-4"></i>
-                <span>학생을 여기로 드래그하여 편제 (Drop)</span>
+              <div class="flex items-center gap-2 text-blue-700 font-black text-sm">
+                <i data-lucide="user-plus" class="w-6 h-6 text-blue-600"></i>
+                <span>학생을 이 영역으로 드래그하여 편제 (Drop)</span>
               </div>
-              <span class="text-[10px] text-slate-400">좌측 학생 명단에서 끌어다 놓으세요</span>
+              <span class="text-xs text-blue-600/80 font-medium">좌측 학생 명단에서 카드를 끌어다 놓으세요 (복수 선택 일괄 드롭 지원)</span>
             </div>
 
-            <!-- 편제된 학생 태그/칩 목록 -->
+            <!-- 편제된 학생 태그/칩 목록 (2배 넓어진 컨테이너) -->
             <div>
-              <div class="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1.5">
-                <span>편제된 수강생 목록 (${studentIds.length}명)</span>
+              <div class="flex items-center justify-between text-xs font-bold text-slate-800 mb-2">
+                <span class="flex items-center gap-1.5">
+                  <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
+                  <span>편제된 수강생 목록 (${studentIds.length}명)</span>
+                </span>
                 ${studentIds.length > 0 ? `
-                  <button type="button" onclick="window.app.handleClearBucketStudents('${sub}')" class="text-[10px] text-slate-400 hover:text-red-500 font-normal">
+                  <button type="button" onclick="window.app.handleClearBucketStudents('${sub}')" class="text-xs text-slate-400 hover:text-red-600 font-medium transition">
                     전체 비우기
                   </button>
                 ` : ''}
               </div>
 
-              <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1 bg-slate-50 rounded-lg border border-slate-100 min-h-[46px]">
+              <div class="flex flex-wrap content-start gap-2 min-h-[130px] max-h-72 overflow-y-auto p-3 bg-slate-50/90 rounded-xl border border-slate-200">
                 ${studentIds.length > 0 ? studentIds.map(stId => {
                   const m = masterMap.get(stId);
                   if (!m) return '';
                   const code = m.studentCode || ExcelService.getStudentCode(m);
                   return `
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-white border border-slate-200 text-slate-800 shadow-2xs hover:border-blue-400 transition">
-                      <span class="font-mono text-[10px] text-slate-500">${code}</span>
-                      <span>${m.name}</span>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-800 shadow-2xs hover:border-blue-400 hover:shadow-xs transition">
+                      <span class="font-mono text-[11px] text-slate-500 font-bold">${code}</span>
+                      <span class="font-bold text-slate-900">${m.name}</span>
                       <button type="button" 
                               onclick="window.app.handleRemoveStudentFromCourse('${sub}', '${m.id}')" 
-                              class="text-slate-400 hover:text-red-600 ml-0.5 font-bold" title="편제 제외">&times;</button>
+                              class="text-slate-400 hover:text-red-600 ml-1 text-sm font-bold" title="편제 제외">&times;</button>
                     </span>
                   `;
                 }).join('') : `
-                  <span class="text-xs text-slate-400 p-2 flex items-center justify-center w-full">편제된 학생이 없습니다.</span>
+                  <div class="text-xs text-slate-400 p-6 flex flex-col items-center justify-center w-full gap-1">
+                    <i data-lucide="user-x" class="w-6 h-6 opacity-30"></i>
+                    <span>아직 편제된 학생이 없습니다. 상단 드롭존으로 학생을 드래그하세요.</span>
+                  </div>
                 `}
               </div>
             </div>
 
             <!-- 과목 시간표 시간 설정 바 (시간표 자동 배치) -->
-            <div class="pt-2.5 border-t border-slate-100 flex flex-col gap-1.5">
-              <div class="flex items-center justify-between text-[11px] font-bold text-slate-700">
-                <span class="flex items-center gap-1">
-                  <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-600"></i>
-                  과목 시간 설정 (시간표 자동 배치)
+            <div class="pt-3.5 border-t border-slate-200 flex flex-col gap-2">
+              <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                <span class="flex items-center gap-1.5">
+                  <i data-lucide="clock" class="w-4 h-4 text-indigo-600"></i>
+                  <span>과목 시간 설정 (종합 시간표 자동 배치)</span>
                 </span>
-                <span class="text-[10px] text-indigo-600 font-semibold">${schedules.length}시간 편성</span>
+                <span class="text-xs text-indigo-700 font-bold px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200">${schedules.length}시간 편성</span>
               </div>
 
               <!-- 요일 + 교시 추가 폼 -->
-              <div class="flex items-center gap-1">
-                <select id="bucket-day-${sub}" class="flex-1 px-2 py-1 text-xs bg-slate-50 border border-slate-300 rounded font-medium text-slate-800">
+              <div class="flex items-center gap-2">
+                <select id="bucket-day-${sub}" class="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-medium text-slate-800 focus:ring-1 focus:ring-indigo-500">
                   ${activeDays.map(d => `<option value="${d.id}">${d.fullName}</option>`).join('')}
                 </select>
-                <select id="bucket-period-${sub}" class="flex-1 px-2 py-1 text-xs bg-slate-50 border border-slate-300 rounded font-medium text-slate-800">
+                <select id="bucket-period-${sub}" class="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-medium text-slate-800 focus:ring-1 focus:ring-indigo-500">
                   ${regularPeriods.map(p => `<option value="${p.id}">${p.name} (${p.startTime})</option>`).join('')}
                 </select>
                 <button type="button" 
                         onclick="window.app.handleAddBucketSchedule('${sub}')" 
-                        class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded transition whitespace-nowrap shadow-2xs">
-                  + 시간 추가
+                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition whitespace-nowrap shadow-xs flex items-center gap-1">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  <span>시간 추가</span>
                 </button>
               </div>
 
               <!-- 현재 편성된 시간 칩 목록 (여러 날, 여러 시간) -->
-              <div class="flex flex-wrap gap-1 mt-1">
+              <div class="flex flex-wrap gap-1.5 mt-1 min-h-[30px] items-center">
                 ${schedules.length > 0 ? schedules.map(sch => {
                   const dayName = ExcelService.dayIdToName(sch.day);
                   const periodObj = this.periods.find(p => p.id === sch.periodId || (!sch.periodId && p.period === sch.period));
                   const periodName = periodObj ? periodObj.name : `${sch.period}교시`;
                   const sym = ExcelService.getStatusSymbol(sch.status || 'confirmed');
                   return `
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 text-indigo-900 border border-indigo-200">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-900 border border-indigo-200 shadow-2xs">
                       <span>${sym}</span>
                       <span>${dayName} ${periodName}</span>
                       <button type="button" 
                               onclick="window.app.handleRemoveBucketSchedule('${sub}', '${sch.id || (sch.day + '_' + sch.periodId)}')"
-                              class="text-indigo-400 hover:text-red-600 ml-1" title="시간표에서 배치 해제">&times;</button>
+                              class="text-indigo-400 hover:text-red-600 ml-1 text-sm font-bold" title="시간표에서 배치 해제">&times;</button>
                     </span>
                   `;
                 }).join('') : `
-                  <span class="text-[11px] text-slate-400">아직 시간표에 배치되지 않음</span>
+                  <span class="text-xs text-slate-400 italic">아직 시간표에 배치된 시간이 없습니다. 요일과 교시를 선택 후 추가하세요.</span>
                 `}
               </div>
 
@@ -2124,6 +2443,316 @@ class TimetableApp {
     if (!modal) return;
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+  }
+
+  // ==========================================
+  // [학년도 및 학기 데이터 변경 / 복사 / 이동 매니저]
+  // ==========================================
+  openSemesterTransferModal(context = null) {
+    const modal = document.getElementById('semester-transfer-modal');
+    if (!modal) return;
+
+    // 현재 출발지 뱃지
+    const srcBadge = document.getElementById('transfer-source-badge');
+    if (srcBadge) {
+      srcBadge.textContent = `${this.activeYear}학년도 ${this.activeSemester}학기`;
+    }
+
+    // 도착 학년도 셀렉트 박스 채우기
+    const yearSel = document.getElementById('transfer-target-year');
+    if (yearSel) {
+      yearSel.innerHTML = this.academicYears.map(y => {
+        return `<option value="${y}" ${y === this.activeYear ? 'selected' : ''}>${y}학년도</option>`;
+      }).join('');
+    }
+
+    // 도착 학기 셀렉트 박스: 기본값은 현재 학기의 반대 학기
+    const semSel = document.getElementById('transfer-target-semester');
+    if (semSel) {
+      semSel.value = this.activeSemester === '1' ? '2' : '1';
+    }
+
+    // 과목 셀렉트 채우기
+    const subSel = document.getElementById('transfer-subject-select');
+    if (subSel) {
+      subSel.innerHTML = this.offeredSubjects.map(s => {
+        return `<option value="${s}">${s}</option>`;
+      }).join('');
+    }
+
+    // 선택된 학생 수 표시
+    const selectedBadge = document.getElementById('transfer-selected-count-badge');
+    const selectedCount = this.selectedStep1StudentIds.size;
+    if (selectedBadge) {
+      selectedBadge.textContent = `${selectedCount}명 선택됨`;
+    }
+
+    // 라디오 버튼 초기화
+    const radios = document.querySelectorAll('input[name="transfer-scope"]');
+    if (context && typeof context === 'string' && this.offeredSubjects.includes(context)) {
+      radios.forEach(r => { r.checked = r.value === 'subject'; });
+      if (subSel) {
+        subSel.value = context;
+        subSel.disabled = false;
+      }
+    } else if (context === 'selected_students') {
+      radios.forEach(r => { r.checked = r.value === 'selected_students'; });
+      if (subSel) subSel.disabled = true;
+    } else {
+      radios.forEach(r => { r.checked = r.value === 'all'; });
+      if (subSel) subSel.disabled = true;
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  closeSemesterTransferModal() {
+    const modal = document.getElementById('semester-transfer-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  handleSemesterTransferSubmit(e) {
+    e.preventDefault();
+
+    const scope = document.querySelector('input[name="transfer-scope"]:checked')?.value || 'all';
+    const mode = document.querySelector('input[name="transfer-mode"]:checked')?.value || 'copy';
+    const targetYear = document.getElementById('transfer-target-year')?.value || this.activeYear;
+    const targetSemester = document.getElementById('transfer-target-semester')?.value || (this.activeSemester === '1' ? '2' : '1');
+    const subjectName = document.getElementById('transfer-subject-select')?.value;
+
+    // 출발지와 도착지가 완전히 동일한 경우 방지
+    if (targetYear === this.activeYear && targetSemester === this.activeSemester) {
+      alert('출발 학기와 도착 학기가 동일합니다. 다른 학년도 또는 다른 학기를 선택해주세요.');
+      return;
+    }
+
+    if (scope === 'subject' && !subjectName) {
+      alert('전송할 과목을 선택해주세요.');
+      return;
+    }
+
+    if (scope === 'selected_students' && this.selectedStep1StudentIds.size === 0) {
+      alert('먼저 전송할 학생을 명단에서 체크 선택해주세요.');
+      return;
+    }
+
+    // 1. 현재 학년도/학기 상태 저장
+    this.saveActiveYearSemesterData();
+
+    // 2. 대상 학년도 및 학기 데이터 준비
+    if (!this.academicYears.includes(targetYear)) {
+      this.academicYears.push(targetYear);
+      this.academicYears.sort((a, b) => Number(a) - Number(b));
+    }
+    this.ensureYearSemesterData(targetYear, targetSemester);
+    const targetData = this.yearsData[targetYear][targetSemester];
+
+    // Helper: 대상 학기에 학생 중복 없이 추가
+    const addStudentToTarget = (st) => {
+      const pCode = st.studentCode || ExcelService.getStudentCode(st);
+      const exists = (targetData.masterStudents || []).find(ms => {
+        const mCode = ms.studentCode || ExcelService.getStudentCode(ms);
+        return mCode === pCode && ms.name === st.name;
+      });
+      if (exists) return exists.id;
+
+      const newId = `sm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+      const newObj = {
+        id: newId,
+        grade: st.grade,
+        classNum: st.classNum,
+        studentNum: st.studentNum,
+        studentCode: pCode,
+        name: st.name
+      };
+      if (!targetData.masterStudents) targetData.masterStudents = [];
+      targetData.masterStudents.push(newObj);
+      return newId;
+    };
+
+    let summaryMsg = '';
+
+    if (scope === 'all') {
+      // 1) 전체 데이터 복사 / 이동
+      targetData.periods = JSON.parse(JSON.stringify(this.periods));
+      targetData.days = JSON.parse(JSON.stringify(this.days));
+      targetData.students = JSON.parse(JSON.stringify(this.students));
+      targetData.masterStudents = JSON.parse(JSON.stringify(this.masterStudents || []));
+      targetData.courseEnrollments = JSON.parse(JSON.stringify(this.courseEnrollments || {}));
+      targetData.courseSchedules = JSON.parse(JSON.stringify(this.courseSchedules || {}));
+      targetData.offeredSubjects = [...this.offeredSubjects];
+      targetData.subjectColorMap = { ...this.subjectColorMap };
+      targetData.showWeekends = this.showWeekends;
+
+      if (mode === 'move') {
+        // 현재 학기는 초기화
+        this.masterStudents = [];
+        this.courseEnrollments = {};
+        this.courseSchedules = {};
+        this.students = [];
+        this.offeredSubjects = [...DEFAULT_OFFERED_SUBJECTS];
+        this.buildSubjectColorMap();
+        this.rebuildStudentAssignments();
+        this.saveActiveYearSemesterData();
+      }
+
+      summaryMsg = `현재 학기 전체 데이터가 [${targetYear}학년도 ${targetSemester}학기]로 ${mode === 'move' ? '이동' : '복사'}되었습니다.`;
+    } 
+    else if (scope === 'subject') {
+      // 2) 특정 과목 전송 (수강생 및 시간표 설정 포함)
+      if (!targetData.offeredSubjects.includes(subjectName)) {
+        targetData.offeredSubjects.push(subjectName);
+      }
+      if (!targetData.subjectColorMap[subjectName] && this.subjectColorMap[subjectName]) {
+        targetData.subjectColorMap[subjectName] = this.subjectColorMap[subjectName];
+      }
+
+      // 수강생 매핑 및 이전
+      const enrolledStudentIds = this.courseEnrollments[subjectName] || [];
+      const targetStudentIds = [];
+      enrolledStudentIds.forEach(stId => {
+        const stObj = this.masterStudents.find(s => s.id === stId);
+        if (stObj) {
+          const targetId = addStudentToTarget(stObj);
+          targetStudentIds.push(targetId);
+        }
+      });
+      if (!targetData.courseEnrollments) targetData.courseEnrollments = {};
+      targetData.courseEnrollments[subjectName] = targetStudentIds;
+
+      // 시간표 스케줄 이전
+      if (!targetData.courseSchedules) targetData.courseSchedules = {};
+      targetData.courseSchedules[subjectName] = JSON.parse(JSON.stringify(this.courseSchedules[subjectName] || []));
+
+      if (mode === 'move') {
+        this.offeredSubjects = this.offeredSubjects.filter(s => s !== subjectName);
+        delete this.courseEnrollments[subjectName];
+        delete this.courseSchedules[subjectName];
+        this.rebuildStudentAssignments();
+        this.saveActiveYearSemesterData();
+      }
+
+      summaryMsg = `'${subjectName}' 과목이 [${targetYear}학년도 ${targetSemester}학기]로 ${mode === 'move' ? '이동' : '복사'}되었습니다.`;
+    }
+    else if (scope === 'students') {
+      // 3) 전체 학생 명단만 전송 (과목 편제는 제외)
+      let count = 0;
+      this.masterStudents.forEach(st => {
+        addStudentToTarget(st);
+        count++;
+      });
+
+      if (mode === 'move') {
+        this.masterStudents = [];
+        this.courseEnrollments = {};
+        this.courseSchedules = {};
+        this.students = [];
+        this.rebuildStudentAssignments();
+        this.saveActiveYearSemesterData();
+      }
+
+      summaryMsg = `학생 명단 ${count}명이 [${targetYear}학년도 ${targetSemester}학기]로 ${mode === 'move' ? '이동' : '복사'}되었습니다.`;
+    }
+    else if (scope === 'selected_students') {
+      // 4) 선택된 학생들만 전송
+      let count = 0;
+      this.selectedStep1StudentIds.forEach(stId => {
+        const stObj = this.masterStudents.find(s => s.id === stId);
+        if (stObj) {
+          addStudentToTarget(stObj);
+          count++;
+        }
+      });
+
+      if (mode === 'move') {
+        this.masterStudents = this.masterStudents.filter(s => !this.selectedStep1StudentIds.has(s.id));
+        Object.keys(this.courseEnrollments).forEach(sub => {
+          this.courseEnrollments[sub] = this.courseEnrollments[sub].filter(id => !this.selectedStep1StudentIds.has(id));
+        });
+        this.selectedStep1StudentIds.clear();
+        this.rebuildStudentAssignments();
+        this.saveActiveYearSemesterData();
+      }
+
+      summaryMsg = `선택한 학생 ${count}명이 [${targetYear}학년도 ${targetSemester}학기]로 ${mode === 'move' ? '이동' : '복사'}되었습니다.`;
+    }
+
+    // 대상 학기의 assignments 재생성
+    this.rebuildSemesterAssignments(targetData);
+    this.saveState();
+    this.render();
+    this.closeSemesterTransferModal();
+
+    // 완료 알림 및 해당 학기로 즉시 이동 여부 질문
+    const moveConfirm = confirm(`${summaryMsg}\n\n[확인]: 지금 바로 [${targetYear}학년도 ${targetSemester}학기]로 이동\n[취소]: 현재 화면 유지`);
+    if (moveConfirm) {
+      if (this.activeYear !== targetYear) this.activeYear = targetYear;
+      this.activeSemester = targetSemester;
+      this.loadActiveYearSemesterData();
+      this.sortPeriods();
+      this.buildSubjectColorMap();
+      this.saveState();
+      this.render();
+      this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 화면으로 전환되었습니다.`);
+    } else {
+      this.showToast(summaryMsg);
+    }
+  }
+
+  rebuildSemesterAssignments(semData) {
+    if (!semData) return;
+    const flat = [];
+    const masterMap = new Map((semData.masterStudents || []).map(s => [s.id, s]));
+    const subjects = semData.offeredSubjects || [];
+
+    subjects.forEach(subject => {
+      const studentIds = (semData.courseEnrollments || {})[subject] || [];
+      const schedules = (semData.courseSchedules || {})[subject] || [];
+
+      studentIds.forEach(stId => {
+        const m = masterMap.get(stId);
+        if (!m) return;
+        const code = m.studentCode || ExcelService.getStudentCode(m);
+
+        if (schedules.length === 0) {
+          flat.push({
+            id: `as_${m.id}_${subject}_none`,
+            studentCode: code,
+            name: m.name,
+            grade: m.grade,
+            classNum: m.classNum,
+            studentNum: m.studentNum,
+            subject: subject,
+            day: '',
+            period: '',
+            periodId: '',
+            status: 'confirmed'
+          });
+        } else {
+          schedules.forEach(sch => {
+            flat.push({
+              id: `as_${m.id}_${subject}_${sch.id || (sch.day + '_' + sch.periodId)}`,
+              studentCode: code,
+              name: m.name,
+              grade: m.grade,
+              classNum: m.classNum,
+              studentNum: m.studentNum,
+              subject: subject,
+              day: sch.day,
+              period: sch.period,
+              periodId: sch.periodId,
+              status: sch.status || 'confirmed'
+            });
+          });
+        }
+      });
+    });
+
+    semData.students = flat;
   }
 
   showToast(message) {

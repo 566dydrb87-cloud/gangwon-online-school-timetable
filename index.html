@@ -144,12 +144,12 @@
     </div>
   </header>
 
-  <!-- ==================== 학년도 및 학기 선택 탭 바 (2026/2027학년도 & 1학기/2학기) ==================== -->
+  <!-- ==================== 학년도 선택 탭 바 (2026/2027학년도 관리) ==================== -->
   <nav class="bg-slate-100/90 border-b border-slate-200 px-4 sm:px-6 py-2 no-print shadow-2xs">
     <div class="max-w-[1780px] mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3 overflow-x-auto py-0.5">
+      <div class="flex items-center gap-2 overflow-x-auto py-0.5">
         
-        <!-- 1. 학년도 선택 영역 -->
+        <!-- 학년도 선택 영역 -->
         <div class="flex items-center gap-1.5 shrink-0">
           <div class="flex items-center gap-1 text-xs font-bold text-slate-700 mr-1 shrink-0">
             <i data-lucide="calendar-range" class="w-4 h-4 text-blue-600"></i>
@@ -166,27 +166,6 @@
           </button>
         </div>
 
-        <!-- 구분선 -->
-        <div class="h-6 w-px bg-slate-300 shrink-0"></div>
-
-        <!-- 2. 학기 선택 탭 영역 (1학기 / 2학기) -->
-        <div class="flex items-center gap-1.5 shrink-0">
-          <div class="flex items-center gap-1 text-xs font-bold text-slate-700 mr-1 shrink-0">
-            <i data-lucide="bookmark" class="w-4 h-4 text-indigo-600"></i>
-            <span>학기:</span>
-          </div>
-          <div id="semester-tabs-container" class="inline-flex items-center p-0.5 bg-slate-200/90 rounded-lg border border-slate-300 gap-0.5 shadow-2xs">
-            <button type="button" id="tab-semester-1" onclick="window.app.switchSemester('1')" class="px-3.5 py-1 text-xs font-bold rounded-md transition flex items-center gap-1.5">
-              <span>1학기</span>
-              <span id="badge-sem-1-count" class="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-white text-slate-600">0명</span>
-            </button>
-            <button type="button" id="tab-semester-2" onclick="window.app.switchSemester('2')" class="px-3.5 py-1 text-xs font-bold rounded-md transition flex items-center gap-1.5">
-              <span>2학기</span>
-              <span id="badge-sem-2-count" class="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-white text-slate-600">0명</span>
-            </button>
-          </div>
-        </div>
-
       </div>
 
       <div class="flex items-center gap-2 text-xs">
@@ -199,26 +178,58 @@
     </div>
   </nav>
 
-  <!-- ==================== 메인 작업 단계 탭 바 (1. 학생·과목 편제 바구니 / 2. 종합 시간표 편성) ==================== -->
-  <nav class="bg-white border-b border-slate-200 px-4 sm:px-6 py-2 sticky top-[57px] z-20 shadow-xs no-print">
-    <div class="max-w-[1780px] mx-auto flex flex-wrap items-center justify-between gap-3">
-      <!-- 2단 메인 워크플로우 탭 -->
-      <div class="flex items-center gap-2">
-        <button type="button" id="tab-btn-step1" onclick="window.app.switchWorkflowTab('step1')" 
-                class="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition bg-blue-600 text-white shadow-xs">
-          <i data-lucide="folder-check" class="w-4 h-4"></i>
-          <span>1. 학생·과목 등록 및 편제 (바구니)</span>
-        </button>
-        <button type="button" id="tab-btn-step2" onclick="window.app.switchWorkflowTab('step2')" 
-                class="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition bg-slate-100 hover:bg-slate-200 text-slate-700">
-          <i data-lucide="calendar-days" class="w-4 h-4"></i>
-          <span>2. 시간표 편성 (드래그 배치 & 복사)</span>
-        </button>
+  <!-- ==================== 메인 작업 단계 탭 바 (학기 선택 + 1/2단계 워크플로우) ==================== -->
+  <nav class="bg-white border-b border-slate-200 px-4 sm:px-6 py-2.5 sticky top-[57px] z-20 shadow-xs no-print">
+    <div class="max-w-[1780px] mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <div class="flex items-center flex-wrap gap-3">
+        <!-- 1. [학기 선택 그룹] (좌측 배치) -->
+        <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-300 shadow-2xs shrink-0">
+          <div class="flex items-center gap-1 px-2 text-xs font-bold text-slate-700 shrink-0">
+            <i data-lucide="bookmark" class="w-4 h-4 text-indigo-600"></i>
+            <span>학기:</span>
+          </div>
+          <div id="semester-tabs-container" class="inline-flex items-center p-0.5 bg-white rounded-lg border border-slate-200 gap-1 shadow-2xs">
+            <button type="button" id="tab-semester-1" onclick="window.app.switchSemester('1')" class="px-3.5 py-1.5 text-xs font-bold rounded-md transition flex items-center gap-1.5 bg-blue-600 text-white shadow-xs">
+              <span>1학기</span>
+              <span id="badge-sem-1-count" class="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-white text-blue-700">0명</span>
+            </button>
+            <button type="button" id="tab-semester-2" onclick="window.app.switchSemester('2')" class="px-3.5 py-1.5 text-xs font-bold rounded-md transition flex items-center gap-1.5 text-slate-600 hover:bg-slate-100">
+              <span>2학기</span>
+              <span id="badge-sem-2-count" class="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-slate-100 text-slate-500">0명</span>
+            </button>
+          </div>
+          <!-- 학년도/학기 변경 및 복사 도구 버튼 -->
+          <button type="button" onclick="window.app.openSemesterTransferModal()" class="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center gap-1 transition shadow-2xs ml-1" title="학년도 및 학기간 데이터 복사/이동">
+            <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+            <span>학년도·학기 변경/복사</span>
+          </button>
+        </div>
+
+        <!-- 뚜렷한 시각적 구분선 (세로 디바이더 + 화살표) -->
+        <div class="hidden sm:flex items-center text-slate-300 shrink-0 mx-0.5">
+          <div class="h-8 w-px bg-slate-300"></div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 -ml-1"></i>
+        </div>
+
+        <!-- 2. [작업 단계 탭] (학기 탭 오른쪽에 배치) -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" id="tab-btn-step1" onclick="window.app.switchWorkflowTab('step1')" 
+                  class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition bg-blue-600 text-white shadow-xs">
+            <span class="w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-[11px] font-black">1</span>
+            <span>학생·과목 등록 및 편제 (바구니)</span>
+          </button>
+          <button type="button" id="tab-btn-step2" onclick="window.app.switchWorkflowTab('step2')" 
+                  class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[11px] font-black">2</span>
+            <span>시간표 편성 (드래그 배치 & 복사)</span>
+          </button>
+        </div>
       </div>
 
       <!-- 도움말 안내 배너 -->
       <div class="flex items-center gap-2 text-xs">
-        <span id="workflow-hint-badge" class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-900 border border-amber-200 flex items-center gap-1.5 font-medium">
+        <span id="workflow-hint-badge" class="px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 flex items-center gap-1.5 font-medium shadow-2xs">
           <i data-lucide="info" class="w-3.5 h-3.5 text-amber-600"></i>
           <span id="workflow-hint-text">학생을 과목 바구니로 드래그하여 편제하세요. 과목 내에서 시간을 설정하면 시간표에 자동 배치됩니다.</span>
         </span>
@@ -282,76 +293,81 @@
     <!-- ============================================================== -->
     <div id="view-step1" class="w-full flex flex-col lg:flex-row gap-5 items-start">
       
-      <!-- 좌측: 학생 풀 & 등록 관리 -->
+      <!-- 좌측: 학생 명단 관리 패널 (엑셀 업로드 ➔ 학생명 검색 ➔ 선택 등록) -->
       <aside class="w-full lg:w-[440px] shrink-0 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col max-h-[calc(100vh-180px)] sticky top-36 no-print">
         <!-- 패널 헤더 -->
-        <div class="p-3.5 border-b border-slate-200 bg-slate-50/70 rounded-t-xl">
-          <div class="flex items-center justify-between mb-2">
+        <div class="p-3.5 border-b border-slate-200 bg-slate-50/70 rounded-t-xl space-y-2.5">
+          <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i data-lucide="users" class="w-4 h-4 text-blue-600"></i>
-              <h2 class="text-sm font-bold text-slate-900">학생 명단 (학생 풀)</h2>
+              <h2 class="text-sm font-bold text-slate-900">수강 대상 학생 명단</h2>
               <span id="step1-student-count-badge" class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold">0명</span>
             </div>
-            <button type="button" onclick="window.app.openStudentModal()" class="text-xs px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 font-medium rounded-md border border-slate-300 transition flex items-center gap-1 shadow-2xs">
-              <i data-lucide="sliders" class="w-3 h-3"></i> 상세 등록
+            <button type="button" onclick="window.app.openStudentModal()" class="text-[11px] px-2 py-1 bg-white hover:bg-slate-100 text-slate-600 font-medium rounded border border-slate-300 transition flex items-center gap-1 shadow-2xs" title="엑셀에 없는 학생 직접 수기 등록">
+              <i data-lucide="plus" class="w-3 h-3"></i> 수기 등록
             </button>
           </div>
 
-          <!-- 사용자 직접 빠른 학생 등록 폼 -->
-          <form id="form-quick-add-student" class="mb-2 p-2 bg-blue-50/90 border border-blue-200 rounded-lg flex flex-col gap-1.5 shadow-2xs">
-            <div class="flex items-center justify-between text-[11px] font-bold text-blue-900">
-              <span class="flex items-center gap-1">
-                <i data-lucide="user-plus" class="w-3.5 h-3.5 text-blue-600"></i>
-                학생 직접 등록 (학년/반/번호/성명)
-              </span>
-              <span class="text-[10px] text-blue-600 font-normal">Enter 누르면 바로 추가</span>
+          <!-- 1. 학생 명단 엑셀 일괄 업로드 영역 -->
+          <div class="p-2.5 rounded-lg border border-blue-200 bg-blue-50/70 flex items-center justify-between gap-2 shadow-2xs">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-7 h-7 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center shrink-0">
+                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-blue-700"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="text-[11px] font-bold text-blue-950 truncate">학생 명부 엑셀 풀</div>
+                <div id="excel-pool-status" class="text-[10px] text-blue-700 font-medium">명단 파일을 업로드해주세요</div>
+              </div>
             </div>
-            <div class="grid grid-cols-12 gap-1 items-center">
-              <select id="quick-grade" class="col-span-3 px-1.5 py-1 text-xs bg-white border border-blue-300 rounded font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                <option value="1">1학년</option>
-                <option value="2" selected>2학년</option>
-                <option value="3">3학년</option>
-              </select>
-              <input type="number" id="quick-class" min="1" max="20" value="1" placeholder="반" class="col-span-2 px-1 py-1 text-xs bg-white border border-blue-300 rounded text-center font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
-              <input type="number" id="quick-number" min="1" max="60" value="1" placeholder="번호" class="col-span-2 px-1 py-1 text-xs bg-white border border-blue-300 rounded text-center font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
-              <input type="text" id="quick-name" placeholder="성명" required class="col-span-3 px-2 py-1 text-xs bg-white border border-blue-300 rounded font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
-              <button type="submit" class="col-span-2 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded shadow-xs transition flex items-center justify-center">
-                +등록
+            
+            <div class="flex items-center gap-1.5 shrink-0">
+              <label class="cursor-pointer px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded shadow-xs transition flex items-center gap-1">
+                <i data-lucide="upload" class="w-3 h-3"></i>
+                <span>엑셀 업로드</span>
+                <input type="file" id="step1-file-upload-student" accept=".xlsx, .xls" class="hidden">
+              </label>
+              <button type="button" onclick="ExcelService.downloadStudentTemplate()" class="p-1 text-slate-400 hover:text-blue-600 transition" title="엑셀 표준 양식 다운로드">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
               </button>
             </div>
-          </form>
-
-          <!-- 엑셀 일괄 업로드 안내 링크 -->
-          <div class="flex items-center justify-between text-xs mb-2 px-0.5">
-            <label class="cursor-pointer text-[11px] font-semibold text-blue-700 hover:text-blue-800 flex items-center gap-1">
-              <i data-lucide="file-up" class="w-3.5 h-3.5"></i>
-              <span>학생 엑셀 일괄 업로드</span>
-              <input type="file" id="step1-file-upload-student" accept=".xlsx, .xls" class="hidden">
-            </label>
-            <button type="button" onclick="ExcelService.downloadStudentTemplate()" class="text-[10px] text-slate-500 hover:text-blue-600 underline">
-              양식 다운로드
-            </button>
           </div>
 
-          <!-- 검색 및 필터 -->
-          <div class="space-y-1.5">
+          <!-- 2. 학생명 검색 & 등록 바 (엑셀 명부 내 검색) -->
+          <div class="relative">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
+              <span class="flex items-center gap-1">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-indigo-600"></i>
+                학생명 검색 후 선택 등록
+              </span>
+              <span class="text-[10px] text-slate-400 font-normal">이름을 치면 엑셀 명부에서 바로 추천</span>
+            </label>
             <div class="relative">
-              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
-              <input type="text" id="step1-search-input" placeholder="학번, 성명 검색..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <input type="text" id="input-search-student-pool" 
+                     placeholder="학생 성명 검색 (예: 김소민, 홍길동)..." 
+                     autocomplete="off"
+                     class="w-full pl-3 pr-8 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-800">
+              <button type="button" id="btn-clear-pool-search" 
+                      class="absolute right-2 top-2 text-slate-400 hover:text-slate-600 hidden">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
             </div>
-            <div class="grid grid-cols-2 gap-1.5">
-              <select id="step1-filter-grade" class="px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                <option value="all">전체 학년</option>
-                <option value="1">1학년</option>
-                <option value="2">2학년</option>
-                <option value="3">3학년</option>
-              </select>
-              <select id="step1-filter-enroll" class="px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                <option value="all">전체 편제상태</option>
-                <option value="unassigned">미편제 학생만</option>
-                <option value="assigned">편제완료 학생만</option>
-              </select>
+
+            <!-- 검색 결과 드롭다운 팝업 (실시간 매칭 리스트) -->
+            <div id="pool-search-results-dropdown" 
+                 class="absolute left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-slate-200 py-1 hidden z-50 max-h-56 overflow-y-auto divide-y divide-slate-100">
+              <!-- JS 동적 생성 -->
             </div>
+          </div>
+
+          <!-- 3. 등록된 학생 목록 내 필터 -->
+          <div class="grid grid-cols-2 gap-1.5 pt-1">
+            <input type="text" id="step1-search-input" placeholder="등록된 학생 내 검색..." class="px-2 py-1 text-[11px] bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <select id="step1-filter-grade" class="px-2 py-1 text-[11px] bg-white border border-slate-300 rounded-md text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <option value="all">전체 학년</option>
+              <option value="1">1학년</option>
+              <option value="2">2학년</option>
+              <option value="3">3학년</option>
+            </select>
           </div>
         </div>
 
@@ -368,6 +384,22 @@
             <button type="button" id="step1-btn-batch-enroll" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded shadow-2xs transition whitespace-nowrap">
               바구니 담기
             </button>
+          </div>
+        </div>
+
+        <!-- 정렬 툴바 (학번순 / 이름순 / 과목명순) -->
+        <div class="px-3 py-1.5 bg-slate-100/90 border-b border-slate-200 flex items-center justify-between text-[11px]">
+          <span class="font-bold flex items-center gap-1 text-slate-700">
+            <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 text-slate-500"></i>
+            <span>정렬:</span>
+          </span>
+          <div class="flex items-center gap-1">
+            <button type="button" id="sort-btn-code" onclick="window.app.setStudentSort('code')" 
+                    class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-600 text-white shadow-2xs transition">학번순</button>
+            <button type="button" id="sort-btn-name" onclick="window.app.setStudentSort('name')" 
+                    class="px-2 py-0.5 rounded text-[11px] font-medium bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition">이름순</button>
+            <button type="button" id="sort-btn-subject" onclick="window.app.setStudentSort('subject')" 
+                    class="px-2 py-0.5 rounded text-[11px] font-medium bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition">과목명순</button>
           </div>
         </div>
 
@@ -402,8 +434,8 @@
           </form>
         </div>
 
-        <!-- 과목 바구니 카드 그리드 -->
-        <div id="subject-buckets-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <!-- 과목 바구니 카드 그리드 (2배 넓어진 2열 와이드 그리드) -->
+        <div id="subject-buckets-container" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <!-- JS 동적 생성 -->
         </div>
       </section>
@@ -783,6 +815,137 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== 학년도 및 학기 데이터 변경 / 복사 / 이동 매니저 모달 ==================== -->
+  <div id="semester-transfer-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-5 py-4 border-b border-slate-200 bg-gradient-to-r from-indigo-50 to-blue-50 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs">
+            <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">학년도·학기 데이터 변경 / 복사 / 이동</h3>
+            <p class="text-xs text-slate-500">1학기/2학기 및 학년도 간 과목, 학생, 시간표를 복사하거나 이동합니다.</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.app.closeSemesterTransferModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-semester-transfer" onsubmit="window.app.handleSemesterTransferSubmit(event)" class="p-5 space-y-4 text-xs">
+        
+        <!-- 1. 출발지 및 도착지 학년도/학기 선택 -->
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-600">출발 (현재 작업 중)</span>
+            <span id="transfer-source-badge" class="px-2.5 py-0.5 rounded-full font-bold bg-blue-100 text-blue-800 border border-blue-200 text-xs">
+              2026학년도 1학기
+            </span>
+          </div>
+
+          <div class="flex items-center justify-center my-1 text-slate-400">
+            <div class="h-px bg-slate-200 flex-1"></div>
+            <span class="px-2 flex items-center gap-1 text-[11px] font-bold text-indigo-600">
+              <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i> 데이터 전송 대상
+            </span>
+            <div class="h-px bg-slate-200 flex-1"></div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">도착 학년도</label>
+              <select id="transfer-target-year" class="w-full px-2.5 py-1.5 bg-white border border-indigo-300 rounded-lg font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500">
+                <!-- JS 동적 생성 -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">도착 학기</label>
+              <select id="transfer-target-semester" class="w-full px-2.5 py-1.5 bg-white border border-indigo-300 rounded-lg font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500">
+                <option value="1">1학기</option>
+                <option value="2">2학기</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 전송할 항목 선택 -->
+        <div>
+          <label class="block font-bold text-slate-800 mb-1.5">1. 전송할 항목 선택</label>
+          <div class="space-y-1.5">
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="transfer-scope" value="all" checked class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+              <div>
+                <span class="font-bold text-slate-900">현재 학기 전체 데이터 (학생 + 과목 + 시간표 일괄 전송)</span>
+                <p class="text-[11px] text-slate-500 mt-0.5">2학기에 등록해야 했는데 1학기에 잘못 입력한 경우 가장 적합합니다.</p>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="transfer-scope" value="subject" class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+              <div class="flex-1 min-w-0">
+                <span class="font-bold text-slate-900">특정 개설 과목 1개만 전송 (수강생 및 시간표 포함)</span>
+                <select id="transfer-subject-select" class="mt-1.5 w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-700">
+                  <!-- JS 동적 생성 -->
+                </select>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="transfer-scope" value="students" class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+              <div>
+                <span class="font-bold text-slate-900">현재 학기 등록 학생 명단만 전송</span>
+                <p class="text-[11px] text-slate-500 mt-0.5">과목 편제는 초기화하고 학생 기본 명부(이름, 학번 등)만 상대 학기로 보냅니다.</p>
+              </div>
+            </label>
+
+            <label id="transfer-scope-selected-row" class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="radio" name="transfer-scope" value="selected_students" class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+              <div>
+                <span class="font-bold text-slate-900">선택된 학생들만 전송</span>
+                <span id="transfer-selected-count-badge" class="ml-1 text-[10px] px-1.5 py-0.2 rounded font-bold bg-blue-100 text-blue-700">0명 선택됨</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 3. 작업 방식 (복사 vs 이동) -->
+        <div>
+          <label class="block font-bold text-slate-800 mb-1.5">2. 작업 방식 선택</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="p-2.5 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-50 cursor-pointer flex items-start gap-2 transition">
+              <input type="radio" name="transfer-mode" value="copy" checked class="mt-0.5 text-blue-600">
+              <div>
+                <span class="font-bold text-blue-900 block">복사하기 (권장)</span>
+                <span class="text-[10px] text-slate-500">현재 학기 데이터는 유지하고 대상 학기에 추가합니다.</span>
+              </div>
+            </label>
+
+            <label class="p-2.5 rounded-xl border border-amber-300 bg-amber-50/60 hover:bg-amber-100/50 cursor-pointer flex items-start gap-2 transition">
+              <input type="radio" name="transfer-mode" value="move" class="mt-0.5 text-amber-600">
+              <div>
+                <span class="font-bold text-amber-900 block">이동하기 (잘못 만든 경우)</span>
+                <span class="text-[10px] text-slate-500">대상 학기로 이전하고 현재 학기에서는 완전히 삭제합니다.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 모달 버튼 -->
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="window.app.closeSemesterTransferModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition">
+            취소
+          </button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-xs transition flex items-center gap-1.5">
+            <i data-lucide="check-check" class="w-4 h-4"></i>
+            <span>전송 실행하기</span>
+          </button>
+        </div>
+
+      </form>
     </div>
   </div>
 

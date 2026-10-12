@@ -44,19 +44,25 @@ body {
   box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.15);
 }
 
-/* Bucket & Drop Zones for Step 1 */
+/* Bucket & Drop Zones for Step 1 (2배 커진 드롭존) */
 .bucket-drop-zone {
-  min-height: 58px;
-  border: 2px dashed #CBD5E1;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  min-height: 110px;
+  border: 2px dashed #93C5FD;
+  border-radius: 14px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: #F8FAFC;
 }
 
+.bucket-drop-zone:hover {
+  border-color: #3B82F6;
+  background-color: #EFF6FF;
+}
+
 .bucket-drop-zone.drag-over {
-  border-color: #3B82F6 !important;
-  background-color: #EFF6FF !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #1D4ED8 !important;
+  background-color: #DBEAFE !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+  transform: scale(1.015);
 }
 
 /* Draggable Student Cards */
