@@ -1,510 +1,994 @@
 {
-  "activeYear": "2026",
+  "activeYear": "2027",
+  "activeSemester": "1",
   "academicYears": [
     "2026",
     "2027"
   ],
   "yearsData": {
     "2026": {
-      "periods": [
-        {
-          "id": "p1",
-          "period": 1,
-          "name": "1교시",
-          "startTime": "09:00",
-          "endTime": "09:50",
-          "isBreak": false
+      "1": {
+        "periods": [
+          {
+            "id": "p1",
+            "period": 1,
+            "name": "1교시",
+            "startTime": "09:00",
+            "endTime": "09:50",
+            "isBreak": false
+          },
+          {
+            "id": "p2",
+            "period": 2,
+            "name": "2교시",
+            "startTime": "10:00",
+            "endTime": "10:50",
+            "isBreak": false
+          },
+          {
+            "id": "p3",
+            "period": 3,
+            "name": "3교시",
+            "startTime": "11:00",
+            "endTime": "11:50",
+            "isBreak": false
+          },
+          {
+            "id": "p4",
+            "period": 4,
+            "name": "4교시",
+            "startTime": "12:00",
+            "endTime": "12:50",
+            "isBreak": false
+          },
+          {
+            "id": "p_lunch",
+            "period": null,
+            "name": "점심시간",
+            "startTime": "12:50",
+            "endTime": "13:40",
+            "isBreak": true
+          },
+          {
+            "id": "p5",
+            "period": 5,
+            "name": "5교시",
+            "startTime": "13:40",
+            "endTime": "14:30",
+            "isBreak": false
+          },
+          {
+            "id": "p6",
+            "period": 6,
+            "name": "6교시",
+            "startTime": "14:40",
+            "endTime": "15:30",
+            "isBreak": false
+          },
+          {
+            "id": "p7",
+            "period": 7,
+            "name": "7교시",
+            "startTime": "15:40",
+            "endTime": "16:30",
+            "isBreak": false
+          },
+          {
+            "id": "p8",
+            "period": 8,
+            "name": "8교시",
+            "startTime": "16:40",
+            "endTime": "17:30",
+            "isBreak": false
+          }
+        ],
+        "days": [
+          {
+            "id": "mon",
+            "name": "월",
+            "fullName": "월요일",
+            "isWeekend": false
+          },
+          {
+            "id": "tue",
+            "name": "화",
+            "fullName": "화요일",
+            "isWeekend": false
+          },
+          {
+            "id": "wed",
+            "name": "수",
+            "fullName": "수요일",
+            "isWeekend": false
+          },
+          {
+            "id": "thu",
+            "name": "목",
+            "fullName": "목요일",
+            "isWeekend": false
+          },
+          {
+            "id": "fri",
+            "name": "금",
+            "fullName": "금요일",
+            "isWeekend": false
+          },
+          {
+            "id": "sat",
+            "name": "토",
+            "fullName": "토요일",
+            "isWeekend": true
+          },
+          {
+            "id": "sun",
+            "name": "일",
+            "fullName": "일요일",
+            "isWeekend": true
+          }
+        ],
+        "students": [
+          {
+            "id": "s_1791806694369_2",
+            "grade": 2,
+            "classNum": 1,
+            "studentNum": 1,
+            "studentCode": "20101",
+            "name": "김소민",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_3",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 13,
+            "studentCode": "10113",
+            "name": "윤지우",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_4",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 17,
+            "studentCode": "10117",
+            "name": "정수민",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_5",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 15,
+            "studentCode": "10115",
+            "name": "장시우",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_6",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 8,
+            "studentCode": "10108",
+            "name": "박은비",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_7",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 5,
+            "studentCode": "10105",
+            "name": "김민진",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_8",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 9,
+            "studentCode": "10109",
+            "name": "박재윤",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_9",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 6,
+            "studentCode": "10106",
+            "name": "김승준",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_10",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 20,
+            "studentCode": "10120",
+            "name": "최리",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_11",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 21,
+            "studentCode": "10121",
+            "name": "최현서",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_12",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 21,
+            "studentCode": "10221",
+            "name": "현표",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_13",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 22,
+            "studentCode": "10222",
+            "name": "홍준서",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_14",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 13,
+            "studentCode": "10213",
+            "name": "이성준",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_15",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 15,
+            "studentCode": "10215",
+            "name": "이지효",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_16",
+            "grade": 2,
+            "classNum": 1,
+            "studentNum": 5,
+            "studentCode": "20105",
+            "name": "김승찬",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806694369_17",
+            "grade": 2,
+            "classNum": 1,
+            "studentNum": 6,
+            "studentCode": "20106",
+            "name": "김예빈",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "s_1791806706123_742",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 1,
+            "studentCode": "10101",
+            "name": "ㅁㅇㄹ",
+            "subject": "",
+            "day": null,
+            "period": null,
+            "periodId": null,
+            "status": "confirmed"
+          }
+        ],
+        "offeredSubjects": [
+          "행성우주과학",
+          "물질과 에너지"
+        ],
+        "subjectColorMap": {
+          "인공지능": {
+            "bg": "#E0F2FE",
+            "text": "#0369A1",
+            "border": "#BAE6FD",
+            "excelBg": "E0F2FE",
+            "excelText": "0369A1"
+          },
+          "빅데이터 분석": {
+            "bg": "#D1FAE5",
+            "text": "#047857",
+            "border": "#A7F3D0",
+            "excelBg": "D1FAE5",
+            "excelText": "047857"
+          },
+          "프로그래밍": {
+            "bg": "#EDE9FE",
+            "text": "#6D28D9",
+            "border": "#DDD6FE",
+            "excelBg": "EDE9FE",
+            "excelText": "6D28D9"
+          },
+          "행성우주과학": {
+            "bg": "#E0F2FE",
+            "text": "#0369A1",
+            "border": "#BAE6FD",
+            "excelBg": "E0F2FE",
+            "excelText": "0369A1"
+          },
+          "물질과 에너지": {
+            "bg": "#D1FAE5",
+            "text": "#047857",
+            "border": "#A7F3D0",
+            "excelBg": "D1FAE5",
+            "excelText": "047857"
+          }
         },
-        {
-          "id": "p2",
-          "period": 2,
-          "name": "2교시",
-          "startTime": "10:00",
-          "endTime": "10:50",
-          "isBreak": false
-        },
-        {
-          "id": "p3",
-          "period": 3,
-          "name": "3교시",
-          "startTime": "11:00",
-          "endTime": "11:50",
-          "isBreak": false
-        },
-        {
-          "id": "p4",
-          "period": 4,
-          "name": "4교시",
-          "startTime": "12:00",
-          "endTime": "12:50",
-          "isBreak": false
-        },
-        {
-          "id": "p_lunch",
-          "period": null,
-          "name": "점심시간",
-          "startTime": "12:50",
-          "endTime": "13:40",
-          "isBreak": true
-        },
-        {
-          "id": "p5",
-          "period": 5,
-          "name": "5교시",
-          "startTime": "13:40",
-          "endTime": "14:30",
-          "isBreak": false
-        },
-        {
-          "id": "p6",
-          "period": 6,
-          "name": "6교시",
-          "startTime": "14:40",
-          "endTime": "15:30",
-          "isBreak": false
-        },
-        {
-          "id": "p7",
-          "period": 7,
-          "name": "7교시",
-          "startTime": "15:40",
-          "endTime": "16:30",
-          "isBreak": false
-        },
-        {
-          "id": "p8",
-          "period": 8,
-          "name": "8교시",
-          "startTime": "16:40",
-          "endTime": "17:30",
-          "isBreak": false
-        }
-      ],
-      "days": [
-        {
-          "id": "mon",
-          "name": "월",
-          "fullName": "월요일",
-          "isWeekend": false
-        },
-        {
-          "id": "tue",
-          "name": "화",
-          "fullName": "화요일",
-          "isWeekend": false
-        },
-        {
-          "id": "wed",
-          "name": "수",
-          "fullName": "수요일",
-          "isWeekend": false
-        },
-        {
-          "id": "thu",
-          "name": "목",
-          "fullName": "목요일",
-          "isWeekend": false
-        },
-        {
-          "id": "fri",
-          "name": "금",
-          "fullName": "금요일",
-          "isWeekend": false
-        },
-        {
-          "id": "sat",
-          "name": "토",
-          "fullName": "토요일",
-          "isWeekend": true
-        },
-        {
-          "id": "sun",
-          "name": "일",
-          "fullName": "일요일",
-          "isWeekend": true
-        }
-      ],
-      "students": [
-        {
-          "id": "s_1791802064312_208",
-          "grade": 2,
-          "classNum": 1,
-          "studentNum": 1,
-          "studentCode": "20101",
-          "name": "김소민",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804426894_496",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 13,
-          "studentCode": "10113",
-          "name": "윤지우",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804436474_561",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 17,
-          "studentCode": "10117",
-          "name": "정수민",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804444826_626",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 15,
-          "studentCode": "10115",
-          "name": "장시우",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804475930_900",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 8,
-          "studentCode": "10108",
-          "name": "박은비",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804484091_85",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 5,
-          "studentCode": "10105",
-          "name": "김민진",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804544843_365",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 9,
-          "studentCode": "10109",
-          "name": "박재윤",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804557698_453",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 6,
-          "studentCode": "10106",
-          "name": "김승준",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804581563_516",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 20,
-          "studentCode": "10120",
-          "name": "최리",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804609498_847",
-          "grade": 1,
-          "classNum": 1,
-          "studentNum": 21,
-          "studentCode": "10121",
-          "name": "최현서",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804627003_977",
-          "grade": 1,
-          "classNum": 2,
-          "studentNum": 21,
-          "studentCode": "10221",
-          "name": "현표",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804635834_719",
-          "grade": 1,
-          "classNum": 2,
-          "studentNum": 22,
-          "studentCode": "10222",
-          "name": "홍준서",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804645090_76",
-          "grade": 1,
-          "classNum": 2,
-          "studentNum": 13,
-          "studentCode": "10213",
-          "name": "이성준",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804674788_154",
-          "grade": 1,
-          "classNum": 2,
-          "studentNum": 15,
-          "studentCode": "10215",
-          "name": "이지효",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804747610_75",
-          "grade": 2,
-          "classNum": 1,
-          "studentNum": 5,
-          "studentCode": "20105",
-          "name": "김승찬",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        },
-        {
-          "id": "s_1791804756707_289",
-          "grade": 2,
-          "classNum": 1,
-          "studentNum": 6,
-          "studentCode": "20106",
-          "name": "김예빈",
-          "subject": "",
-          "day": null,
-          "period": null,
-          "periodId": null,
-          "status": "confirmed"
-        }
-      ],
-      "offeredSubjects": [
-        "세포와 물질대사",
-        "물질과 에너지"
-      ],
-      "subjectColorMap": {
-        "세포와 물질대사": {
-          "bg": "#E0F2FE",
-          "text": "#0369A1",
-          "border": "#BAE6FD",
-          "excelBg": "E0F2FE",
-          "excelText": "0369A1"
-        },
-        "물질과 에너지": {
-          "bg": "#D1FAE5",
-          "text": "#047857",
-          "border": "#A7F3D0",
-          "excelBg": "D1FAE5",
-          "excelText": "047857"
-        }
+        "showWeekends": true,
+        "masterStudents": [
+          {
+            "id": "s_1791806694369_2",
+            "grade": 2,
+            "classNum": 1,
+            "studentNum": 1,
+            "studentCode": "20101",
+            "name": "김소민"
+          },
+          {
+            "id": "s_1791806694369_3",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 13,
+            "studentCode": "10113",
+            "name": "윤지우"
+          },
+          {
+            "id": "s_1791806694369_4",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 17,
+            "studentCode": "10117",
+            "name": "정수민"
+          },
+          {
+            "id": "s_1791806694369_5",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 15,
+            "studentCode": "10115",
+            "name": "장시우"
+          },
+          {
+            "id": "s_1791806694369_6",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 8,
+            "studentCode": "10108",
+            "name": "박은비"
+          },
+          {
+            "id": "s_1791806694369_7",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 5,
+            "studentCode": "10105",
+            "name": "김민진"
+          },
+          {
+            "id": "s_1791806694369_8",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 9,
+            "studentCode": "10109",
+            "name": "박재윤"
+          },
+          {
+            "id": "s_1791806694369_9",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 6,
+            "studentCode": "10106",
+            "name": "김승준"
+          },
+          {
+            "id": "s_1791806694369_10",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 20,
+            "studentCode": "10120",
+            "name": "최리"
+          },
+          {
+            "id": "s_1791806694369_11",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 21,
+            "studentCode": "10121",
+            "name": "최현서"
+          },
+          {
+            "id": "s_1791806694369_12",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 21,
+            "studentCode": "10221",
+            "name": "현표"
+          },
+          {
+            "id": "s_1791806694369_13",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 22,
+            "studentCode": "10222",
+            "name": "홍준서"
+          },
+          {
+            "id": "s_1791806694369_14",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 13,
+            "studentCode": "10213",
+            "name": "이성준"
+          },
+          {
+            "id": "s_1791806694369_15",
+            "grade": 1,
+            "classNum": 2,
+            "studentNum": 15,
+            "studentCode": "10215",
+            "name": "이지효"
+          },
+          {
+            "id": "s_1791806694369_16",
+            "grade": 2,
+            "classNum": 1,
+            "studentNum": 5,
+            "studentCode": "20105",
+            "name": "김승찬"
+          },
+          {
+            "id": "s_1791806694369_17",
+            "grade": 2,
+            "classNum": 1,
+            "studentNum": 6,
+            "studentCode": "20106",
+            "name": "김예빈"
+          },
+          {
+            "id": "s_1791806706123_742",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 1,
+            "studentCode": "10101",
+            "name": "ㅁㅇㄹ"
+          }
+        ],
+        "courseEnrollments": {},
+        "courseSchedules": {}
       },
-      "showWeekends": true
+      "2": {
+        "periods": [
+          {
+            "id": "p1",
+            "period": 1,
+            "name": "1교시",
+            "startTime": "09:00",
+            "endTime": "09:50",
+            "isBreak": false
+          },
+          {
+            "id": "p2",
+            "period": 2,
+            "name": "2교시",
+            "startTime": "10:00",
+            "endTime": "10:50",
+            "isBreak": false
+          },
+          {
+            "id": "p3",
+            "period": 3,
+            "name": "3교시",
+            "startTime": "11:00",
+            "endTime": "11:50",
+            "isBreak": false
+          },
+          {
+            "id": "p4",
+            "period": 4,
+            "name": "4교시",
+            "startTime": "12:00",
+            "endTime": "12:50",
+            "isBreak": false
+          },
+          {
+            "id": "p_lunch",
+            "period": null,
+            "name": "점심시간",
+            "startTime": "12:50",
+            "endTime": "13:40",
+            "isBreak": true
+          },
+          {
+            "id": "p5",
+            "period": 5,
+            "name": "5교시",
+            "startTime": "13:40",
+            "endTime": "14:30",
+            "isBreak": false
+          },
+          {
+            "id": "p6",
+            "period": 6,
+            "name": "6교시",
+            "startTime": "14:40",
+            "endTime": "15:30",
+            "isBreak": false
+          },
+          {
+            "id": "p7",
+            "period": 7,
+            "name": "7교시",
+            "startTime": "15:40",
+            "endTime": "16:30",
+            "isBreak": false
+          },
+          {
+            "id": "p8",
+            "period": 8,
+            "name": "8교시",
+            "startTime": "16:40",
+            "endTime": "17:30",
+            "isBreak": false
+          }
+        ],
+        "days": [
+          {
+            "id": "mon",
+            "name": "월",
+            "fullName": "월요일",
+            "isWeekend": false
+          },
+          {
+            "id": "tue",
+            "name": "화",
+            "fullName": "화요일",
+            "isWeekend": false
+          },
+          {
+            "id": "wed",
+            "name": "수",
+            "fullName": "수요일",
+            "isWeekend": false
+          },
+          {
+            "id": "thu",
+            "name": "목",
+            "fullName": "목요일",
+            "isWeekend": false
+          },
+          {
+            "id": "fri",
+            "name": "금",
+            "fullName": "금요일",
+            "isWeekend": false
+          },
+          {
+            "id": "sat",
+            "name": "토",
+            "fullName": "토요일",
+            "isWeekend": true
+          },
+          {
+            "id": "sun",
+            "name": "일",
+            "fullName": "일요일",
+            "isWeekend": true
+          }
+        ],
+        "students": [],
+        "offeredSubjects": [
+          "인공지능",
+          "빅데이터 분석",
+          "프로그래밍"
+        ],
+        "subjectColorMap": {
+          "인공지능": {
+            "bg": "#E0F2FE",
+            "text": "#0369A1",
+            "border": "#BAE6FD",
+            "excelBg": "E0F2FE",
+            "excelText": "0369A1"
+          },
+          "빅데이터 분석": {
+            "bg": "#D1FAE5",
+            "text": "#047857",
+            "border": "#A7F3D0",
+            "excelBg": "D1FAE5",
+            "excelText": "047857"
+          },
+          "프로그래밍": {
+            "bg": "#EDE9FE",
+            "text": "#6D28D9",
+            "border": "#DDD6FE",
+            "excelBg": "EDE9FE",
+            "excelText": "6D28D9"
+          }
+        },
+        "showWeekends": true
+      }
     },
     "2027": {
-      "periods": [
-        {
-          "id": "p1",
-          "period": 1,
-          "name": "1교시",
-          "startTime": "09:00",
-          "endTime": "09:50",
-          "isBreak": false
+      "1": {
+        "periods": [
+          {
+            "id": "p1",
+            "period": 1,
+            "name": "1교시",
+            "startTime": "09:00",
+            "endTime": "09:50",
+            "isBreak": false
+          },
+          {
+            "id": "p2",
+            "period": 2,
+            "name": "2교시",
+            "startTime": "10:00",
+            "endTime": "10:50",
+            "isBreak": false
+          },
+          {
+            "id": "p3",
+            "period": 3,
+            "name": "3교시",
+            "startTime": "11:00",
+            "endTime": "11:50",
+            "isBreak": false
+          },
+          {
+            "id": "p4",
+            "period": 4,
+            "name": "4교시",
+            "startTime": "12:00",
+            "endTime": "12:50",
+            "isBreak": false
+          },
+          {
+            "id": "p_lunch",
+            "period": null,
+            "name": "점심시간",
+            "startTime": "12:50",
+            "endTime": "13:40",
+            "isBreak": true
+          },
+          {
+            "id": "p5",
+            "period": 5,
+            "name": "5교시",
+            "startTime": "13:40",
+            "endTime": "14:30",
+            "isBreak": false
+          },
+          {
+            "id": "p6",
+            "period": 6,
+            "name": "6교시",
+            "startTime": "14:40",
+            "endTime": "15:30",
+            "isBreak": false
+          },
+          {
+            "id": "p7",
+            "period": 7,
+            "name": "7교시",
+            "startTime": "15:40",
+            "endTime": "16:30",
+            "isBreak": false
+          },
+          {
+            "id": "p8",
+            "period": 8,
+            "name": "8교시",
+            "startTime": "16:40",
+            "endTime": "17:30",
+            "isBreak": false
+          }
+        ],
+        "days": [
+          {
+            "id": "mon",
+            "name": "월",
+            "fullName": "월요일",
+            "isWeekend": false
+          },
+          {
+            "id": "tue",
+            "name": "화",
+            "fullName": "화요일",
+            "isWeekend": false
+          },
+          {
+            "id": "wed",
+            "name": "수",
+            "fullName": "수요일",
+            "isWeekend": false
+          },
+          {
+            "id": "thu",
+            "name": "목",
+            "fullName": "목요일",
+            "isWeekend": false
+          },
+          {
+            "id": "fri",
+            "name": "금",
+            "fullName": "금요일",
+            "isWeekend": false
+          },
+          {
+            "id": "sat",
+            "name": "토",
+            "fullName": "토요일",
+            "isWeekend": true
+          },
+          {
+            "id": "sun",
+            "name": "일",
+            "fullName": "일요일",
+            "isWeekend": true
+          }
+        ],
+        "masterStudents": [
+          {
+            "id": "s_1791806826747_637",
+            "grade": 2,
+            "classNum": 1,
+            "studentNum": 1,
+            "studentCode": "20101",
+            "name": "ㅁ"
+          }
+        ],
+        "courseEnrollments": {},
+        "courseSchedules": {},
+        "students": [
+          {
+            "id": "master_pure_s_1791806826747_637",
+            "studentMasterId": "s_1791806826747_637",
+            "grade": 2,
+            "classNum": 1,
+            "studentNum": 1,
+            "studentCode": "20101",
+            "name": "ㅁ",
+            "subject": "",
+            "day": null,
+            "periodId": null,
+            "period": null,
+            "status": "confirmed"
+          }
+        ],
+        "offeredSubjects": [
+          "인공지능",
+          "빅데이터 분석",
+          "프로그래밍"
+        ],
+        "subjectColorMap": {
+          "인공지능": {
+            "bg": "#E0F2FE",
+            "text": "#0369A1",
+            "border": "#BAE6FD",
+            "excelBg": "E0F2FE",
+            "excelText": "0369A1"
+          },
+          "빅데이터 분석": {
+            "bg": "#D1FAE5",
+            "text": "#047857",
+            "border": "#A7F3D0",
+            "excelBg": "D1FAE5",
+            "excelText": "047857"
+          },
+          "프로그래밍": {
+            "bg": "#EDE9FE",
+            "text": "#6D28D9",
+            "border": "#DDD6FE",
+            "excelBg": "EDE9FE",
+            "excelText": "6D28D9"
+          }
         },
-        {
-          "id": "p2",
-          "period": 2,
-          "name": "2교시",
-          "startTime": "10:00",
-          "endTime": "10:50",
-          "isBreak": false
-        },
-        {
-          "id": "p3",
-          "period": 3,
-          "name": "3교시",
-          "startTime": "11:00",
-          "endTime": "11:50",
-          "isBreak": false
-        },
-        {
-          "id": "p4",
-          "period": 4,
-          "name": "4교시",
-          "startTime": "12:00",
-          "endTime": "12:50",
-          "isBreak": false
-        },
-        {
-          "id": "p_lunch",
-          "period": null,
-          "name": "점심시간",
-          "startTime": "12:50",
-          "endTime": "13:40",
-          "isBreak": true
-        },
-        {
-          "id": "p5",
-          "period": 5,
-          "name": "5교시",
-          "startTime": "13:40",
-          "endTime": "14:30",
-          "isBreak": false
-        },
-        {
-          "id": "p6",
-          "period": 6,
-          "name": "6교시",
-          "startTime": "14:40",
-          "endTime": "15:30",
-          "isBreak": false
-        },
-        {
-          "id": "p7",
-          "period": 7,
-          "name": "7교시",
-          "startTime": "15:40",
-          "endTime": "16:30",
-          "isBreak": false
-        },
-        {
-          "id": "p8",
-          "period": 8,
-          "name": "8교시",
-          "startTime": "16:40",
-          "endTime": "17:30",
-          "isBreak": false
-        }
-      ],
-      "days": [
-        {
-          "id": "mon",
-          "name": "월",
-          "fullName": "월요일",
-          "isWeekend": false
-        },
-        {
-          "id": "tue",
-          "name": "화",
-          "fullName": "화요일",
-          "isWeekend": false
-        },
-        {
-          "id": "wed",
-          "name": "수",
-          "fullName": "수요일",
-          "isWeekend": false
-        },
-        {
-          "id": "thu",
-          "name": "목",
-          "fullName": "목요일",
-          "isWeekend": false
-        },
-        {
-          "id": "fri",
-          "name": "금",
-          "fullName": "금요일",
-          "isWeekend": false
-        },
-        {
-          "id": "sat",
-          "name": "토",
-          "fullName": "토요일",
-          "isWeekend": true
-        },
-        {
-          "id": "sun",
-          "name": "일",
-          "fullName": "일요일",
-          "isWeekend": true
-        }
-      ],
-      "students": [],
-      "offeredSubjects": [
-        "인공지능",
-        "빅데이터 분석",
-        "프로그래밍"
-      ],
-      "subjectColorMap": {
-        "인공지능": {
-          "bg": "#E0F2FE",
-          "text": "#0369A1",
-          "border": "#BAE6FD",
-          "excelBg": "E0F2FE",
-          "excelText": "0369A1"
-        },
-        "빅데이터 분석": {
-          "bg": "#D1FAE5",
-          "text": "#047857",
-          "border": "#A7F3D0",
-          "excelBg": "D1FAE5",
-          "excelText": "047857"
-        },
-        "프로그래밍": {
-          "bg": "#EDE9FE",
-          "text": "#6D28D9",
-          "border": "#DDD6FE",
-          "excelBg": "EDE9FE",
-          "excelText": "6D28D9"
-        }
+        "showWeekends": true
       },
-      "showWeekends": true
+      "2": {
+        "periods": [
+          {
+            "id": "p1",
+            "period": 1,
+            "name": "1교시",
+            "startTime": "09:00",
+            "endTime": "09:50",
+            "isBreak": false
+          },
+          {
+            "id": "p2",
+            "period": 2,
+            "name": "2교시",
+            "startTime": "10:00",
+            "endTime": "10:50",
+            "isBreak": false
+          },
+          {
+            "id": "p3",
+            "period": 3,
+            "name": "3교시",
+            "startTime": "11:00",
+            "endTime": "11:50",
+            "isBreak": false
+          },
+          {
+            "id": "p4",
+            "period": 4,
+            "name": "4교시",
+            "startTime": "12:00",
+            "endTime": "12:50",
+            "isBreak": false
+          },
+          {
+            "id": "p_lunch",
+            "period": null,
+            "name": "점심시간",
+            "startTime": "12:50",
+            "endTime": "13:40",
+            "isBreak": true
+          },
+          {
+            "id": "p5",
+            "period": 5,
+            "name": "5교시",
+            "startTime": "13:40",
+            "endTime": "14:30",
+            "isBreak": false
+          },
+          {
+            "id": "p6",
+            "period": 6,
+            "name": "6교시",
+            "startTime": "14:40",
+            "endTime": "15:30",
+            "isBreak": false
+          },
+          {
+            "id": "p7",
+            "period": 7,
+            "name": "7교시",
+            "startTime": "15:40",
+            "endTime": "16:30",
+            "isBreak": false
+          },
+          {
+            "id": "p8",
+            "period": 8,
+            "name": "8교시",
+            "startTime": "16:40",
+            "endTime": "17:30",
+            "isBreak": false
+          }
+        ],
+        "days": [
+          {
+            "id": "mon",
+            "name": "월",
+            "fullName": "월요일",
+            "isWeekend": false
+          },
+          {
+            "id": "tue",
+            "name": "화",
+            "fullName": "화요일",
+            "isWeekend": false
+          },
+          {
+            "id": "wed",
+            "name": "수",
+            "fullName": "수요일",
+            "isWeekend": false
+          },
+          {
+            "id": "thu",
+            "name": "목",
+            "fullName": "목요일",
+            "isWeekend": false
+          },
+          {
+            "id": "fri",
+            "name": "금",
+            "fullName": "금요일",
+            "isWeekend": false
+          },
+          {
+            "id": "sat",
+            "name": "토",
+            "fullName": "토요일",
+            "isWeekend": true
+          },
+          {
+            "id": "sun",
+            "name": "일",
+            "fullName": "일요일",
+            "isWeekend": true
+          }
+        ],
+        "students": [],
+        "offeredSubjects": [
+          "인공지능",
+          "빅데이터 분석",
+          "프로그래밍"
+        ],
+        "subjectColorMap": {},
+        "showWeekends": true
+      }
     }
   },
   "periods": [
@@ -627,234 +1111,60 @@
   ],
   "students": [
     {
-      "id": "s_1791802064312_208",
+      "id": "master_pure_s_1791806826747_637",
+      "studentMasterId": "s_1791806826747_637",
       "grade": 2,
       "classNum": 1,
       "studentNum": 1,
       "studentCode": "20101",
-      "name": "김소민",
+      "name": "ㅁ",
       "subject": "",
       "day": null,
-      "period": null,
       "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804426894_496",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 13,
-      "studentCode": "10113",
-      "name": "윤지우",
-      "subject": "",
-      "day": null,
       "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804436474_561",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 17,
-      "studentCode": "10117",
-      "name": "정수민",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804444826_626",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 15,
-      "studentCode": "10115",
-      "name": "장시우",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804475930_900",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 8,
-      "studentCode": "10108",
-      "name": "박은비",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804484091_85",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 5,
-      "studentCode": "10105",
-      "name": "김민진",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804544843_365",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 9,
-      "studentCode": "10109",
-      "name": "박재윤",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804557698_453",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 6,
-      "studentCode": "10106",
-      "name": "김승준",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804581563_516",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 20,
-      "studentCode": "10120",
-      "name": "최리",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804609498_847",
-      "grade": 1,
-      "classNum": 1,
-      "studentNum": 21,
-      "studentCode": "10121",
-      "name": "최현서",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804627003_977",
-      "grade": 1,
-      "classNum": 2,
-      "studentNum": 21,
-      "studentCode": "10221",
-      "name": "현표",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804635834_719",
-      "grade": 1,
-      "classNum": 2,
-      "studentNum": 22,
-      "studentCode": "10222",
-      "name": "홍준서",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804645090_76",
-      "grade": 1,
-      "classNum": 2,
-      "studentNum": 13,
-      "studentCode": "10213",
-      "name": "이성준",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804674788_154",
-      "grade": 1,
-      "classNum": 2,
-      "studentNum": 15,
-      "studentCode": "10215",
-      "name": "이지효",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804747610_75",
-      "grade": 2,
-      "classNum": 1,
-      "studentNum": 5,
-      "studentCode": "20105",
-      "name": "김승찬",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
-      "status": "confirmed"
-    },
-    {
-      "id": "s_1791804756707_289",
-      "grade": 2,
-      "classNum": 1,
-      "studentNum": 6,
-      "studentCode": "20106",
-      "name": "김예빈",
-      "subject": "",
-      "day": null,
-      "period": null,
-      "periodId": null,
       "status": "confirmed"
     }
   ],
+  "masterStudents": [
+    {
+      "id": "s_1791806826747_637",
+      "grade": 2,
+      "classNum": 1,
+      "studentNum": 1,
+      "studentCode": "20101",
+      "name": "ㅁ"
+    }
+  ],
+  "courseEnrollments": {},
+  "courseSchedules": {},
   "offeredSubjects": [
-    "세포와 물질대사",
-    "물질과 에너지"
+    "인공지능",
+    "빅데이터 분석",
+    "프로그래밍"
   ],
   "subjectColorMap": {
-    "세포와 물질대사": {
+    "인공지능": {
       "bg": "#E0F2FE",
       "text": "#0369A1",
       "border": "#BAE6FD",
       "excelBg": "E0F2FE",
       "excelText": "0369A1"
     },
-    "물질과 에너지": {
+    "빅데이터 분석": {
       "bg": "#D1FAE5",
       "text": "#047857",
       "border": "#A7F3D0",
       "excelBg": "D1FAE5",
       "excelText": "047857"
+    },
+    "프로그래밍": {
+      "bg": "#EDE9FE",
+      "text": "#6D28D9",
+      "border": "#DDD6FE",
+      "excelBg": "EDE9FE",
+      "excelText": "6D28D9"
     }
   },
   "showWeekends": true,
-  "lastUpdated": "2026-10-12T11:32:36.713Z"
+  "lastUpdated": "2026-10-12T12:09:28.926Z"
 }

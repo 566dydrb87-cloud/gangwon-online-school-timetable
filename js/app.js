@@ -59,15 +59,23 @@ class TimetableApp {
     setTimeout(async () => {
       if (window.cloudSync) {
         const remoteData = await window.cloudSync.loadFromBackend();
-        if (remoteData && remoteData.lastUpdated) {
+        if (remoteData) {
           const localSaved = localStorage.getItem(this.storageKey);
           const localData = localSaved ? JSON.parse(localSaved) : null;
-          if (!localData || !localData.lastUpdated || new Date(remoteData.lastUpdated) > new Date(localData.lastUpdated)) {
-            this.applyExternalData(remoteData, '백엔드 서버에서 최신 시간표 데이터를 불러왔습니다.');
+          const localCount = (this.masterStudents || []).length;
+
+          // 원격 데이터가 더 최신이거나, 로컬 학생 데이터가 비어있는 경우 즉시 적용
+          const shouldApply = !localData || 
+            localCount === 0 || 
+            !localData.lastUpdated || 
+            (remoteData.lastUpdated && new Date(remoteData.lastUpdated) > new Date(localData.lastUpdated));
+
+          if (shouldApply) {
+            this.applyExternalData(remoteData, '시간표 및 학생 데이터를 불러왔습니다.');
           }
         }
       }
-    }, 500);
+    }, 200);
   }
 
   // ==========================================
@@ -126,7 +134,10 @@ class TimetableApp {
     if (d.showWeekends === undefined) d.showWeekends = true;
 
     // masterStudents & courseEnrollments & courseSchedules 마이그레이션
-    if (!d.masterStudents || !Array.isArray(d.masterStudents)) {
+    const needsMigration = !d.masterStudents || !Array.isArray(d.masterStudents) || 
+      (d.masterStudents.length === 0 && d.students && Array.isArray(d.students) && d.students.length > 0);
+
+    if (needsMigration) {
       d.masterStudents = [];
       d.courseEnrollments = d.courseEnrollments || {};
       d.courseSchedules = d.courseSchedules || {};
@@ -187,6 +198,28 @@ class TimetableApp {
     this.offeredSubjects = d.offeredSubjects;
     this.subjectColorMap = d.subjectColorMap;
     this.showWeekends = d.showWeekends !== undefined ? d.showWeekends : true;
+
+    // masterStudents 재확인 및 보정
+    if (this.masterStudents.length === 0 && d.students && Array.isArray(d.students) && d.students.length > 0) {
+      const studentMap = new Map();
+      d.students.forEach(s => {
+        const code = s.studentCode || ExcelService.getStudentCode(s);
+        const key = `${code}_${s.name}`;
+        if (!studentMap.has(key)) {
+          const mStudent = {
+            id: s.studentMasterId || s.id || `sm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+            grade: s.grade || 1,
+            classNum: s.classNum || 1,
+            studentNum: s.studentNum || null,
+            studentCode: code,
+            name: s.name
+          };
+          studentMap.set(key, mStudent);
+          this.masterStudents.push(mStudent);
+        }
+      });
+      d.masterStudents = this.masterStudents;
+    }
 
     this.selectedStep1StudentIds.clear();
     this.rebuildStudentAssignments();

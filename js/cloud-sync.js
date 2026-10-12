@@ -172,6 +172,19 @@ class CloudSyncService {
       }
     }
 
+    // C. 정적 호스팅(GitHub Pages) 또는 오프라인 환경인 경우: data/timetable-db.json 파일 불러오기
+    try {
+      const res = await fetch('data/timetable-db.json?t=' + Date.now());
+      if (res.ok) {
+        const json = await res.json();
+        if (json && (json.yearsData || json.periods || json.students)) {
+          return json;
+        }
+      }
+    } catch (e) {
+      // 정적 파일 없음 또는 네트워크 오류 (정상 동작)
+    }
+
     return null;
   }
 
