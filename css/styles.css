@@ -65,6 +65,24 @@ body {
   transform: scale(1.015);
 }
 
+/* Side Subject List Items (드롭존 겸용) */
+.side-subject-item {
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.side-subject-item:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+.side-subject-item.drag-over {
+  border-color: #2563EB !important;
+  background-color: #DBEAFE !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+  transform: scale(1.025) !important;
+}
+
 /* Draggable Student Cards */
 .draggable-student-item {
   cursor: grab;

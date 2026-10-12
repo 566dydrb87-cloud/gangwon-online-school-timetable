@@ -1636,6 +1636,52 @@ class TimetableApp {
 
   renderSubjectBuckets() {
     const container = document.getElementById('subject-buckets-container');
+    const sideListContainer = document.getElementById('side-subject-list-container');
+    const sideCountBadge = document.getElementById('side-subject-count-badge');
+
+    if (sideCountBadge) {
+      sideCountBadge.textContent = `${this.offeredSubjects.length}개`;
+    }
+
+    // [좌측]: 세로 과목 목록 렌더링 (가장 긴 과목명 기준, '과목명(인원)', 드롭존 겸 클릭 스크롤)
+    if (sideListContainer) {
+      if (this.offeredSubjects.length === 0) {
+        sideListContainer.innerHTML = `
+          <div class="py-6 text-center text-slate-400 text-xs italic">
+            개설된 과목이 없습니다.
+          </div>
+        `;
+      } else {
+        sideListContainer.innerHTML = this.offeredSubjects.map(sub => {
+          const color = this.getSubjectColor(sub);
+          const studentIds = this.courseEnrollments[sub] || [];
+          const safeSub = encodeURIComponent(sub);
+          const count = studentIds.length;
+
+          return `
+            <div class="side-subject-item group flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/40 transition-all cursor-pointer shadow-2xs"
+                 draggable="false"
+                 onclick="window.app.scrollToBucket(decodeURIComponent('${safeSub}'))"
+                 ondragover="window.app.handleBucketDragOver(event)"
+                 ondragleave="window.app.handleBucketDragLeave(event)"
+                 ondrop="window.app.handleBucketDrop(event, decodeURIComponent('${safeSub}'))"
+                 title="클릭하여 해당 바구니로 이동 / 학생 카드를 여기에 드롭하여 편제">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" 
+                      style="background-color: ${color.text};"></span>
+                <span class="text-xs font-bold text-slate-800 whitespace-nowrap group-hover:text-indigo-900 transition">
+                  ${sub}
+                </span>
+              </div>
+              <span class="text-[11px] font-black px-2 py-0.5 rounded-full shrink-0 shadow-2xs ${count > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-400'}">
+                (${count}명)
+              </span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
     if (!container) return;
 
     if (this.offeredSubjects.length === 0) {
@@ -1659,9 +1705,10 @@ class TimetableApp {
       const color = this.getSubjectColor(sub);
       const studentIds = this.courseEnrollments[sub] || [];
       const schedules = this.courseSchedules[sub] || [];
+      const safeSub = encodeURIComponent(sub);
 
       html += `
-        <div class="bg-white rounded-2xl border-2 border-slate-200/90 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg">
+        <div id="bucket-card-${safeSub}" class="bg-white rounded-2xl border-2 border-slate-200/90 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36">
           
           <!-- 바구니 상단 헤더 -->
           <div class="p-4 border-b flex items-center justify-between"
@@ -1678,7 +1725,7 @@ class TimetableApp {
             <div class="flex items-center gap-1.5">
               <!-- 학년도/학기 변경 및 이전 버튼 -->
               <button type="button" 
-                      onclick="window.app.openSemesterTransferModal('${sub}')" 
+                      onclick="window.app.openSemesterTransferModal(decodeURIComponent('${safeSub}'))" 
                       class="px-2.5 py-1 text-xs font-bold rounded-lg bg-white/90 hover:bg-white text-indigo-700 border border-indigo-200 shadow-2xs transition flex items-center gap-1" 
                       title="'${sub}' 과목을 다른 학기/학년도로 복사 또는 이동">
                 <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-indigo-600"></i>
@@ -1687,7 +1734,7 @@ class TimetableApp {
 
               <!-- 과목 바구니 삭제 -->
               <button type="button" 
-                      onclick="window.app.handleDeleteSubjectBucket('${sub}')" 
+                      onclick="window.app.handleDeleteSubjectBucket(decodeURIComponent('${safeSub}'))" 
                       class="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-white/80 transition" title="과목 바구니 삭제">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>
@@ -1701,7 +1748,7 @@ class TimetableApp {
             <div class="bucket-drop-zone py-7 px-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer min-h-[110px]"
                  ondragover="window.app.handleBucketDragOver(event)"
                  ondragleave="window.app.handleBucketDragLeave(event)"
-                 ondrop="window.app.handleBucketDrop(event, '${sub}')">
+                 ondrop="window.app.handleBucketDrop(event, decodeURIComponent('${safeSub}'))">
               <div class="flex items-center gap-2 text-blue-700 font-black text-sm">
                 <i data-lucide="user-plus" class="w-6 h-6 text-blue-600"></i>
                 <span>학생을 이 영역으로 드래그하여 편제 (Drop)</span>
@@ -1717,7 +1764,7 @@ class TimetableApp {
                   <span>편제된 수강생 목록 (${studentIds.length}명)</span>
                 </span>
                 ${studentIds.length > 0 ? `
-                  <button type="button" onclick="window.app.handleClearBucketStudents('${sub}')" class="text-xs text-slate-400 hover:text-red-600 font-medium transition">
+                  <button type="button" onclick="window.app.handleClearBucketStudents(decodeURIComponent('${safeSub}'))" class="text-xs text-slate-400 hover:text-red-600 font-medium transition">
                     전체 비우기
                   </button>
                 ` : ''}
@@ -1733,7 +1780,7 @@ class TimetableApp {
                       <span class="font-mono text-[11px] text-slate-500 font-bold">${code}</span>
                       <span class="font-bold text-slate-900">${m.name}</span>
                       <button type="button" 
-                              onclick="window.app.handleRemoveStudentFromCourse('${sub}', '${m.id}')" 
+                              onclick="window.app.handleRemoveStudentFromCourse(decodeURIComponent('${safeSub}'), '${m.id}')" 
                               class="text-slate-400 hover:text-red-600 ml-1 text-sm font-bold" title="편제 제외">&times;</button>
                     </span>
                   `;
@@ -1765,7 +1812,7 @@ class TimetableApp {
                   ${regularPeriods.map(p => `<option value="${p.id}">${p.name} (${p.startTime})</option>`).join('')}
                 </select>
                 <button type="button" 
-                        onclick="window.app.handleAddBucketSchedule('${sub}')" 
+                        onclick="window.app.handleAddBucketSchedule(decodeURIComponent('${safeSub}'))" 
                         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition whitespace-nowrap shadow-xs flex items-center gap-1">
                   <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                   <span>시간 추가</span>
@@ -1784,7 +1831,7 @@ class TimetableApp {
                       <span>${sym}</span>
                       <span>${dayName} ${periodName}</span>
                       <button type="button" 
-                              onclick="window.app.handleRemoveBucketSchedule('${sub}', '${sch.id || (sch.day + '_' + sch.periodId)}')"
+                              onclick="window.app.handleRemoveBucketSchedule(decodeURIComponent('${safeSub}'), '${sch.id || (sch.day + '_' + sch.periodId)}')"
                               class="text-indigo-400 hover:text-red-600 ml-1 text-sm font-bold" title="시간표에서 배치 해제">&times;</button>
                     </span>
                   `;
@@ -1803,6 +1850,18 @@ class TimetableApp {
 
     container.innerHTML = html;
     if (window.lucide) window.lucide.createIcons();
+  }
+
+  scrollToBucket(subjectName) {
+    const safeSub = encodeURIComponent(subjectName);
+    const card = document.getElementById(`bucket-card-${safeSub}`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      card.classList.add('ring-4', 'ring-indigo-400', 'ring-offset-2');
+      setTimeout(() => {
+        card.classList.remove('ring-4', 'ring-indigo-400', 'ring-offset-2');
+      }, 1500);
+    }
   }
 
   handleBucketDragOver(e) {

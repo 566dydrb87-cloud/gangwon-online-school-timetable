@@ -410,9 +410,9 @@
 
       </aside>
 
-      <!-- 우측: 과목 바구니/폴더 영역 -->
+      <!-- 우측: 개설 과목 바구니 영역 (좌: 과목 목록 세로 나열 / 우: 과목 바구니 카드 스크롤) -->
       <section class="flex-1 min-w-0 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col p-4 sm:p-5">
-        <!-- 바구니 상단 툴바 -->
+        <!-- 상단 툴바 -->
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
           <div>
             <div class="flex items-center gap-2">
@@ -420,7 +420,7 @@
               <h2 class="text-base font-bold text-slate-900">개설 과목 바구니 (편제 & 시간 설정)</h2>
             </div>
             <p class="text-xs text-slate-500 mt-0.5">
-              좌측 학생을 <strong>과목 바구니로 드래그</strong>하여 편제하세요. 과목 내에서 <strong>시간을 추가</strong>하면 시간표에 자동 배치됩니다.
+              좌측 학생을 <strong>과목 목록</strong>이나 <strong>과목 바구니</strong>로 드래그하여 편제하세요.
             </p>
           </div>
 
@@ -434,9 +434,35 @@
           </form>
         </div>
 
-        <!-- 과목 바구니 카드 그리드 (2배 넓어진 2열 와이드 그리드) -->
-        <div id="subject-buckets-container" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <!-- JS 동적 생성 -->
+        <!-- 본문 2분할 레이아웃: 좌측 과목 목록 / 우측 과목 바구니 -->
+        <div class="flex-1 flex flex-col lg:flex-row gap-5 items-start min-h-0">
+          
+          <!-- [좌측]: 세로 과목 목록 (가장 긴 과목명 기준 너비, 바로 학생 드롭 가능) -->
+          <aside class="w-full lg:w-max lg:min-w-[210px] lg:max-w-[290px] shrink-0 flex flex-col gap-2 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200 sticky top-36">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+              <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <i data-lucide="list" class="w-4 h-4 text-indigo-600"></i>
+                <span>과목 목록 (바로 드롭)</span>
+              </span>
+              <span id="side-subject-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">0개</span>
+            </div>
+            <p class="text-[10px] text-slate-500 leading-tight">
+              학생 카드를 아래 과목명 위로 끌어다 놓아도 바로 편제됩니다.
+            </p>
+
+            <!-- 동적 과목 목록 컨테이너 -->
+            <div id="side-subject-list-container" class="flex flex-col gap-1.5 max-h-[calc(100vh-270px)] overflow-y-auto pr-0.5">
+              <!-- JS 동적 생성: 과목명(인원) -->
+            </div>
+          </aside>
+
+          <!-- [우측]: 과목 바구니 카드 스크롤 영역 (2배 커진 와이드 바구니들) -->
+          <div class="flex-1 min-w-0 w-full flex flex-col">
+            <div id="subject-buckets-container" class="flex flex-col gap-6 max-h-[calc(100vh-230px)] overflow-y-auto pr-1">
+              <!-- JS 동적 생성: 세로로 나열되어 아래로 스크롤 가능 -->
+            </div>
+          </div>
+
         </div>
       </section>
 
