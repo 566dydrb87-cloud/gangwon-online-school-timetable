@@ -65,6 +65,20 @@ body {
   transform: scale(0.96);
 }
 
+/* Status Styles */
+.subject-card.is-canceled {
+  background-color: #E2E8F0 !important;
+  color: #64748B !important;
+  border-color: #CBD5E1 !important;
+  text-decoration: line-through;
+  opacity: 0.85;
+}
+
+.subject-card.is-adjust {
+  border-style: dashed !important;
+  border-width: 1.5px !important;
+}
+
 /* Badge & Tag Styling */
 .badge-pill {
   display: inline-flex;
