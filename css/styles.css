@@ -44,6 +44,71 @@ body {
   box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.15);
 }
 
+/* Bucket & Drop Zones for Step 1 */
+.bucket-drop-zone {
+  min-height: 58px;
+  border: 2px dashed #CBD5E1;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background-color: #F8FAFC;
+}
+
+.bucket-drop-zone.drag-over {
+  border-color: #3B82F6 !important;
+  background-color: #EFF6FF !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Draggable Student Cards */
+.draggable-student-item {
+  cursor: grab;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.draggable-student-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.draggable-student-item:active {
+  cursor: grabbing;
+}
+
+.draggable-student-item.is-dragging {
+  opacity: 0.4;
+  transform: scale(0.96);
+}
+
+/* Draggable Palette Subject */
+.draggable-palette-subject {
+  cursor: grab;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.draggable-palette-subject:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.draggable-palette-subject:active {
+  cursor: grabbing;
+}
+
+.draggable-palette-subject.is-dragging {
+  opacity: 0.45;
+  transform: scale(0.96);
+}
+
+/* Ctrl Copy Mode Cursor */
+body.is-copy-mode,
+body.is-copy-mode .subject-card,
+body.is-copy-mode .draggable-palette-subject,
+body.is-copy-mode .timetable-cell {
+  cursor: copy !important;
+}
+
 /* Card Dragging */
 .subject-card {
   cursor: grab;
