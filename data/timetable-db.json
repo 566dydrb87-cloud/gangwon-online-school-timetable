@@ -254,14 +254,6 @@
             "studentNum": 6,
             "studentCode": "20106",
             "name": "김예빈"
-          },
-          {
-            "id": "s_1791806706123_742",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 1,
-            "studentCode": "10101",
-            "name": "ㅁㅇㄹ"
           }
         ],
         "courseEnrollments": {
@@ -617,20 +609,6 @@
             "periodId": null,
             "period": null,
             "status": "confirmed"
-          },
-          {
-            "id": "master_pure_s_1791806706123_742",
-            "studentMasterId": "s_1791806706123_742",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 1,
-            "studentCode": "10101",
-            "name": "ㅁㅇㄹ",
-            "subject": "",
-            "day": null,
-            "periodId": null,
-            "period": null,
-            "status": "confirmed"
           }
         ],
         "offeredSubjects": [
@@ -866,6 +844,14 @@
             "studentNum": 20,
             "studentCode": "10120",
             "name": "최리"
+          },
+          {
+            "id": "sm_1791807862451_4sbs1m",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 21,
+            "studentCode": "10121",
+            "name": "최현서"
           }
         ],
         "courseEnrollments": {
@@ -881,6 +867,12 @@
           ],
           "국제 경제": [
             "sm_1791807771363_nl3iuu"
+          ],
+          "문예 창작의 이해": [
+            "sm_1791807611306_8neqob"
+          ],
+          "문학 감상과 비평": [
+            "sm_1791807862451_4sbs1m"
           ]
         },
         "courseSchedules": {
@@ -930,7 +922,9 @@
               "period": 6,
               "status": "confirmed"
             }
-          ]
+          ],
+          "문예 창작의 이해": [],
+          "문학 감상과 비평": []
         },
         "students": [
           {
@@ -1185,12 +1179,42 @@
             "periodId": "p6",
             "period": 6,
             "status": "confirmed"
+          },
+          {
+            "id": "assign_문예 창작의 이해_unassigned_sm_1791807611306_8neqob",
+            "studentMasterId": "sm_1791807611306_8neqob",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 8,
+            "studentCode": "10108",
+            "name": "박은비",
+            "subject": "문예 창작의 이해",
+            "day": null,
+            "periodId": null,
+            "period": null,
+            "status": "confirmed"
+          },
+          {
+            "id": "assign_문학 감상과 비평_unassigned_sm_1791807862451_4sbs1m",
+            "studentMasterId": "sm_1791807862451_4sbs1m",
+            "grade": 1,
+            "classNum": 1,
+            "studentNum": 21,
+            "studentCode": "10121",
+            "name": "최현서",
+            "subject": "문학 감상과 비평",
+            "day": null,
+            "periodId": null,
+            "period": null,
+            "status": "confirmed"
           }
         ],
         "offeredSubjects": [
           "화학 반응의 세계",
           "인공지능 기초",
-          "국제 경제"
+          "국제 경제",
+          "문예 창작의 이해",
+          "문학 감상과 비평"
         ],
         "subjectColorMap": {
           "인공지능": {
@@ -1241,6 +1265,20 @@
             "border": "#DDD6FE",
             "excelBg": "EDE9FE",
             "excelText": "6D28D9"
+          },
+          "문예 창작의 이해": {
+            "bg": "#FFE4E6",
+            "text": "#BE123C",
+            "border": "#FECDD3",
+            "excelBg": "FFE4E6",
+            "excelText": "BE123C"
+          },
+          "문학 감상과 비평": {
+            "bg": "#FEF3C7",
+            "text": "#B45309",
+            "border": "#FDE68A",
+            "excelBg": "FEF3C7",
+            "excelText": "B45309"
           }
         },
         "showWeekends": true
@@ -1925,6 +1963,34 @@
       "periodId": "p6",
       "period": 6,
       "status": "confirmed"
+    },
+    {
+      "id": "assign_문예 창작의 이해_unassigned_sm_1791807611306_8neqob",
+      "studentMasterId": "sm_1791807611306_8neqob",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 8,
+      "studentCode": "10108",
+      "name": "박은비",
+      "subject": "문예 창작의 이해",
+      "day": null,
+      "periodId": null,
+      "period": null,
+      "status": "confirmed"
+    },
+    {
+      "id": "assign_문학 감상과 비평_unassigned_sm_1791807862451_4sbs1m",
+      "studentMasterId": "sm_1791807862451_4sbs1m",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 21,
+      "studentCode": "10121",
+      "name": "최현서",
+      "subject": "문학 감상과 비평",
+      "day": null,
+      "periodId": null,
+      "period": null,
+      "status": "confirmed"
     }
   ],
   "masterStudents": [
@@ -1983,6 +2049,14 @@
       "studentNum": 20,
       "studentCode": "10120",
       "name": "최리"
+    },
+    {
+      "id": "sm_1791807862451_4sbs1m",
+      "grade": 1,
+      "classNum": 1,
+      "studentNum": 21,
+      "studentCode": "10121",
+      "name": "최현서"
     }
   ],
   "courseEnrollments": {
@@ -1998,6 +2072,12 @@
     ],
     "국제 경제": [
       "sm_1791807771363_nl3iuu"
+    ],
+    "문예 창작의 이해": [
+      "sm_1791807611306_8neqob"
+    ],
+    "문학 감상과 비평": [
+      "sm_1791807862451_4sbs1m"
     ]
   },
   "courseSchedules": {
@@ -2047,12 +2127,16 @@
         "period": 6,
         "status": "confirmed"
       }
-    ]
+    ],
+    "문예 창작의 이해": [],
+    "문학 감상과 비평": []
   },
   "offeredSubjects": [
     "화학 반응의 세계",
     "인공지능 기초",
-    "국제 경제"
+    "국제 경제",
+    "문예 창작의 이해",
+    "문학 감상과 비평"
   ],
   "subjectColorMap": {
     "인공지능": {
@@ -2103,8 +2187,22 @@
       "border": "#DDD6FE",
       "excelBg": "EDE9FE",
       "excelText": "6D28D9"
+    },
+    "문예 창작의 이해": {
+      "bg": "#FFE4E6",
+      "text": "#BE123C",
+      "border": "#FECDD3",
+      "excelBg": "FFE4E6",
+      "excelText": "BE123C"
+    },
+    "문학 감상과 비평": {
+      "bg": "#FEF3C7",
+      "text": "#B45309",
+      "border": "#FDE68A",
+      "excelBg": "FEF3C7",
+      "excelText": "B45309"
     }
   },
   "showWeekends": true,
-  "lastUpdated": "2026-10-12T12:23:16.170Z"
+  "lastUpdated": "2026-10-12T12:28:20.264Z"
 }

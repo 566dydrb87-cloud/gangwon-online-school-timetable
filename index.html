@@ -93,8 +93,8 @@
           <div class="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-slate-200 py-1 hidden group-hover:block z-40">
             <label class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 cursor-pointer">
               <i data-lucide="file-up" class="w-3.5 h-3.5 text-blue-600"></i>
-              <span>편성 학생 엑셀 업로드</span>
-              <input type="file" id="file-upload-student" accept=".xlsx, .xls" class="hidden">
+              <span>편성 학생 엑셀 업로드 (복수 파일)</span>
+              <input type="file" id="file-upload-student" accept=".xlsx, .xls" multiple class="hidden">
             </label>
             <label class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 cursor-pointer border-t border-slate-100">
               <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-600"></i>
@@ -323,8 +323,8 @@
             <div class="flex items-center gap-1.5 shrink-0">
               <label class="cursor-pointer px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded shadow-xs transition flex items-center gap-1">
                 <i data-lucide="upload" class="w-3 h-3"></i>
-                <span>엑셀 업로드</span>
-                <input type="file" id="step1-file-upload-student" accept=".xlsx, .xls" class="hidden">
+                <span>엑셀 업로드 (다중 선택)</span>
+                <input type="file" id="step1-file-upload-student" accept=".xlsx, .xls" multiple class="hidden">
               </label>
               <button type="button" onclick="ExcelService.downloadStudentTemplate()" class="p-1 text-slate-400 hover:text-blue-600 transition" title="엑셀 표준 양식 다운로드">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>

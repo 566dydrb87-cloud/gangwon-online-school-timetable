@@ -676,18 +676,18 @@ class TimetableApp {
       this.renderStep1StudentList();
     });
 
-    // 6. 엑셀 학생 명부 업로드 (전체 일괄 등록 금지 -> 엑셀 풀에 보관 후 검색 선택 등록)
-    const handleStudentUpload = async (file) => {
-      if (!file) return;
-      await this.handleExcelPoolUpload(file);
+    // 6. 엑셀 학생 명부 업로드 (복수 파일 다중 선택 지원)
+    const handleStudentUpload = async (files) => {
+      if (!files || files.length === 0) return;
+      await this.handleExcelPoolUpload(files);
     };
 
     document.getElementById('file-upload-student')?.addEventListener('change', (e) => {
-      handleStudentUpload(e.target.files[0]);
+      handleStudentUpload(e.target.files);
       e.target.value = '';
     });
     document.getElementById('step1-file-upload-student')?.addEventListener('change', (e) => {
-      handleStudentUpload(e.target.files[0]);
+      handleStudentUpload(e.target.files);
       e.target.value = '';
     });
 
@@ -1086,34 +1086,68 @@ class TimetableApp {
     }
   }
 
-  async handleExcelPoolUpload(file) {
-    if (!file) return;
+  async handleExcelPoolUpload(filesInput) {
+    if (!filesInput) return;
+    const fileList = Array.isArray(filesInput) 
+      ? filesInput 
+      : (filesInput instanceof FileList ? Array.from(filesInput) : [filesInput]);
+    if (fileList.length === 0) return;
+
     try {
-      const parsed = await ExcelService.parseStudentExcel(file);
-      if (!parsed || parsed.length === 0) {
-        alert('엑셀 파일에서 학생 명단을 찾을 수 없습니다.');
-        return;
+      // 기존 풀이 있으면 병합 여부 확인
+      let mergeWithExisting = false;
+      if (this.excelStudentPool && this.excelStudentPool.length > 0) {
+        mergeWithExisting = confirm(
+          `기존에 등록된 학생 명부 풀(${this.excelStudentPool.length}명)이 있습니다.\n\n` +
+          `[확인]: 기존 명부에 이번 엑셀 파일 학생들을 통합 추가 (중복 자동 제거)\n` +
+          `[취소]: 기존 명부를 비우고 새 파일의 학생들로 새로 등록`
+        );
       }
 
-      // 학생 명부 풀에 보관 (중복 학번/이름 정리)
       const map = new Map();
-      parsed.forEach(st => {
-        const code = st.studentCode || ExcelService.getStudentCode(st);
-        const key = `${code}_${st.name}`;
-        if (!map.has(key)) {
-          map.set(key, {
-            grade: st.grade,
-            classNum: st.classNum,
-            studentNum: st.studentNum,
-            studentCode: code,
-            name: st.name
-          });
+      if (mergeWithExisting) {
+        this.excelStudentPool.forEach(st => {
+          const code = st.studentCode || ExcelService.getStudentCode(st);
+          map.set(`${code}_${st.name}`, st);
+        });
+      }
+
+      let totalParsed = 0;
+      let successFiles = 0;
+
+      for (const file of fileList) {
+        try {
+          const parsed = await ExcelService.parseStudentExcel(file);
+          if (parsed && parsed.length > 0) {
+            parsed.forEach(st => {
+              const code = st.studentCode || ExcelService.getStudentCode(st);
+              const key = `${code}_${st.name}`;
+              if (!map.has(key)) {
+                map.set(key, {
+                  grade: st.grade,
+                  classNum: st.classNum,
+                  studentNum: st.studentNum,
+                  studentCode: code,
+                  name: st.name
+                });
+              }
+              totalParsed++;
+            });
+            successFiles++;
+          }
+        } catch (fileErr) {
+          console.warn(`파일(${file.name}) 처리 실패:`, fileErr);
         }
-      });
+      }
 
       this.excelStudentPool = Array.from(map.values());
       this.saveExcelStudentPool();
-      this.showToast(`총 ${this.excelStudentPool.length}명의 학생 명부가 엑셀 풀에 등록되었습니다. 성명을 검색하여 선택 등록하세요.`);
+
+      if (fileList.length > 1) {
+        this.showToast(`${successFiles}개 파일에서 총 ${this.excelStudentPool.length}명의 학생 명부가 통합 등록되었습니다.`);
+      } else {
+        this.showToast(`총 ${this.excelStudentPool.length}명의 학생 명부가 엑셀 풀에 등록되었습니다. 성명을 검색하여 선택 등록하세요.`);
+      }
 
       // 검색창에 포커스
       const searchInput = document.getElementById('input-search-student-pool');
