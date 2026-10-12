@@ -44,7 +44,13 @@ body {
   box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.15);
 }
 
-/* Bucket & Drop Zones for Step 1 (2배 커진 드롭존) */
+/* Bucket & Drop Zones for Step 1 (2배 커진 드롭존 및 바구니 카드) */
+.bucket-card {
+  flex-shrink: 0 !important;
+  min-height: fit-content;
+  width: 100%;
+}
+
 .bucket-drop-zone {
   min-height: 110px;
   border: 2px dashed #93C5FD;

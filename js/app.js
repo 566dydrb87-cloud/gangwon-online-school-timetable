@@ -1708,10 +1708,10 @@ class TimetableApp {
       const safeSub = encodeURIComponent(sub);
 
       html += `
-        <div id="bucket-card-${safeSub}" class="bg-white rounded-2xl border-2 border-slate-200/90 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36">
+        <div id="bucket-card-${safeSub}" class="bucket-card w-full shrink-0 bg-white rounded-2xl border-2 border-slate-200/90 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36">
           
           <!-- 바구니 상단 헤더 -->
-          <div class="p-4 border-b flex items-center justify-between"
+          <div class="p-4 border-b flex items-center justify-between shrink-0"
                style="background-color: ${color.bg}; border-color: ${color.border};">
             <div class="flex items-center gap-2.5">
               <span class="w-4 h-4 rounded-full border shadow-2xs" 
@@ -1742,7 +1742,7 @@ class TimetableApp {
           </div>
 
           <!-- 바구니 본문 (2배 커진 여유로운 영역) -->
-          <div class="p-5 flex-1 flex flex-col gap-4">
+          <div class="p-5 flex flex-col gap-4">
             
             <!-- 드롭존 (학생을 여기로 드래그 앤 드롭) -->
             <div class="bucket-drop-zone py-7 px-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer min-h-[110px]"
