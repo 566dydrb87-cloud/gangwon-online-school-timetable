@@ -437,17 +437,17 @@
         <!-- 본문 2분할 레이아웃: 좌측 과목 목록 / 우측 과목 바구니 -->
         <div class="flex-1 flex flex-col lg:flex-row gap-5 items-start min-h-0">
           
-          <!-- [좌측]: 세로 과목 목록 (가장 긴 과목명 기준 너비, 바로 학생 드롭 가능) -->
-          <aside class="w-full lg:w-max lg:min-w-[210px] lg:max-w-[290px] shrink-0 flex flex-col gap-2 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200 sticky top-36">
+          <!-- [좌측]: 세로 과목 목록 (가장 긴 과목명 기준 너비, 바로 학생 드롭 및 개설/폐강 상태 토글) -->
+          <aside class="w-full lg:w-max lg:min-w-[250px] lg:max-w-[340px] shrink-0 flex flex-col gap-2 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200 sticky top-36">
             <div class="flex items-center justify-between pb-2 border-b border-slate-200">
               <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                 <i data-lucide="list" class="w-4 h-4 text-indigo-600"></i>
-                <span>과목 목록 (바로 드롭)</span>
+                <span>과목 목록 (상태/편제)</span>
               </span>
               <span id="side-subject-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">0개</span>
             </div>
             <p class="text-[10px] text-slate-500 leading-tight">
-              학생 카드를 아래 과목명 위로 끌어다 놓아도 바로 편제됩니다.
+              학생을 드롭하여 편제하거나, 과목 우측 배지를 눌러 개설/폐강을 전환하세요.
             </p>
 
             <!-- 동적 과목 목록 컨테이너 -->

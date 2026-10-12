@@ -92,6 +92,7 @@ class TimetableApp {
       masterStudents: [],
       courseEnrollments: {},
       courseSchedules: {},
+      courseStatus: {},
       students: [],
       offeredSubjects: baseSubjects ? [...baseSubjects] : [...DEFAULT_OFFERED_SUBJECTS],
       subjectColorMap: baseColorMap ? JSON.parse(JSON.stringify(baseColorMap)) : {},
@@ -199,6 +200,7 @@ class TimetableApp {
     this.masterStudents = d.masterStudents || [];
     this.courseEnrollments = d.courseEnrollments || {};
     this.courseSchedules = d.courseSchedules || {};
+    this.courseStatus = d.courseStatus || {};
     this.offeredSubjects = d.offeredSubjects;
     this.subjectColorMap = d.subjectColorMap;
     this.showWeekends = d.showWeekends !== undefined ? d.showWeekends : true;
@@ -239,6 +241,7 @@ class TimetableApp {
       masterStudents: this.masterStudents,
       courseEnrollments: this.courseEnrollments,
       courseSchedules: this.courseSchedules,
+      courseStatus: this.courseStatus || {},
       students: this.students,
       offeredSubjects: this.offeredSubjects,
       subjectColorMap: this.subjectColorMap,
@@ -1634,6 +1637,34 @@ class TimetableApp {
     this.showToast(`'${subjectName}' 과목 바구니가 삭제되었습니다.`);
   }
 
+  // ==========================================
+  // 과목 개설 / 폐강 상태 관리
+  // ==========================================
+  getSubjectStatus(subjectName) {
+    if (!this.courseStatus) this.courseStatus = {};
+    return this.courseStatus[subjectName] || 'open';
+  }
+
+  toggleSubjectStatus(subjectName) {
+    if (!this.courseStatus) this.courseStatus = {};
+    const current = this.getSubjectStatus(subjectName);
+    const next = current === 'closed' ? 'open' : 'closed';
+    this.courseStatus[subjectName] = next;
+    this.saveState();
+    this.render();
+    const label = next === 'open' ? '개설' : '폐강';
+    this.showToast(`'${subjectName}' 과목이 [${label}] 상태로 변경되었습니다.`);
+  }
+
+  setSubjectStatus(subjectName, status) {
+    if (!this.courseStatus) this.courseStatus = {};
+    this.courseStatus[subjectName] = status;
+    this.saveState();
+    this.render();
+    const label = status === 'open' ? '개설' : (status === 'closed' ? '폐강' : '대기');
+    this.showToast(`'${subjectName}' 과목이 [${label}] 상태로 설정되었습니다.`);
+  }
+
   renderSubjectBuckets() {
     const container = document.getElementById('subject-buckets-container');
     const sideListContainer = document.getElementById('side-subject-list-container');
@@ -1643,7 +1674,7 @@ class TimetableApp {
       sideCountBadge.textContent = `${this.offeredSubjects.length}개`;
     }
 
-    // [좌측]: 세로 과목 목록 렌더링 (가장 긴 과목명 기준, '과목명(인원)', 드롭존 겸 클릭 스크롤)
+    // [좌측]: 세로 과목 목록 렌더링 (과목명, 인원수, 개설/폐강 상태 배지 표시 및 클릭 스크롤)
     if (sideListContainer) {
       if (this.offeredSubjects.length === 0) {
         sideListContainer.innerHTML = `
@@ -1657,25 +1688,51 @@ class TimetableApp {
           const studentIds = this.courseEnrollments[sub] || [];
           const safeSub = encodeURIComponent(sub);
           const count = studentIds.length;
+          const status = this.getSubjectStatus(sub);
+          const isSelected = this.activeSelectedSubject === sub;
 
           return `
-            <div class="side-subject-item group flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/40 transition-all cursor-pointer shadow-2xs"
+            <div id="side-item-${safeSub}"
+                 class="side-subject-item group flex items-center justify-between gap-1.5 px-2.5 py-2 rounded-xl border transition-all cursor-pointer shadow-2xs ${
+                   status === 'closed' 
+                     ? 'border-slate-300 bg-slate-100/90 text-slate-400' 
+                     : (isSelected ? 'border-indigo-500 bg-indigo-50/80 ring-2 ring-indigo-200' : 'border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/40')
+                 }"
                  draggable="false"
                  onclick="window.app.scrollToBucket(decodeURIComponent('${safeSub}'))"
                  ondragover="window.app.handleBucketDragOver(event)"
                  ondragleave="window.app.handleBucketDragLeave(event)"
                  ondrop="window.app.handleBucketDrop(event, decodeURIComponent('${safeSub}'))"
-                 title="클릭하여 해당 바구니로 이동 / 학생 카드를 여기에 드롭하여 편제">
-              <div class="flex items-center gap-2 min-w-0">
+                 title="클릭하여 해당 과목 바구니로 이동 / 학생을 여기에 드롭하여 편제">
+              <div class="flex items-center gap-1.5 min-w-0">
                 <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" 
-                      style="background-color: ${color.text};"></span>
-                <span class="text-xs font-bold text-slate-800 whitespace-nowrap group-hover:text-indigo-900 transition">
+                      style="background-color: ${status === 'closed' ? '#94A3B8' : color.text};"></span>
+                <span class="text-xs font-bold whitespace-nowrap truncate ${status === 'closed' ? 'line-through text-slate-400' : 'text-slate-800 group-hover:text-indigo-900'}">
                   ${sub}
                 </span>
               </div>
-              <span class="text-[11px] font-black px-2 py-0.5 rounded-full shrink-0 shadow-2xs ${count > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-400'}">
-                (${count}명)
-              </span>
+
+              <div class="flex items-center gap-1 shrink-0">
+                <!-- 인원수 배지 -->
+                <span class="text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-2xs ${
+                  status === 'closed' ? 'bg-slate-200 text-slate-500' : (count > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-400')
+                }">
+                  (${count}명)
+                </span>
+
+                <!-- 개설 / 폐강 상태 토글 배지 버튼 -->
+                <button type="button" 
+                        onclick="event.stopPropagation(); window.app.toggleSubjectStatus(decodeURIComponent('${safeSub}'))"
+                        class="px-1.5 py-0.5 text-[10px] font-black rounded border transition-all shadow-2xs flex items-center gap-0.5 ${
+                          status === 'open' 
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400' 
+                            : 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100 hover:border-rose-400'
+                        }"
+                        title="클릭 시 '${status === 'open' ? '폐강' : '개설'}'(으)로 상태 변경">
+                  <span class="w-1.5 h-1.5 rounded-full ${status === 'open' ? 'bg-emerald-500' : 'bg-rose-500'}"></span>
+                  <span>${status === 'open' ? '개설' : '폐강'}</span>
+                </button>
+              </div>
             </div>
           `;
         }).join('');
@@ -1706,24 +1763,40 @@ class TimetableApp {
       const studentIds = this.courseEnrollments[sub] || [];
       const schedules = this.courseSchedules[sub] || [];
       const safeSub = encodeURIComponent(sub);
+      const status = this.getSubjectStatus(sub);
 
       html += `
         <div id="bucket-card-${safeSub}" 
-             class="bucket-card w-full shrink-0 bg-white rounded-2xl border-2 border-slate-200/90 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36"
+             class="bucket-card w-full shrink-0 bg-white rounded-2xl border-2 shadow-sm flex flex-col overflow-hidden transition-all hover:shadow-lg scroll-mt-36 ${
+               status === 'closed' ? 'border-slate-300 opacity-90' : 'border-slate-200/90'
+             }"
              ondragover="window.app.handleBucketDragOver(event)"
              ondragleave="window.app.handleBucketDragLeave(event)"
              ondrop="window.app.handleBucketDrop(event, decodeURIComponent('${safeSub}'))">
           
           <!-- 바구니 상단 헤더 -->
           <div class="p-4 border-b flex items-center justify-between shrink-0"
-               style="background-color: ${color.bg}; border-color: ${color.border};">
-            <div class="flex items-center gap-2.5">
+               style="background-color: ${status === 'closed' ? '#F1F5F9' : color.bg}; border-color: ${status === 'closed' ? '#CBD5E1' : color.border};">
+            <div class="flex items-center gap-2.5 flex-wrap">
               <span class="w-4 h-4 rounded-full border shadow-2xs" 
-                    style="background-color: ${color.text}; border-color: ${color.border};"></span>
-              <h3 class="font-black text-base" style="color: ${color.text};">${sub}</h3>
+                    style="background-color: ${status === 'closed' ? '#94A3B8' : color.text}; border-color: ${color.border};"></span>
+              <h3 class="font-black text-base ${status === 'closed' ? 'line-through text-slate-500' : ''}" style="color: ${status === 'closed' ? '#64748B' : color.text};">${sub}</h3>
               <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/90 border text-slate-800 shadow-2xs">
                 ${studentIds.length}명 수강
               </span>
+
+              <!-- 개설 / 폐강 상태 토글 버튼 (우측 카드에서도 바로 변경 가능) -->
+              <button type="button" 
+                      onclick="window.app.toggleSubjectStatus(decodeURIComponent('${safeSub}'))"
+                      class="px-2.5 py-0.5 text-xs font-black rounded-lg border transition-all shadow-2xs flex items-center gap-1.5 ${
+                        status === 'open'
+                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200'
+                          : 'bg-rose-100 text-rose-800 border-rose-300 hover:bg-rose-200'
+                      }"
+                      title="클릭하여 개설/폐강 상태 전환">
+                <span class="w-2 h-2 rounded-full ${status === 'open' ? 'bg-emerald-600' : 'bg-rose-600'}"></span>
+                <span>${status === 'open' ? '개설 상태' : '폐강 상태'}</span>
+              </button>
             </div>
 
             <div class="flex items-center gap-1.5">
@@ -1846,6 +1919,17 @@ class TimetableApp {
   }
 
   scrollToBucket(subjectName) {
+    this.activeSelectedSubject = subjectName;
+
+    // 좌측 목록 아이템 활성 하이라이트 갱신
+    document.querySelectorAll('.side-subject-item').forEach(el => {
+      el.classList.remove('ring-2', 'ring-indigo-400', 'border-indigo-500', 'bg-indigo-50/70');
+    });
+    const sideItem = document.getElementById(`side-item-${encodeURIComponent(subjectName)}`);
+    if (sideItem) {
+      sideItem.classList.add('ring-2', 'ring-indigo-400', 'border-indigo-500', 'bg-indigo-50/70');
+    }
+
     const safeSub = encodeURIComponent(subjectName);
     const card = document.getElementById(`bucket-card-${safeSub}`);
     if (card) {
@@ -1972,22 +2056,30 @@ class TimetableApp {
       const studentIds = this.courseEnrollments[sub] || [];
       const schedules = this.courseSchedules[sub] || [];
       const safeSub = sub.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      const status = this.getSubjectStatus(sub);
 
       html += `
-        <div class="draggable-palette-subject p-3 rounded-xl border transition-all hover:scale-[1.01] shadow-2xs cursor-grab active:cursor-grabbing select-none"
-             style="background-color: ${color.bg}; border-color: ${color.border};"
+        <div class="draggable-palette-subject p-3 rounded-xl border transition-all hover:scale-[1.01] shadow-2xs cursor-grab active:cursor-grabbing select-none ${
+          status === 'closed' ? 'opacity-60 bg-slate-100 border-slate-300' : ''
+        }"
+             style="background-color: ${status === 'closed' ? '#F8FAFC' : color.bg}; border-color: ${status === 'closed' ? '#CBD5E1' : color.border};"
              draggable="true"
              ondragstart="window.app.handlePaletteDragStart(event, '${safeSub}')"
              ondragend="window.app.handlePaletteDragEnd(event)">
           
           <div class="flex items-center justify-between gap-1 mb-1.5 pointer-events-none">
             <div class="flex items-center gap-1.5 min-w-0">
-              <i data-lucide="grip-vertical" class="w-3.5 h-3.5 shrink-0" style="color: ${color.text};"></i>
-              <span class="font-bold text-xs truncate" style="color: ${color.text};">${sub}</span>
+              <i data-lucide="grip-vertical" class="w-3.5 h-3.5 shrink-0" style="color: ${status === 'closed' ? '#94A3B8' : color.text};"></i>
+              <span class="font-bold text-xs truncate ${status === 'closed' ? 'line-through text-slate-400' : ''}" style="color: ${status === 'closed' ? '#64748B' : color.text};">${sub}</span>
             </div>
-            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/90 border text-slate-700 shadow-2xs">
-              ${studentIds.length}명
-            </span>
+            <div class="flex items-center gap-1">
+              ${status === 'closed' ? `
+                <span class="text-[10px] font-black px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 border border-rose-300">폐강</span>
+              ` : ''}
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/90 border text-slate-700 shadow-2xs">
+                ${studentIds.length}명
+              </span>
+            </div>
           </div>
 
           <div class="flex items-center justify-between text-[11px] text-slate-600 pointer-events-none">
