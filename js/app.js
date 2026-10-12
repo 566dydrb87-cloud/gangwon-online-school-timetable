@@ -32,13 +32,44 @@ class TimetableApp {
     this.init();
   }
 
-  init() {
+  async init() {
     this.loadState();
     this.sortPeriods();
     this.syncOfferedSubjects();
     this.buildSubjectColorMap();
     this.bindEvents();
     this.render();
+
+    // 백엔드/클라우드에 최신 데이터가 있는지 비동기 확인
+    setTimeout(async () => {
+      if (window.cloudSync) {
+        const remoteData = await window.cloudSync.loadFromBackend();
+        if (remoteData && remoteData.lastUpdated) {
+          const localSaved = localStorage.getItem(this.storageKey);
+          const localData = localSaved ? JSON.parse(localSaved) : null;
+          if (!localData || !localData.lastUpdated || new Date(remoteData.lastUpdated) > new Date(localData.lastUpdated)) {
+            this.applyExternalData(remoteData, '백엔드 서버에서 최신 시간표 데이터를 불러왔습니다.');
+          }
+        }
+      }
+    }, 500);
+  }
+
+  // 외부(백엔드/클라우드) 데이터 수신 시 화면 갱신
+  applyExternalData(data, msg = '') {
+    if (!data) return;
+    if (data.periods) this.periods = data.periods;
+    if (data.days) this.days = data.days;
+    if (data.students) this.students = data.students;
+    if (data.offeredSubjects) this.offeredSubjects = data.offeredSubjects;
+    if (data.subjectColorMap) this.subjectColorMap = data.subjectColorMap;
+    if (data.showWeekends !== undefined) this.showWeekends = data.showWeekends;
+
+    this.sortPeriods();
+    this.buildSubjectColorMap();
+    localStorage.setItem(this.storageKey, JSON.stringify(data));
+    this.render();
+    if (msg) this.showToast(msg);
   }
 
   // 로컬스토리지에서 데이터 로드 또는 기본값 초기화
@@ -82,6 +113,11 @@ class TimetableApp {
       };
       localStorage.setItem(this.storageKey, JSON.stringify(data));
       this.updateStats();
+
+      // 백엔드/클라우드로 비동기 전송
+      if (window.cloudSync) {
+        window.cloudSync.saveToBackend(data);
+      }
     } catch (e) {
       console.error('Failed to save state to localStorage:', e);
     }

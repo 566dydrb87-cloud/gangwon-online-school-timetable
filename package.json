@@ -1,0 +1,16 @@
+{
+  "name": "gangwon-online-school-timetable",
+  "version": "1.0.0",
+  "description": "강원온라인학교 & 상지대관령고등학교 시간표 시스템 및 백엔드 서버",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "author": "상지대관령고등학교",
+  "license": "MIT"
+}
