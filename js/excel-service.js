@@ -311,13 +311,14 @@ const ExcelService = {
   },
 
   // 5. 결괏값 형태 1: 학급 시간표 형태 (파스텔톤 디자인 멀티시트 엑셀)
-  async exportTimetableExcel(periods, days, students, subjectColorMap, schoolName = '강원온라인학교') {
+  async exportTimetableExcel(periods, days, students, subjectColorMap, academicYear = '2026', schoolName = '강원온라인학교') {
     const workbook = new ExcelJS.Workbook();
+    const yearLabel = academicYear ? `${academicYear}학년도` : '';
     workbook.creator = `${schoolName} 시간표 시스템`;
 
     // 5-1. 종합 시간표 시트 생성
     const totalSheet = workbook.addWorksheet('종합 시간표', { views: [{ showGridLines: true }] });
-    this.buildTimetableSheet(totalSheet, periods, days, students, subjectColorMap, `${schoolName} 전체 종합 시간표`);
+    this.buildTimetableSheet(totalSheet, periods, days, students, subjectColorMap, `${yearLabel} ${schoolName} 전체 종합 시간표`.trim());
 
     // 5-2. 학년-반별 개별 시트 자동 생성
     const classSet = new Set();
@@ -344,12 +345,12 @@ const ExcelService = {
         days,
         classStudents,
         subjectColorMap,
-        `${schoolName} [${grade}학년 ${classNum}반] 시간표`
+        `${yearLabel} ${schoolName} [${grade}학년 ${classNum}반] 시간표`.trim()
       );
     }
 
     const buffer = await workbook.xlsx.writeBuffer();
-    this.saveFile(buffer, `${schoolName}_학급_시간표_${this.getTimestamp()}.xlsx`);
+    this.saveFile(buffer, `${yearLabel}_${schoolName}_학급_시간표_${this.getTimestamp()}.xlsx`);
   },
 
   // 개별 시간표 시트 디자인 생성 헬퍼
@@ -494,10 +495,11 @@ const ExcelService = {
   },
 
   // 6. 결괏값 형태 2: 엑셀데이터 형태 (원천 데이터 테이블)
-  async exportDataExcel(students, periods, days, schoolName = '강원온라인학교') {
+  async exportDataExcel(students, periods, days, academicYear = '2026', schoolName = '강원온라인학교') {
     const workbook = new ExcelJS.Workbook();
+    const yearLabel = academicYear ? `${academicYear}학년도` : '';
     workbook.creator = `${schoolName} 시간표 시스템`;
-    const worksheet = workbook.addWorksheet('수강배정_원천데이터', { views: [{ showGridLines: true }] });
+    const worksheet = workbook.addWorksheet(`${yearLabel}_수강배정_원천데이터`.trim(), { views: [{ showGridLines: true }] });
 
     worksheet.columns = [
       { header: '순번', key: 'index', width: 8 },
@@ -579,7 +581,7 @@ const ExcelService = {
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
-    this.saveFile(buffer, `${schoolName}_수강데이터_원천목록_${this.getTimestamp()}.xlsx`);
+    this.saveFile(buffer, `${yearLabel}_${schoolName}_수강데이터_원천목록_${this.getTimestamp()}.xlsx`.replace(/^_/, ''));
   },
 
   applyBorder(cell) {
