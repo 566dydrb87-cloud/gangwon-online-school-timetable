@@ -405,6 +405,7 @@ class TimetableApp {
         masterStudents: this.masterStudents,
         courseEnrollments: this.courseEnrollments,
         courseSchedules: this.courseSchedules,
+        courseStatus: this.courseStatus || {},
         offeredSubjects: this.offeredSubjects,
         subjectColorMap: this.subjectColorMap,
         showWeekends: this.showWeekends,
@@ -1094,26 +1095,34 @@ class TimetableApp {
     if (fileList.length === 0) return;
 
     try {
-      // 기존 풀이 있으면 병합 여부 확인
+      // 1. 기존 편성 학생이 있는 경우 병합 여부 확인
       let mergeWithExisting = false;
-      if (this.excelStudentPool && this.excelStudentPool.length > 0) {
+      const currentStudentCount = (this.masterStudents || []).length;
+      if (currentStudentCount > 0) {
         mergeWithExisting = confirm(
-          `기존에 등록된 학생 명부 풀(${this.excelStudentPool.length}명)이 있습니다.\n\n` +
-          `[확인]: 기존 명부에 이번 엑셀 파일 학생들을 통합 추가 (중복 자동 제거)\n` +
-          `[취소]: 기존 명부를 비우고 새 파일의 학생들로 새로 등록`
+          `현재 [${this.activeYear}학년도 ${this.activeSemester}학기]에 이미 등록된 학생(${currentStudentCount}명)이 있습니다.\n\n` +
+          `[확인]: 기존 명단 및 과목에 이번 수강신청 학생·과목 편제를 통합 추가 (권장)\n` +
+          `[취소]: 기존 학생 편제를 비우고 이번 엑셀 수강신청 데이터로 새로 등록`
         );
       }
 
-      const map = new Map();
-      if (mergeWithExisting) {
-        this.excelStudentPool.forEach(st => {
-          const code = st.studentCode || ExcelService.getStudentCode(st);
-          map.set(`${code}_${st.name}`, st);
-        });
+      if (!mergeWithExisting) {
+        this.masterStudents = [];
+        this.courseEnrollments = {};
       }
+
+      // 학생 중복 방지 매핑 (학번_성명 -> masterStudent 객체)
+      const masterMap = new Map();
+      this.masterStudents.forEach(st => {
+        const code = st.studentCode || ExcelService.getStudentCode(st);
+        masterMap.set(`${code}_${st.name}`, st);
+      });
 
       let totalParsed = 0;
       let successFiles = 0;
+      let totalEnrolledCount = 0;
+      const newSubjectsAdded = new Set();
+      const allExtractedSubjects = new Set();
 
       for (const file of fileList) {
         try {
@@ -1122,15 +1131,51 @@ class TimetableApp {
             parsed.forEach(st => {
               const code = st.studentCode || ExcelService.getStudentCode(st);
               const key = `${code}_${st.name}`;
-              if (!map.has(key)) {
-                map.set(key, {
+              
+              // 1) masterStudents 등록 또는 기존 학생 매칭
+              let mStudent = masterMap.get(key);
+              if (!mStudent) {
+                mStudent = {
+                  id: `sm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
                   grade: st.grade,
                   classNum: st.classNum,
                   studentNum: st.studentNum,
                   studentCode: code,
                   name: st.name
-                });
+                };
+                masterMap.set(key, mStudent);
+                this.masterStudents.push(mStudent);
               }
+
+              // 2) 신청 과목이 존재하는 경우 과목 바구니 자동 생성 및 학생 자동 편제
+              const subs = (st.subjects && Array.isArray(st.subjects) && st.subjects.length > 0)
+                ? st.subjects
+                : (st.subject ? [st.subject] : []);
+
+              subs.forEach(rawSub => {
+                const sub = String(rawSub).trim();
+                if (!sub || sub === '-' || sub === '미배정') return;
+
+                allExtractedSubjects.add(sub);
+
+                // 개설 과목 목록에 없으면 새 과목 바구니로 자동 등록
+                if (!this.offeredSubjects.includes(sub)) {
+                  this.offeredSubjects.push(sub);
+                  newSubjectsAdded.add(sub);
+                  if (!this.courseStatus) this.courseStatus = {};
+                  this.courseStatus[sub] = 'open';
+                }
+
+                // 해당 과목 바구니에 학생 편제 등록
+                if (!this.courseEnrollments[sub]) {
+                  this.courseEnrollments[sub] = [];
+                }
+                if (!this.courseEnrollments[sub].includes(mStudent.id)) {
+                  this.courseEnrollments[sub].push(mStudent.id);
+                  totalEnrolledCount++;
+                }
+              });
+
               totalParsed++;
             });
             successFiles++;
@@ -1140,13 +1185,37 @@ class TimetableApp {
         }
       }
 
-      this.excelStudentPool = Array.from(map.values());
+      // 색상 맵 동기화
+      this.buildSubjectColorMap();
+
+      // 3. 학생 명부 풀(검색용)도 함께 동기화
+      const poolMap = new Map((this.excelStudentPool || []).map(s => {
+        const c = s.studentCode || ExcelService.getStudentCode(s);
+        return [`${c}_${s.name}`, s];
+      }));
+      this.masterStudents.forEach(ms => {
+        const c = ms.studentCode || ExcelService.getStudentCode(ms);
+        poolMap.set(`${c}_${ms.name}`, {
+          grade: ms.grade,
+          classNum: ms.classNum,
+          studentNum: ms.studentNum,
+          studentCode: c,
+          name: ms.name
+        });
+      });
+      this.excelStudentPool = Array.from(poolMap.values());
       this.saveExcelStudentPool();
 
-      if (fileList.length > 1) {
-        this.showToast(`${successFiles}개 파일에서 총 ${this.excelStudentPool.length}명의 학생 명부가 통합 등록되었습니다.`);
+      // 4. 상태 저장 및 1단계 화면 갱신
+      this.rebuildStudentAssignments();
+      this.saveState();
+      this.switchWorkflowTab('step1');
+      this.render();
+
+      if (allExtractedSubjects.size > 0) {
+        this.showToast(`🎉 수강신청 엑셀 반영 완료: 총 ${masterMap.size}명의 학생과 ${allExtractedSubjects.size}개 과목(${totalEnrolledCount}건 수강)이 '1. 학생·과목 등록 및 편제'에 자동 반영되었습니다.`);
       } else {
-        this.showToast(`총 ${this.excelStudentPool.length}명의 학생 명부가 엑셀 풀에 등록되었습니다. 성명을 검색하여 선택 등록하세요.`);
+        this.showToast(`총 ${masterMap.size}명의 학생 명단이 등록되었습니다. 과목 바구니로 드래그하여 편제하세요.`);
       }
 
       // 검색창에 포커스
@@ -1832,39 +1901,20 @@ class TimetableApp {
                 ${studentIds.length}명 수강
               </span>
 
-              <!-- [개설 / 조정 / 폐강] 3단 선택 버튼 그룹 (직관적인 원클릭 변경) -->
-              <div class="inline-flex p-0.5 rounded-lg bg-white/90 border border-slate-200 shadow-2xs gap-0.5 text-xs font-bold ml-1">
-                <button type="button" 
-                        onclick="window.app.setSubjectStatus(decodeURIComponent('${safeSub}'), 'open')" 
-                        class="px-2 py-0.5 rounded-md transition flex items-center gap-1 ${
-                          status === 'open' 
-                            ? 'bg-emerald-600 text-white shadow-2xs' 
-                            : 'text-slate-600 hover:bg-slate-100'
-                        }"
-                        title="개설 상태로 설정">
-                  <span>🟢</span><span>개설</span>
-                </button>
-                <button type="button" 
-                        onclick="window.app.setSubjectStatus(decodeURIComponent('${safeSub}'), 'adjust')" 
-                        class="px-2 py-0.5 rounded-md transition flex items-center gap-1 ${
-                          status === 'adjust' 
-                            ? 'bg-amber-500 text-white shadow-2xs' 
-                            : 'text-slate-600 hover:bg-slate-100'
-                        }"
-                        title="조정 상태로 설정">
-                  <span>▲</span><span>조정</span>
-                </button>
-                <button type="button" 
-                        onclick="window.app.setSubjectStatus(decodeURIComponent('${safeSub}'), 'closed')" 
-                        class="px-2 py-0.5 rounded-md transition flex items-center gap-1 ${
-                          status === 'closed' 
-                            ? 'bg-rose-600 text-white shadow-2xs' 
-                            : 'text-slate-600 hover:bg-slate-100'
-                        }"
-                        title="폐강 상태로 설정">
-                  <span>✖️</span><span>폐강</span>
-                </button>
-              </div>
+              <!-- 개설 / 조정 / 폐강 원클릭 순환 배지 버튼 (선택지 없이 클릭할 때마다 순환 변경) -->
+              <button type="button" 
+                      onclick="event.stopPropagation(); window.app.cycleSubjectStatus(decodeURIComponent('${safeSub}'))" 
+                      class="px-2.5 py-1 text-xs font-black rounded-lg border transition-all shadow-2xs flex items-center gap-1.5 ${
+                        status === 'open' 
+                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200' 
+                          : (status === 'adjust' 
+                              ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200' 
+                              : 'bg-rose-100 text-rose-800 border-rose-300 hover:bg-rose-200')
+                      }" 
+                      title="클릭하여 상태 순환 (🟢 개설 ➔ 🔺 조정 ➔ ✖️ 폐강 ➔ 🟢 개설)">
+                <span>${status === 'open' ? '🟢' : (status === 'adjust' ? '🔺' : '✖️')}</span>
+                <span>${status === 'open' ? '개설' : (status === 'adjust' ? '조정' : '폐강')}</span>
+              </button>
             </div>
 
             <div class="flex items-center gap-1.5">
@@ -2748,6 +2798,7 @@ class TimetableApp {
   }
 
   // ==========================================
+  // ==========================================
   // [학년도 및 학기 데이터 변경 / 복사 / 이동 매니저]
   // ==========================================
   openSemesterTransferModal(context = null) {
@@ -2817,6 +2868,34 @@ class TimetableApp {
     modal.classList.remove('flex');
   }
 
+  // 모달에서 특정 학년도·학기로 단순 화면 전환(변경)
+  handleQuickSwitchSemesterFromModal() {
+    const targetYear = document.getElementById('transfer-target-year')?.value || this.activeYear;
+    const targetSemester = document.getElementById('transfer-target-semester')?.value || this.activeSemester;
+
+    if (targetYear === this.activeYear && targetSemester === this.activeSemester) {
+      this.closeSemesterTransferModal();
+      this.showToast(`이미 현재 [${targetYear}학년도 ${targetSemester}학기] 화면입니다.`);
+      return;
+    }
+
+    this.saveActiveYearSemesterData();
+    if (!this.academicYears.includes(targetYear)) {
+      this.academicYears.push(targetYear);
+      this.academicYears.sort((a, b) => Number(a) - Number(b));
+    }
+    this.ensureYearSemesterData(targetYear, targetSemester);
+    this.activeYear = targetYear;
+    this.activeSemester = targetSemester;
+    this.loadActiveYearSemesterData();
+    this.sortPeriods();
+    this.buildSubjectColorMap();
+    this.saveState();
+    this.render();
+    this.closeSemesterTransferModal();
+    this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 시간표 화면으로 전환되었습니다.`);
+  }
+
   handleSemesterTransferSubmit(e) {
     e.preventDefault();
 
@@ -2826,9 +2905,9 @@ class TimetableApp {
     const targetSemester = document.getElementById('transfer-target-semester')?.value || (this.activeSemester === '1' ? '2' : '1');
     const subjectName = document.getElementById('transfer-subject-select')?.value;
 
-    // 출발지와 도착지가 완전히 동일한 경우 방지
+    // 출발지와 도착지가 완전히 동일한 경우 안내
     if (targetYear === this.activeYear && targetSemester === this.activeSemester) {
-      alert('출발 학기와 도착 학기가 동일합니다. 다른 학년도 또는 다른 학기를 선택해주세요.');
+      alert('출발 학기와 도착 학기가 동일합니다. 데이터를 복사/이전할 다른 대상 학년도 또는 다른 학기를 선택해주세요.\n(화면만 변경하시려면 좌측의 [화면만 전환 (변경)] 버튼을 누르세요.)');
       return;
     }
 
@@ -2886,6 +2965,7 @@ class TimetableApp {
       targetData.masterStudents = JSON.parse(JSON.stringify(this.masterStudents || []));
       targetData.courseEnrollments = JSON.parse(JSON.stringify(this.courseEnrollments || {}));
       targetData.courseSchedules = JSON.parse(JSON.stringify(this.courseSchedules || {}));
+      targetData.courseStatus = JSON.parse(JSON.stringify(this.courseStatus || {}));
       targetData.offeredSubjects = [...this.offeredSubjects];
       targetData.subjectColorMap = { ...this.subjectColorMap };
       targetData.showWeekends = this.showWeekends;
@@ -2895,6 +2975,7 @@ class TimetableApp {
         this.masterStudents = [];
         this.courseEnrollments = {};
         this.courseSchedules = {};
+        this.courseStatus = {};
         this.students = [];
         this.offeredSubjects = [...DEFAULT_OFFERED_SUBJECTS];
         this.buildSubjectColorMap();
@@ -2905,15 +2986,17 @@ class TimetableApp {
       summaryMsg = `현재 학기 전체 데이터가 [${targetYear}학년도 ${targetSemester}학기]로 ${mode === 'move' ? '이동' : '복사'}되었습니다.`;
     } 
     else if (scope === 'subject') {
-      // 2) 특정 과목 전송 (수강생 및 시간표 설정 포함)
+      // 2) 특정 과목 전송 (수강생, 시간표 및 개설/조정/폐강 상태 포함)
       if (!targetData.offeredSubjects.includes(subjectName)) {
         targetData.offeredSubjects.push(subjectName);
       }
       if (!targetData.subjectColorMap[subjectName] && this.subjectColorMap[subjectName]) {
         targetData.subjectColorMap[subjectName] = this.subjectColorMap[subjectName];
       }
+      if (!targetData.courseStatus) targetData.courseStatus = {};
+      targetData.courseStatus[subjectName] = this.getSubjectStatus(subjectName);
 
-      // 수강생 매핑 및 이전
+      // 수강생 매핑 및 이전 (기존 수강생과 안전 병합)
       const enrolledStudentIds = this.courseEnrollments[subjectName] || [];
       const targetStudentIds = [];
       enrolledStudentIds.forEach(stId => {
@@ -2924,7 +3007,11 @@ class TimetableApp {
         }
       });
       if (!targetData.courseEnrollments) targetData.courseEnrollments = {};
-      targetData.courseEnrollments[subjectName] = targetStudentIds;
+      const existingEnrollments = targetData.courseEnrollments[subjectName] || [];
+      targetStudentIds.forEach(id => {
+        if (!existingEnrollments.includes(id)) existingEnrollments.push(id);
+      });
+      targetData.courseEnrollments[subjectName] = existingEnrollments;
 
       // 시간표 스케줄 이전
       if (!targetData.courseSchedules) targetData.courseSchedules = {};
@@ -2934,6 +3021,7 @@ class TimetableApp {
         this.offeredSubjects = this.offeredSubjects.filter(s => s !== subjectName);
         delete this.courseEnrollments[subjectName];
         delete this.courseSchedules[subjectName];
+        if (this.courseStatus) delete this.courseStatus[subjectName];
         this.rebuildStudentAssignments();
         this.saveActiveYearSemesterData();
       }
@@ -2983,16 +3071,16 @@ class TimetableApp {
       summaryMsg = `선택한 학생 ${count}명이 [${targetYear}학년도 ${targetSemester}학기]로 ${mode === 'move' ? '이동' : '복사'}되었습니다.`;
     }
 
-    // 대상 학기의 assignments 재생성
+    // 대상 학기의 assignments 재생성 및 영구 저장
     this.rebuildSemesterAssignments(targetData);
     this.saveState();
     this.render();
     this.closeSemesterTransferModal();
 
     // 완료 알림 및 해당 학기로 즉시 이동 여부 질문
-    const moveConfirm = confirm(`${summaryMsg}\n\n[확인]: 지금 바로 [${targetYear}학년도 ${targetSemester}학기]로 이동\n[취소]: 현재 화면 유지`);
+    const moveConfirm = confirm(`${summaryMsg}\n\n[확인]: 지금 바로 [${targetYear}학년도 ${targetSemester}학기] 시간표로 이동\n[취소]: 현재 화면 유지`);
     if (moveConfirm) {
-      if (this.activeYear !== targetYear) this.activeYear = targetYear;
+      this.activeYear = targetYear;
       this.activeSemester = targetSemester;
       this.loadActiveYearSemesterData();
       this.sortPeriods();

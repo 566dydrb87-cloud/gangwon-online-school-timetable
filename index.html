@@ -961,14 +961,21 @@
         </div>
 
         <!-- 모달 버튼 -->
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-          <button type="button" onclick="window.app.closeSemesterTransferModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition">
-            취소
+        <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+          <button type="button" onclick="window.app.handleQuickSwitchSemesterFromModal()" class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-lg border border-blue-200 transition flex items-center gap-1.5 shadow-2xs" title="데이터 복사 없이 해당 학년도·학기 시간표 화면으로 즉시 전환">
+            <i data-lucide="arrow-right-circle" class="w-4 h-4 text-blue-600"></i>
+            <span>화면만 전환 (변경)</span>
           </button>
-          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-xs transition flex items-center gap-1.5">
-            <i data-lucide="check-check" class="w-4 h-4"></i>
-            <span>전송 실행하기</span>
-          </button>
+          
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="window.app.closeSemesterTransferModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition">
+              취소
+            </button>
+            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-xs transition flex items-center gap-1.5">
+              <i data-lucide="copy-check" class="w-4 h-4"></i>
+              <span>데이터 복사 / 이전 실행</span>
+            </button>
+          </div>
         </div>
 
       </form>

@@ -215,21 +215,22 @@ const ExcelService = {
     this.saveFile(buffer, '수강신청_편성학생_양식.xlsx');
   },
 
-  // 4. 수강생 명단 엑셀 업로드 파싱 (요청사항: 학번과 성명만 읽고 표시)
+  // 4. 수강생 명단 및 수강신청 엑셀 업로드 파싱 (학생 정보 및 과목명 동시 추출)
   async parseStudentExcel(file) {
     const workbook = new ExcelJS.Workbook();
     const buffer = await file.arrayBuffer();
     await workbook.xlsx.load(buffer);
     const worksheet = workbook.worksheets[0];
 
-    const students = [];
     let headerRowIndex = -1;
     let colGrade = -1;
     let colClass = -1;
     let colNumber = -1;
+    let colStudentCode = -1;
     let colName = -1;
+    const colSubjects = []; // 과목 컬럼 인덱스 목록 (단일 또는 복수 과목 컬럼 지원)
 
-    // 헤더 행 탐색
+    // 헤더 행 탐색 (최대 15행 스캔)
     const maxScanRows = Math.min(15, worksheet.rowCount);
     for (let r = 1; r <= maxScanRows; r++) {
       const row = worksheet.getRow(r);
@@ -239,73 +240,130 @@ const ExcelService = {
         if (text) cellEntries.push({ colNum, text });
       });
 
-      const hasGrade = cellEntries.some(c => c.text === '학년');
-      const hasName = cellEntries.some(c => c.text === '성명' || c.text === '이름' || c.text === '학생명');
+      const hasGrade = cellEntries.some(c => c.text === '학년' || c.text.toLowerCase() === 'grade');
+      const hasCode = cellEntries.some(c => c.text === '학번' || c.text === '학생번호' || c.text.toLowerCase() === 'studentcode' || c.text.toLowerCase() === 'id');
+      const hasName = cellEntries.some(c => c.text === '성명' || c.text === '이름' || c.text === '학생명' || c.text.toLowerCase() === 'name');
 
-      if (hasGrade && hasName) {
+      if ((hasGrade || hasCode) && hasName) {
         headerRowIndex = r;
         cellEntries.forEach(c => {
           const t = c.text;
-          if (t === '학년') colGrade = c.colNum;
-          else if (t === '반') colClass = c.colNum;
-          else if (t === '번호') colNumber = c.colNum;
-          else if (t === '성명' || t === '이름' || t === '학생명') colName = c.colNum;
+          const lower = t.toLowerCase();
+          if (t === '학년' || lower === 'grade') colGrade = c.colNum;
+          else if (t === '반' || lower === 'class') colClass = c.colNum;
+          else if (t === '번호' || t === '번' || lower === 'number' || lower === 'no') colNumber = c.colNum;
+          else if (t === '학번' || t === '학생번호' || lower === 'studentcode' || lower === 'id') colStudentCode = c.colNum;
+          else if (t === '성명' || t === '이름' || t === '학생명' || lower === 'name') colName = c.colNum;
+          else if (
+            t.includes('과목') || t.includes('교과') || t.includes('신청') || t.includes('수강') || t.includes('희망')
+          ) {
+            colSubjects.push(c.colNum);
+          }
         });
         break;
       }
     }
 
+    // 헤더를 못 찾은 경우 기본 NEIS 수강편성 양식 위치 적용
     if (headerRowIndex === -1) {
       headerRowIndex = 2;
+      colSubjects.push(5); // 개설과목(학점)
       colGrade = 3;
       colClass = 8;
       colNumber = 9;
       colName = 10;
     }
 
-    // 중복 방지 Set (학번_성명 기준)
-    const seen = new Set();
+    // 학생별 통합 Map (학번_성명 기준)
+    const studentMap = new Map();
 
     for (let r = headerRowIndex + 1; r <= worksheet.rowCount; r++) {
       const row = worksheet.getRow(r);
       const rawName = colName > 0 ? String(row.getCell(colName).value || '').trim() : '';
-      if (!rawName || rawName === '성명' || rawName === '이름') continue;
+      if (!rawName || rawName === '성명' || rawName === '이름' || rawName === '학생명') continue;
 
-      const rawGrade = colGrade > 0 ? row.getCell(colGrade).value : 1;
-      const rawClass = colClass > 0 ? row.getCell(colClass).value : 1;
+      let grade = 1;
+      let classNum = 1;
+      let studentNum = null;
+      let studentCode = '';
+
+      const rawCode = colStudentCode > 0 ? String(row.getCell(colStudentCode).value || '').trim() : '';
+      const rawGrade = colGrade > 0 ? row.getCell(colGrade).value : null;
+      const rawClass = colClass > 0 ? row.getCell(colClass).value : null;
       const rawNumber = colNumber > 0 ? row.getCell(colNumber).value : null;
 
-      const grade = parseInt(String(rawGrade).replace(/[^0-9]/g, ''), 10) || 1;
-      const classNum = parseInt(String(rawClass).replace(/[^0-9]/g, ''), 10) || 1;
-      const studentNum = rawNumber !== null && rawNumber !== undefined
-        ? (parseInt(String(rawNumber).replace(/[^0-9]/g, ''), 10) || null)
-        : null;
+      if (rawGrade !== null && rawGrade !== undefined && String(rawGrade).trim() !== '') {
+        grade = parseInt(String(rawGrade).replace(/[^0-9]/g, ''), 10) || 1;
+      }
+      if (rawClass !== null && rawClass !== undefined && String(rawClass).trim() !== '') {
+        classNum = parseInt(String(rawClass).replace(/[^0-9]/g, ''), 10) || 1;
+      }
+      if (rawNumber !== null && rawNumber !== undefined && String(rawNumber).trim() !== '') {
+        studentNum = parseInt(String(rawNumber).replace(/[^0-9]/g, ''), 10) || null;
+      }
 
-      const studentCode = this.getStudentCode({ grade, classNum, studentNum });
+      // 학번 열이 존재하고 4~5자리 숫자인 경우 학년/반/번호 보정
+      const cleanRawCode = rawCode.replace(/[^0-9]/g, '');
+      if (cleanRawCode.length >= 4 && cleanRawCode.length <= 5) {
+        if (!rawGrade && cleanRawCode.length === 5) grade = parseInt(cleanRawCode[0], 10) || grade;
+        if (!rawClass && cleanRawCode.length === 5) classNum = parseInt(cleanRawCode.slice(1, 3), 10) || classNum;
+        if (!studentNum && cleanRawCode.length === 5) studentNum = parseInt(cleanRawCode.slice(3), 10) || studentNum;
+        studentCode = cleanRawCode;
+      } else {
+        studentCode = this.getStudentCode({ grade, classNum, studentNum });
+      }
+
       const uniqueKey = `${studentCode}_${rawName}`;
 
-      // 중복 학생은 1명만 등록 (이후 교사가 여러 과목 배정 가능)
-      if (seen.has(uniqueKey)) continue;
-      seen.add(uniqueKey);
+      // 과목 컬럼들에서 과목명 추출
+      const rowSubjects = [];
+      colSubjects.forEach(colIdx => {
+        const val = row.getCell(colIdx).value;
+        if (!val) return;
+        const text = String(val).trim();
+        if (!text || text === '-' || text === '미배정' || text === '없음') return;
 
-      // 과목은 아직 배정되지 않은 상태 ('')로 학번과 성명만 가져옴
-      students.push({
-        id: `s_${Date.now()}_${r}`,
-        grade: grade,
-        classNum: classNum,
-        studentNum: studentNum,
-        studentCode: studentCode,
-        name: rawName,
-        subject: '', // 업로드 시점에는 과목 미배정
-        day: null,
-        period: null,
-        periodId: null,
-        status: 'confirmed' // 기본 상태: 확정(🟢)
+        // 쉼표, 슬래시, 플러스, 개행 등으로 복수 과목 구분
+        const tokens = text.split(/[,/+\n\r]/);
+        tokens.forEach(token => {
+          let cleanSub = token.trim();
+          if (!cleanSub) return;
+          // 뒤쪽의 학점 표기 (예: (3), (3학점), [3학점]) 제거
+          cleanSub = cleanSub.replace(/[\(\[]\s*\d+\s*(?:학점)?\s*[\)\]]$/, '').trim();
+          if (cleanSub && cleanSub !== '-' && !rowSubjects.includes(cleanSub)) {
+            rowSubjects.push(cleanSub);
+          }
+        });
       });
+
+      if (studentMap.has(uniqueKey)) {
+        const existing = studentMap.get(uniqueKey);
+        rowSubjects.forEach(sub => {
+          if (!existing.subjects.includes(sub)) {
+            existing.subjects.push(sub);
+          }
+        });
+      } else {
+        studentMap.set(uniqueKey, {
+          id: `s_${Date.now()}_${r}_${Math.random().toString(36).substr(2, 4)}`,
+          grade: grade,
+          classNum: classNum,
+          studentNum: studentNum,
+          studentCode: studentCode,
+          name: rawName,
+          subject: rowSubjects[0] || '',
+          subjects: rowSubjects,
+          day: null,
+          period: null,
+          periodId: null,
+          status: 'confirmed'
+        });
+      }
     }
 
+    const students = Array.from(studentMap.values());
     if (students.length === 0) {
-      throw new Error('유효한 학생 데이터를 찾을 수 없습니다. [학년, 반, 번호, 성명] 열을 확인해주세요.');
+      throw new Error('유효한 학생 데이터를 찾을 수 없습니다. [학년, 반, 번호, 성명] 또는 [학번, 성명, 과목] 열을 확인해주세요.');
     }
     return students;
   },
