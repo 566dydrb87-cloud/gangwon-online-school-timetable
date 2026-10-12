@@ -1989,7 +1989,7 @@ class TimetableApp {
   scrollToBucket(subjectName) {
     this.activeSelectedSubject = subjectName;
 
-    // 좌측 목록 아이템 활성 하이라이트 갱신
+    // 1. 좌측 목록 아이템 활성 하이라이트 갱신
     document.querySelectorAll('.side-subject-item').forEach(el => {
       el.classList.remove('ring-2', 'ring-indigo-400', 'border-indigo-500', 'bg-indigo-50/70');
     });
@@ -1998,14 +1998,30 @@ class TimetableApp {
       sideItem.classList.add('ring-2', 'ring-indigo-400', 'border-indigo-500', 'bg-indigo-50/70');
     }
 
+    // 2. 우측 스크롤 컨테이너 내에서 해당 카드가 가장 위에 정확히 보이도록 정밀 스크롤
+    const container = document.getElementById('subject-buckets-container');
     const safeSub = encodeURIComponent(subjectName);
     const card = document.getElementById(`bucket-card-${safeSub}`);
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      card.classList.add('ring-4', 'ring-indigo-400', 'ring-offset-2');
+
+    if (container && card) {
+      const containerRect = container.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      // 컨테이너 맨 위에서 딱 2px 여백을 두고 정확하게 최상단에 안착
+      const offsetDiff = cardRect.top - containerRect.top;
+      const targetScrollTop = Math.max(0, container.scrollTop + offsetDiff - 2);
+
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth'
+      });
+
+      // 3. 눈에 띄는 선명한 하이라이트 링 효과
+      card.classList.remove('ring-4', 'ring-indigo-500', 'ring-offset-2');
+      void card.offsetWidth; // reflow 트리거
+      card.classList.add('ring-4', 'ring-indigo-500', 'ring-offset-2');
       setTimeout(() => {
-        card.classList.remove('ring-4', 'ring-indigo-400', 'ring-offset-2');
-      }, 1500);
+        card.classList.remove('ring-4', 'ring-indigo-500', 'ring-offset-2');
+      }, 1600);
     }
   }
 
