@@ -710,11 +710,8 @@ class TimetableApp {
     });
 
     btnClearSearch?.addEventListener('click', () => {
-      if (inputSearchPool) {
-        inputSearchPool.value = '';
-        this.handleSearchPoolInput('');
-        inputSearchPool.focus();
-      }
+      this.clearPoolSearch();
+      inputSearchPool?.focus();
     });
 
     // 바깥 클릭 시 검색 추천창 닫기
@@ -1283,6 +1280,23 @@ class TimetableApp {
     }
   }
 
+  clearPoolSearch() {
+    const inputSearch = document.getElementById('input-search-student-pool');
+    const dropdown = document.getElementById('pool-search-results-dropdown');
+    const clearBtn = document.getElementById('btn-clear-pool-search');
+
+    if (inputSearch) {
+      inputSearch.value = '';
+    }
+    if (clearBtn) {
+      clearBtn.classList.add('hidden');
+    }
+    if (dropdown) {
+      dropdown.classList.add('hidden');
+      dropdown.innerHTML = '';
+    }
+  }
+
   importStudentFromPool(poolStudent) {
     if (this.isMasterStudentEnrolled(poolStudent)) {
       this.showToast(`'${poolStudent.name}' 학생은 이미 등록되어 있습니다.`);
@@ -1304,13 +1318,16 @@ class TimetableApp {
     this.saveState();
     this.render();
 
-    // 검색 드롭다운 상태 실시간 갱신
-    const inputSearch = document.getElementById('input-search-student-pool');
-    if (inputSearch && inputSearch.value.trim()) {
-      this.handleSearchPoolInput(inputSearch.value);
-    }
+    // 학생 등록 완료 후 검색창에 남아있던 검색어 및 추천 드롭다운 즉시 초기화(삭제)
+    this.clearPoolSearch();
 
     this.showToast(`'${code} ${poolStudent.name}' 학생이 시간표 편제 목록에 등록되었습니다.`);
+
+    // 다음 학생을 편리하게 연속 검색할 수 있도록 검색창 포커스
+    const inputSearch = document.getElementById('input-search-student-pool');
+    if (inputSearch) {
+      inputSearch.focus();
+    }
   }
 
   // ==========================================
