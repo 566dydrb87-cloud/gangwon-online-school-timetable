@@ -43,16 +43,27 @@ const ExcelService = {
     return `${code}${student.name || ''}`;
   },
 
-  // 상태별 이모티콘 기호
+  // 상태별 기호 (확정: 🟢, 조정: 노란 세모 ▲, 폐강: ✖️)
   getStatusSymbol(status) {
-    if (status === 'adjust') return '🔺';
+    if (status === 'adjust') return '▲';
     if (status === 'canceled') return '✖️';
     return '🟢';
   },
 
+  // 상태별 HTML 표기 (노란색 세모 스타일 적용)
+  getStatusHtml(status) {
+    if (status === 'adjust') {
+      return '<span class="text-amber-500 font-black drop-shadow-xs" style="color: #F59E0B;" title="조정(노랑 세모)">▲</span>';
+    }
+    if (status === 'canceled') {
+      return '<span class="text-slate-400 font-bold" title="폐강(회색 엑스)">✖️</span>';
+    }
+    return '<span class="text-emerald-500" title="확정(초록)">🟢</span>';
+  },
+
   // 상태 텍스트
   getStatusText(status) {
-    if (status === 'adjust') return '조정(🔺)';
+    if (status === 'adjust') return '조정(▲)';
     if (status === 'canceled') return '폐강(✖️)';
     return '확정(🟢)';
   },

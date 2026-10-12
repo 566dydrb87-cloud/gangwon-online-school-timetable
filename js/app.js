@@ -53,16 +53,24 @@ class TimetableApp {
 
   applyExternalData(data, msg = '') {
     if (!data) return;
-    if (data.periods) this.periods = data.periods;
-    if (data.days) this.days = data.days;
+    if (data.periods && Array.isArray(data.periods) && data.periods.length > 0) {
+      this.periods = data.periods;
+    } else if (!this.periods || this.periods.length === 0) {
+      this.periods = JSON.parse(JSON.stringify(DEFAULT_PERIODS));
+    }
+    if (data.days && Array.isArray(data.days) && data.days.length > 0) {
+      this.days = data.days;
+    } else if (!this.days || this.days.length === 0) {
+      this.days = JSON.parse(JSON.stringify(DEFAULT_DAYS));
+    }
     if (data.students) this.students = data.students;
-    if (data.offeredSubjects) this.offeredSubjects = data.offeredSubjects;
+    if (data.offeredSubjects && data.offeredSubjects.length > 0) this.offeredSubjects = data.offeredSubjects;
     if (data.subjectColorMap) this.subjectColorMap = data.subjectColorMap;
     if (data.showWeekends !== undefined) this.showWeekends = data.showWeekends;
 
     this.sortPeriods();
     this.buildSubjectColorMap();
-    localStorage.setItem(this.storageKey, JSON.stringify(data));
+    this.saveState();
     this.render();
     if (msg) this.showToast(msg);
   }
@@ -72,12 +80,22 @@ class TimetableApp {
       const saved = localStorage.getItem(this.storageKey);
       if (saved) {
         const data = JSON.parse(saved);
-        this.periods = data.periods || JSON.parse(JSON.stringify(DEFAULT_PERIODS));
-        this.days = data.days || JSON.parse(JSON.stringify(DEFAULT_DAYS));
+        this.periods = (data.periods && Array.isArray(data.periods) && data.periods.length > 0) 
+          ? data.periods 
+          : JSON.parse(JSON.stringify(DEFAULT_PERIODS));
+        this.days = (data.days && Array.isArray(data.days) && data.days.length > 0) 
+          ? data.days 
+          : JSON.parse(JSON.stringify(DEFAULT_DAYS));
         this.students = data.students || [];
-        this.offeredSubjects = data.offeredSubjects || [...DEFAULT_OFFERED_SUBJECTS];
+        this.offeredSubjects = (data.offeredSubjects && data.offeredSubjects.length > 0)
+          ? data.offeredSubjects 
+          : [...DEFAULT_OFFERED_SUBJECTS];
         this.subjectColorMap = data.subjectColorMap || {};
         this.showWeekends = data.showWeekends !== undefined ? data.showWeekends : true;
+
+        if (!this.periods || this.periods.length === 0) {
+          this.periods = JSON.parse(JSON.stringify(DEFAULT_PERIODS));
+        }
         return;
       }
     } catch (e) {
@@ -381,6 +399,12 @@ class TimetableApp {
       this.openStudentModal();
     });
 
+    // 퀵 학생 직접 등록 (학년/반/번호/성명 바로 추가)
+    document.getElementById('form-quick-add-student')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleQuickAddStudent();
+    });
+
     document.getElementById('form-add-student')?.addEventListener('submit', (e) => {
       e.preventDefault();
       this.handleSaveStudent();
@@ -394,6 +418,52 @@ class TimetableApp {
     document.getElementById('btn-print')?.addEventListener('click', () => {
       window.print();
     });
+  }
+
+  // 사용자 직접 학년/반/번호/성명 빠른 등록
+  handleQuickAddStudent() {
+    const gradeEl = document.getElementById('quick-grade');
+    const classEl = document.getElementById('quick-class');
+    const numberEl = document.getElementById('quick-number');
+    const nameEl = document.getElementById('quick-name');
+
+    const grade = parseInt(gradeEl.value, 10) || 1;
+    const classNum = parseInt(classEl.value, 10) || 1;
+    const studentNum = parseInt(numberEl.value, 10) || 1;
+    const name = nameEl.value.trim();
+
+    if (!name) {
+      alert('학생 성명을 입력해주세요.');
+      nameEl.focus();
+      return;
+    }
+
+    const studentCode = ExcelService.getStudentCode({ grade, classNum, studentNum });
+
+    const newStudent = {
+      id: `s_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      grade: grade,
+      classNum: classNum,
+      studentNum: studentNum,
+      studentCode: studentCode,
+      name: name,
+      subject: '', // 최초 등록 시 과목 미배정 상태
+      day: null,
+      period: null,
+      periodId: null,
+      status: 'confirmed'
+    };
+
+    this.students.push(newStudent);
+    this.saveState();
+    this.render();
+
+    // 다음 학생 입력을 위해 번호 자동 1 증가 및 성명 입력란 비우기
+    numberEl.value = studentNum + 1;
+    nameEl.value = '';
+    nameEl.focus();
+
+    this.showToast(`'${studentCode} ${name}' 학생이 등록되었습니다.`);
   }
 
   // 사이드바에서 새 과목 입력 즉시 목록화
@@ -654,11 +724,11 @@ class TimetableApp {
                      style="background-color: ${bgStyle}; color: ${textStyle}; border-color: ${borderStyle};"
                      title="학번성명: ${codeName} / 과목: ${student.subject} / 상태: ${ExcelService.getStatusText(student.status)} (클릭하여 상태 변경)">
                   
-                  <!-- 상태 이모티콘 (원클릭 순환 변경) -->
+                  <!-- 상태 기호 (원클릭 순환 변경: 🟢확정 -> ▲조정(노랑) -> ✖️폐강) -->
                   <span onclick="event.stopPropagation(); window.app.toggleStudentStatus('${student.id}')" 
-                        class="cursor-pointer mr-1 text-[11px] hover:scale-125 transition-transform" 
-                        title="상태 클릭 변경 (🟢확정 / 🔺조정 / ✖️폐강)">
-                    ${symbol}
+                        class="cursor-pointer mr-1 text-[11px] inline-flex items-center hover:scale-125 transition-transform" 
+                        title="상태 클릭 변경 (🟢확정 / ▲조정(노랑) / ✖️폐강)">
+                    ${ExcelService.getStatusHtml(student.status)}
                   </span>
 
                   <span class="truncate max-w-[140px] text-xs font-semibold">
@@ -1005,19 +1075,19 @@ class TimetableApp {
               </span>
             `}
           </td>
-          <!-- 상태 (🟢 확정 / 🔺 조정 / ✖️ 폐강 원클릭 전환) -->
+          <!-- 상태 (🟢 확정 / ▲ 조정 / ✖️ 폐강 원클릭 전환) -->
           <td class="py-2 px-1 text-center text-xs whitespace-nowrap">
             ${isAssigned ? `
               <button type="button" 
                       onclick="window.app.toggleStudentStatus('${student.id}')"
-                      class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold border transition hover:scale-105 ${
+                      class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold border transition hover:scale-105 shadow-2xs ${
                         student.status === 'canceled' ? 'bg-slate-200 text-slate-600 border-slate-300' :
-                        student.status === 'adjust' ? 'bg-amber-100 text-amber-800 border-amber-300' :
-                        'bg-emerald-100 text-emerald-800 border-emerald-300'
+                        student.status === 'adjust' ? 'bg-amber-50 text-amber-800 border-amber-300' :
+                        'bg-emerald-50 text-emerald-800 border-emerald-300'
                       }"
-                      title="클릭하여 상태 변경 (🟢확정 -> 🔺조정 -> ✖️폐강)">
-                <span>${symbol}</span>
-                <span class="text-[10px]">${student.status === 'canceled' ? '폐강' : student.status === 'adjust' ? '조정' : '확정'}</span>
+                      title="클릭하여 상태 변경 (🟢확정 -> ▲조정 -> ✖️폐강)">
+                <span>${ExcelService.getStatusHtml(student.status)}</span>
+                <span class="text-[10px] ${student.status === 'adjust' ? 'text-amber-800 font-black' : ''}">${student.status === 'canceled' ? '폐강' : student.status === 'adjust' ? '조정' : '확정'}</span>
               </button>
             ` : `
               <span class="text-slate-300 text-xs">-</span>

@@ -174,10 +174,10 @@
       </div>
 
       <div class="hidden md:flex items-center gap-3 text-slate-600 text-[11px]">
-        <div class="inline-flex items-center gap-2 bg-slate-100 px-2.5 py-0.5 rounded font-medium border border-slate-200">
+        <div class="inline-flex items-center gap-2.5 bg-slate-100 px-2.5 py-0.5 rounded font-medium border border-slate-200">
           <span class="font-bold text-slate-700">상태 기호:</span>
           <span>🟢 확정</span>
-          <span>🔺 조정</span>
+          <span class="inline-flex items-center gap-0.5 font-bold text-amber-600"><span class="text-amber-500 font-black text-xs">▲</span> 조정</span>
           <span class="text-slate-500 font-semibold line-through">✖️ 폐강(회색)</span>
         </div>
         <span class="text-slate-400">|</span>
@@ -190,7 +190,7 @@
   <main id="main-container" class="flex-1 max-w-[1780px] w-full mx-auto p-4 sm:p-5 flex flex-col lg:flex-row gap-5 items-start">
 
     <!-- ==================== 좌측: 수강신청 학생 명단 & 일괄 배정 패널 ==================== -->
-    <aside id="sidebar-container" class="w-full lg:w-[450px] shrink-0 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col max-h-[calc(100vh-140px)] sticky top-20 no-print">
+    <aside id="sidebar-container" class="w-full lg:w-[460px] shrink-0 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col max-h-[calc(100vh-140px)] sticky top-20 no-print">
       
       <!-- 패널 헤더 -->
       <div class="p-3.5 border-b border-slate-200 bg-slate-50/70 rounded-t-xl">
@@ -199,10 +199,40 @@
             <i data-lucide="clipboard-list" class="w-4 h-4 text-blue-600"></i>
             <h2 class="text-sm font-bold text-slate-900">수강 신청 학생 명단</h2>
           </div>
-          <button id="btn-open-add-student-modal" class="text-xs px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-xs transition flex items-center gap-1">
-            <i data-lucide="plus" class="w-3 h-3"></i> 학생 등록
+          <button id="btn-open-add-student-modal" class="text-xs px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-md border border-slate-300 transition flex items-center gap-1" title="상세 등록 모달">
+            <i data-lucide="sliders" class="w-3 h-3"></i> 상세 등록
           </button>
         </div>
+
+        <!-- 사용자 직접 입력 바 (학년, 반, 번호, 성명) -->
+        <form id="form-quick-add-student" class="mb-2.5 p-2 bg-blue-50/90 border border-blue-200 rounded-lg flex flex-col gap-1.5 shadow-2xs">
+          <div class="flex items-center justify-between text-[11px] font-bold text-blue-900">
+            <span class="flex items-center gap-1">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5 text-blue-600"></i>
+              학생 직접 입력 (학년/반/번호/성명)
+            </span>
+            <span class="text-[10px] text-blue-600 font-normal">Enter 누르면 바로 등록</span>
+          </div>
+          <div class="grid grid-cols-12 gap-1 items-center">
+            <select id="quick-grade" class="col-span-3 px-1.5 py-1 text-xs bg-white border border-blue-300 rounded font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" title="학년">
+              <option value="1">1학년</option>
+              <option value="2" selected>2학년</option>
+              <option value="3">3학년</option>
+            </select>
+            <div class="col-span-2 flex items-center">
+              <input type="number" id="quick-class" min="1" max="20" value="1" placeholder="반" class="w-full px-1 py-1 text-xs bg-white border border-blue-300 rounded text-center font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" title="반 (예: 1반)">
+            </div>
+            <div class="col-span-2 flex items-center">
+              <input type="number" id="quick-number" min="1" max="60" value="1" placeholder="번호" class="w-full px-1 py-1 text-xs bg-white border border-blue-300 rounded text-center font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" title="번호 (예: 1번)">
+            </div>
+            <div class="col-span-3">
+              <input type="text" id="quick-name" placeholder="성명 입력" required class="w-full px-2 py-1 text-xs bg-white border border-blue-300 rounded font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500" title="학생 성명">
+            </div>
+            <button type="submit" class="col-span-2 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded shadow-xs transition flex items-center justify-center gap-0.5" title="학생 등록">
+              + 등록
+            </button>
+          </div>
+        </form>
 
         <!-- 검색 및 필터 -->
         <div class="space-y-2">
@@ -225,8 +255,8 @@
             <select id="filter-status" class="px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
               <option value="all">전체 상태</option>
               <option value="confirmed">🟢 확정</option>
-              <option value="adjust">🔺 조정</option>
-              <option value="canceled">✖️ 폐강</option>
+              <option value="adjust">▲ 조정(노랑)</option>
+              <option value="canceled">✖️ 폐강(회색)</option>
               <option value="assigned">배정완료</option>
               <option value="unassigned">미배정</option>
             </select>
