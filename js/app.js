@@ -15,11 +15,14 @@
 
 class TimetableApp {
   constructor() {
-    this.storageKey = 'gw_online_school_timetable_data_v4';
-    this.legacyStorageKey = 'gw_online_school_timetable_data_v3';
-    this.activeYear = '2026';
-    this.activeSemester = '1';
-    this.academicYears = ['2026', '2027'];
+    this.storageKey = 'gw_online_school_timetable_data_v5';
+    this.legacyStorageKey = 'gw_online_school_timetable_data_v4';
+    this.legacyStorageKeyV3 = 'gw_online_school_timetable_data_v3';
+    this.activeYear = '2027'; // 기본 활성 학년도: 2027학년도
+    this.activeGrade = '2'; // 기본 활성 학년: 2학년 ('2' | '3')
+    this.activeSemester = '1'; // 기본 활성 학기: 1학기 ('1' | '2')
+    this.academicYears = ['2027', '2026'];
+    this.grades = ['2', '3'];
     this.currentWorkflowTab = 'step1'; // 'step1' | 'step2'
     this.yearsData = {};
 
@@ -105,32 +108,58 @@ class TimetableApp {
     };
   }
 
-  ensureYearSemesterData(year, semester = '1') {
+  ensureYearSemesterData(year = this.activeYear, grade = this.activeGrade || '2', semester = this.activeSemester || '1') {
     if (!this.yearsData[year]) {
+      this.yearsData[year] = {};
+    }
+
+    // 구 버전 데이터 마이그레이션 (yearsData[year]['1'] 바로 아래에 periods가 있는 경우)
+    const isOldStructure = (this.yearsData[year]['1'] && this.yearsData[year]['1'].periods) ||
+                           (this.yearsData[year]['2'] && this.yearsData[year]['2'].periods) ||
+                           this.yearsData[year].periods;
+    if (isOldStructure) {
+      const oldSem1 = this.yearsData[year]['1'] || (this.yearsData[year].periods ? this.yearsData[year] : null) || this.createDefaultSemesterData();
+      const oldSem2 = this.yearsData[year]['2'] || this.createDefaultSemesterData();
       this.yearsData[year] = {
+        '2': {
+          '1': oldSem1,
+          '2': oldSem2
+        },
+        '3': {
+          '1': this.createDefaultSemesterData(),
+          '2': this.createDefaultSemesterData()
+        }
+      };
+    }
+
+    // 2학년, 3학년 컨테이너 확보
+    if (!this.yearsData[year]['2']) {
+      this.yearsData[year]['2'] = {
+        '1': this.createDefaultSemesterData(),
+        '2': this.createDefaultSemesterData()
+      };
+    }
+    if (!this.yearsData[year]['3']) {
+      this.yearsData[year]['3'] = {
         '1': this.createDefaultSemesterData(),
         '2': this.createDefaultSemesterData()
       };
     }
 
-    // 구 버전 데이터 구조 마이그레이션
-    if (this.yearsData[year].periods || this.yearsData[year].students) {
-      const old = this.yearsData[year];
-      this.yearsData[year] = {
-        '1': old,
-        '2': this.createDefaultSemesterData(old.periods, old.days, old.offeredSubjects, old.subjectColorMap)
+    if (!this.yearsData[year][grade]) {
+      this.yearsData[year][grade] = {
+        '1': this.createDefaultSemesterData(),
+        '2': this.createDefaultSemesterData()
       };
     }
-
-    if (!this.yearsData[year]['1']) {
-      this.yearsData[year]['1'] = this.createDefaultSemesterData();
+    if (!this.yearsData[year][grade]['1']) {
+      this.yearsData[year][grade]['1'] = this.createDefaultSemesterData();
     }
-    if (!this.yearsData[year]['2']) {
-      const sem1 = this.yearsData[year]['1'];
-      this.yearsData[year]['2'] = this.createDefaultSemesterData(sem1.periods, sem1.days, sem1.offeredSubjects, sem1.subjectColorMap);
+    if (!this.yearsData[year][grade]['2']) {
+      this.yearsData[year][grade]['2'] = this.createDefaultSemesterData();
     }
 
-    const d = this.yearsData[year][semester];
+    const d = this.yearsData[year][grade][semester];
     if (!d.periods || !Array.isArray(d.periods) || d.periods.length === 0) {
       d.periods = JSON.parse(JSON.stringify(DEFAULT_PERIODS));
     }
@@ -161,7 +190,7 @@ class TimetableApp {
           if (!studentMap.has(key)) {
             const mStudent = {
               id: s.studentMasterId || s.id || `sm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-              grade: s.grade || 1,
+              grade: Number(grade) || s.grade || 2,
               classNum: s.classNum || 1,
               studentNum: s.studentNum || null,
               studentCode: code,
@@ -198,8 +227,8 @@ class TimetableApp {
   }
 
   loadActiveYearSemesterData() {
-    this.ensureYearSemesterData(this.activeYear, this.activeSemester);
-    const d = this.yearsData[this.activeYear][this.activeSemester];
+    this.ensureYearSemesterData(this.activeYear, this.activeGrade, this.activeSemester);
+    const d = this.yearsData[this.activeYear][this.activeGrade][this.activeSemester];
     this.periods = d.periods;
     this.days = d.days;
     this.masterStudents = d.masterStudents || [];
@@ -220,7 +249,7 @@ class TimetableApp {
         if (!studentMap.has(key)) {
           const mStudent = {
             id: s.studentMasterId || s.id || `sm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-            grade: s.grade || 1,
+            grade: Number(this.activeGrade) || s.grade || 2,
             classNum: s.classNum || 1,
             studentNum: s.studentNum || null,
             studentCode: code,
@@ -241,8 +270,8 @@ class TimetableApp {
     this.sortPeriods();
     this.sortOfferedSubjects();
     this.rebuildStudentAssignments();
-    this.ensureYearSemesterData(this.activeYear, this.activeSemester);
-    this.yearsData[this.activeYear][this.activeSemester] = {
+    this.ensureYearSemesterData(this.activeYear, this.activeGrade, this.activeSemester);
+    this.yearsData[this.activeYear][this.activeGrade][this.activeSemester] = {
       periods: this.periods,
       days: this.days,
       masterStudents: this.masterStudents,
@@ -350,44 +379,32 @@ class TimetableApp {
     try {
       let saved = localStorage.getItem(this.storageKey);
       if (!saved) {
-        // v3 레거시 키 확인
+        // v4, v3 레거시 키 순차 확인
         saved = localStorage.getItem(this.legacyStorageKey);
+      }
+      if (!saved) {
+        saved = localStorage.getItem(this.legacyStorageKeyV3);
       }
 
       if (saved) {
         const data = JSON.parse(saved);
-        if (data.yearsData || data.years) {
-          this.yearsData = data.yearsData || data.years;
-          this.academicYears = data.academicYears || Object.keys(this.yearsData);
-          if (!this.academicYears.includes('2026')) this.academicYears.unshift('2026');
-          if (!this.academicYears.includes('2027')) this.academicYears.push('2027');
-          this.activeYear = data.activeYear || '2026';
-          this.activeSemester = data.activeSemester || '1';
-        } else {
-          this.academicYears = ['2026', '2027'];
-          this.activeYear = '2026';
-          this.activeSemester = '1';
-          this.yearsData['2026'] = {
-            '1': {
-              periods: (data.periods && data.periods.length > 0) ? data.periods : JSON.parse(JSON.stringify(DEFAULT_PERIODS)),
-              days: (data.days && data.days.length > 0) ? data.days : JSON.parse(JSON.stringify(DEFAULT_DAYS)),
-              students: data.students || [],
-              offeredSubjects: (data.offeredSubjects && data.offeredSubjects.length > 0) ? data.offeredSubjects : [...DEFAULT_OFFERED_SUBJECTS],
-              subjectColorMap: data.subjectColorMap || {},
-              showWeekends: data.showWeekends !== undefined ? data.showWeekends : true
-            },
-            '2': this.createDefaultSemesterData()
-          };
-          this.yearsData['2027'] = {
-            '1': this.createDefaultSemesterData(),
-            '2': this.createDefaultSemesterData()
-          };
-        }
+        this.yearsData = data.yearsData || data.years || {};
+        this.academicYears = data.academicYears || Object.keys(this.yearsData);
+        if (!this.academicYears.includes('2027')) this.academicYears.unshift('2027');
+        if (!this.academicYears.includes('2026')) this.academicYears.push('2026');
 
-        this.ensureYearSemesterData('2026', '1');
-        this.ensureYearSemesterData('2026', '2');
-        this.ensureYearSemesterData('2027', '1');
-        this.ensureYearSemesterData('2027', '2');
+        // 기본 작업 학년도: 2027학년도, 기본 학년: 2학년
+        this.activeYear = data.activeYear || '2027';
+        this.activeGrade = data.activeGrade || '2';
+        this.activeSemester = data.activeSemester || '1';
+
+        this.ensureYearSemesterData('2027', '2', '1');
+        this.ensureYearSemesterData('2027', '2', '2');
+        this.ensureYearSemesterData('2027', '3', '1');
+        this.ensureYearSemesterData('2027', '3', '2');
+        this.ensureYearSemesterData('2026', '2', '1');
+        this.ensureYearSemesterData('2026', '2', '2');
+
         this.loadActiveYearSemesterData();
         return;
       }
@@ -395,7 +412,14 @@ class TimetableApp {
       console.error('Failed to load state:', e);
     }
 
-    this.resetToDefaults(false);
+    // 초기 상태 (2027학년도 2학년 1학기 기본)
+    this.activeYear = '2027';
+    this.activeGrade = '2';
+    this.activeSemester = '1';
+    this.academicYears = ['2027', '2026'];
+    this.ensureYearSemesterData('2027', '2', '1');
+    this.ensureYearSemesterData('2027', '3', '1');
+    this.loadActiveYearSemesterData();
   }
 
   saveState() {
@@ -403,8 +427,10 @@ class TimetableApp {
       this.saveActiveYearSemesterData();
       const data = {
         activeYear: this.activeYear,
+        activeGrade: this.activeGrade,
         activeSemester: this.activeSemester,
         academicYears: this.academicYears,
+        grades: this.grades,
         yearsData: this.yearsData,
         periods: this.periods,
         days: this.days,
@@ -421,6 +447,7 @@ class TimetableApp {
       localStorage.setItem(this.storageKey, JSON.stringify(data));
       this.updateStats();
       this.renderAcademicYearTabs();
+      this.renderAcademicGradeTabs();
 
       if (window.cloudSync) {
         window.cloudSync.saveToBackend(data);
@@ -438,9 +465,11 @@ class TimetableApp {
       if (!this.academicYears.includes('2026')) this.academicYears.unshift('2026');
       if (!this.academicYears.includes('2027')) this.academicYears.push('2027');
       if (data.activeYear && this.academicYears.includes(data.activeYear)) this.activeYear = data.activeYear;
+      if (data.activeGrade && ['2', '3'].includes(String(data.activeGrade))) this.activeGrade = String(data.activeGrade);
       if (data.activeSemester) this.activeSemester = data.activeSemester;
     }
 
+    this.ensureYearSemesterData(this.activeYear, this.activeGrade, this.activeSemester);
     this.loadActiveYearSemesterData();
     this.sortPeriods();
     this.buildSubjectColorMap();
@@ -527,7 +556,20 @@ class TimetableApp {
     this.buildSubjectColorMap();
     this.saveState();
     this.render();
-    this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 시간표로 전환되었습니다.`);
+    this.showToast(`[${this.activeYear}학년도 ${this.activeGrade}학년 ${this.activeSemester}학기] 시간표로 전환되었습니다.`);
+  }
+
+  // 대상 학년 전환 (2학년 / 3학년)
+  switchGrade(grade) {
+    if (this.activeGrade === grade) return;
+    this.saveActiveYearSemesterData();
+    this.activeGrade = grade;
+    this.loadActiveYearSemesterData();
+    this.sortPeriods();
+    this.buildSubjectColorMap();
+    this.saveState();
+    this.render();
+    this.showToast(`[${this.activeYear}학년도 ${this.activeGrade}학년 ${this.activeSemester}학기] 작업 환경으로 전환되었습니다.`);
   }
 
   handleAddAcademicYear() {
@@ -927,7 +969,7 @@ class TimetableApp {
       this.activeYear,
       this.activeSemester
     );
-    this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 학생 명단(${studentsToExport.length}명) 엑셀이 다운로드되었습니다.`, true);
+    this.showToast(`[${this.activeYear}학년도 ${this.activeGrade}학년 ${this.activeSemester}학기] 학생 명단(${studentsToExport.length}명) 엑셀이 다운로드되었습니다.`, true);
   }
 
   /**
@@ -1183,6 +1225,7 @@ class TimetableApp {
   render() {
     this.updateStats();
     this.renderAcademicYearTabs();
+    this.renderAcademicGradeTabs();
     this.updateWeekendToggleBtn();
     this.updateUndoButtonUI();
 
@@ -1228,13 +1271,50 @@ class TimetableApp {
     if (statPeriod) statPeriod.textContent = regularPeriodsCount;
   }
 
+  // 대상 학년 (2학년 / 3학년) 탭 렌더링
+  renderAcademicGradeTabs() {
+    const container = document.getElementById('academic-grade-tabs');
+    if (!container) return;
+
+    let html = '';
+    ['2', '3'].forEach(g => {
+      const isActive = this.activeGrade === g;
+      const count = this.getStudentCountForGrade(g);
+      html += `
+        <button type="button" 
+                onclick="window.app.switchGrade('${g}')"
+                class="px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition ${
+                  isActive 
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xs ring-2 ring-indigo-400' 
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold'
+                }"
+                title="${this.activeYear}학년도 ${g}학년 작업 환경으로 전환">
+          <span>${g}학년</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+            isActive ? 'bg-white text-indigo-700 shadow-2xs' : 'bg-slate-200 text-slate-600'
+          }">
+            ${count}명
+          </span>
+        </button>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  getStudentCountForGrade(grade) {
+    const yearObj = this.yearsData[this.activeYear] || {};
+    const gradeObj = yearObj[grade] || {};
+    const semObj = gradeObj[this.activeSemester] || gradeObj['1'] || {};
+    return (semObj.masterStudents && Array.isArray(semObj.masterStudents)) ? semObj.masterStudents.length : 0;
+  }
+
   renderAcademicYearTabs() {
     const container = document.getElementById('academic-year-tabs');
     const badgeLabel = document.getElementById('current-year-label');
     const titleYear = document.getElementById('timetable-academic-year-text');
     const printYear = document.getElementById('timetable-print-year-text');
 
-    const fullYearSemText = `${this.activeYear}학년도 ${this.activeSemester}학기`;
+    const fullYearSemText = `${this.activeYear}학년도 ${this.activeGrade}학년 ${this.activeSemester}학기`;
     if (badgeLabel) badgeLabel.textContent = fullYearSemText;
     if (titleYear) titleYear.textContent = fullYearSemText;
     if (printYear) printYear.textContent = fullYearSemText;
@@ -1243,9 +1323,17 @@ class TimetableApp {
       container.innerHTML = this.academicYears.map(year => {
         const isActive = year === this.activeYear;
         const yearObj = this.yearsData[year] || {};
-        const count1 = (yearObj['1'] && yearObj['1'].masterStudents) ? yearObj['1'].masterStudents.length : 0;
-        const count2 = (yearObj['2'] && yearObj['2'].masterStudents) ? yearObj['2'].masterStudents.length : 0;
-        const totalCount = count1 + count2;
+        
+        let totalCount = 0;
+        ['2', '3'].forEach(g => {
+          const gObj = yearObj[g] || {};
+          ['1', '2'].forEach(s => {
+            const semObj = gObj[s] || {};
+            if (semObj.masterStudents && Array.isArray(semObj.masterStudents)) {
+              totalCount += semObj.masterStudents.length;
+            }
+          });
+        });
 
         return `
           <div class="inline-flex items-center rounded-lg transition-all ${
@@ -1281,8 +1369,9 @@ class TimetableApp {
     }
 
     const currentYearObj = this.yearsData[this.activeYear] || {};
-    const sem1Count = (currentYearObj['1'] && currentYearObj['1'].masterStudents) ? currentYearObj['1'].masterStudents.length : 0;
-    const sem2Count = (currentYearObj['2'] && currentYearObj['2'].masterStudents) ? currentYearObj['2'].masterStudents.length : 0;
+    const currentGradeObj = currentYearObj[this.activeGrade] || {};
+    const sem1Count = (currentGradeObj['1'] && currentGradeObj['1'].masterStudents) ? currentGradeObj['1'].masterStudents.length : 0;
+    const sem2Count = (currentGradeObj['2'] && currentGradeObj['2'].masterStudents) ? currentGradeObj['2'].masterStudents.length : 0;
 
     const btnSem1 = document.getElementById('tab-semester-1');
     const btnSem2 = document.getElementById('tab-semester-2');
