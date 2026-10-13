@@ -1045,13 +1045,43 @@ const ExcelService = {
   },
 
   // -------------------------------------------------------------
-  // 8. 1단계 전용: 학생 및 과목 편제 명단 엑셀 다운로드
+  // 8. 1단계 전용: 학생 및 과목 편제 명단 엑셀 다운로드 (1학기 + 2학기 연속 출력 & 옅은 파스텔 음영 구분)
   // -------------------------------------------------------------
-  async exportStudentRosterExcel(students, courseEnrollments, academicYear = '2026', semester = '1', schoolName = '강원온라인학교') {
+  async exportStudentRosterExcel(optionsOrStudents, maybeEnrollments, academicYear = '2026', semester = '1', schoolName = '강원온라인학교') {
     const workbook = new ExcelJS.Workbook();
-    const filePrefix = `${academicYear}학년도_${semester}학기_${schoolName}`;
     workbook.creator = `${schoolName} 시간표 시스템`;
-    const worksheet = workbook.addWorksheet(`${academicYear}학년도_${semester}학기_학생명단`, { views: [{ showGridLines: true }] });
+
+    let year = academicYear;
+    let gradeLabel = '';
+    let semestersData = [];
+
+    // 옵션 객체 형태인지 레거시 단일 학기 호출인지 판별
+    if (optionsOrStudents && typeof optionsOrStudents === 'object' && !Array.isArray(optionsOrStudents) && (optionsOrStudents.sem1Students || optionsOrStudents.sem2Students || optionsOrStudents.semesters)) {
+      const opts = optionsOrStudents;
+      year = opts.academicYear || year;
+      gradeLabel = opts.grade ? `${opts.grade}학년` : '';
+      schoolName = opts.schoolName || schoolName;
+
+      if (Array.isArray(opts.semesters)) {
+        semestersData = opts.semesters;
+      } else {
+        // 기본 1학기 + 2학기 순서 구조 (1학기 먼저, 2학기 이어서)
+        semestersData = [
+          { semester: '1', students: opts.sem1Students || [], enrollments: opts.sem1Enrollments || {} },
+          { semester: '2', students: opts.sem2Students || [], enrollments: opts.sem2Enrollments || {} }
+        ];
+      }
+    } else {
+      // 레거시 단일 학기 호출 대응
+      semestersData = [
+        { semester: String(semester), students: optionsOrStudents || [], enrollments: maybeEnrollments || {} }
+      ];
+    }
+
+    const titleGrade = gradeLabel ? `_${gradeLabel}` : '';
+    const filePrefix = `${year}학년도${titleGrade}_1·2학기통합_${schoolName}`;
+    const sheetName = `${year}학년도${titleGrade}_학생명단`.slice(0, 31);
+    const worksheet = workbook.addWorksheet(sheetName, { views: [{ showGridLines: true }] });
 
     worksheet.columns = [
       { header: '순번', key: 'index', width: 8 },
@@ -1064,74 +1094,114 @@ const ExcelService = {
       { header: '성명', key: 'name', width: 14 },
       { header: '편제상태', key: 'enrollStatus', width: 12 },
       { header: '수강과목수', key: 'courseCount', width: 12 },
-      { header: '수강과목목록', key: 'courses', width: 36 }
+      { header: '수강과목목록', key: 'courses', width: 40 }
     ];
 
+    // 헤더 행 스타일링
     const headerRow = worksheet.getRow(1);
     headerRow.height = 30;
     headerRow.eachCell((cell) => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } }; // 진한 틸/에메랄드
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } }; // 세련된 딥 슬레이트
       cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       this.applyBorder(cell);
     });
 
-    (students || []).forEach((st, idx) => {
-      const code = st.studentCode || this.getStudentCode(st);
-      const courses = [];
-      Object.entries(courseEnrollments || {}).forEach(([sub, ids]) => {
-        if (ids && ids.includes(st.id)) courses.push(sub);
-      });
+    let globalRowIdx = 1;
 
-      const isEnrolled = courses.length > 0;
-      const statusLabel = isEnrolled ? '편제완료' : '미편성';
-      const courseCountText = `${courses.length}과목`;
-      const coursesText = isEnrolled ? courses.join(', ') : '미편성';
+    // 학기별 옅은 파스텔톤 테마 (1학기: 연한 하늘색, 2학기: 연한 보라색)
+    const semesterTheme = {
+      '1': {
+        // 1학기: 연한 하늘색 계열 (Sky)
+        rowBg: 'FFF0F9FF',        // 행 전체 은은한 연하늘색
+        termBg: 'FFE0F2FE',       // 학기 셀 연하늘 뱃지
+        termText: 'FF0369A1'      // 학기 셀 진파랑 볼드
+      },
+      '2': {
+        // 2학기: 연한 보라색 계열 (Purple)
+        rowBg: 'FFFAF5FF',        // 행 전체 은은한 연보라색
+        termBg: 'FFEDE9FE',       // 학기 셀 연보라 뱃지
+        termText: 'FF6D28D9'      // 학기 셀 진보라 볼드
+      },
+      default: {
+        rowBg: 'FFFFFFFF',
+        termBg: 'FFF1F5F9',
+        termText: 'FF334155'
+      }
+    };
 
-      const row = worksheet.addRow({
-        index: idx + 1,
-        year: academicYear,
-        term: `${semester}학기`,
-        grade: st.grade ? `${st.grade}` : '1',
-        classNum: st.classNum ? `${st.classNum}` : '1',
-        studentNum: st.studentNum ? `${st.studentNum}` : '',
-        studentCode: code,
-        name: st.name || '',
-        enrollStatus: statusLabel,
-        courseCount: courseCountText,
-        courses: coursesText
-      });
+    semestersData.forEach(({ semester, students, enrollments }) => {
+      const termLabel = `${semester}학기`;
+      const theme = semesterTheme[String(semester)] || semesterTheme.default;
 
-      row.height = 24;
-      row.eachCell((cell, colNum) => {
-        cell.alignment = { vertical: 'middle', horizontal: colNum === 11 ? 'left' : 'center' };
-        cell.font = { name: '맑은 고딕', size: 10 };
-        this.applyBorder(cell);
+      (students || []).forEach(st => {
+        const code = st.studentCode || this.getStudentCode(st);
+        const courses = [];
+        Object.entries(enrollments || {}).forEach(([sub, ids]) => {
+          if (ids && ids.includes(st.id)) courses.push(sub);
+        });
 
-        // 편제상태 열 (col 9)
-        if (colNum === 9) {
-          if (isEnrolled) {
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
-            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF047857' } };
-          } else {
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
-            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFB45309' } };
+        const isEnrolled = courses.length > 0;
+        const statusLabel = isEnrolled ? '편제완료' : '미편성';
+        const courseCountText = `${courses.length}과목`;
+        const coursesText = isEnrolled ? courses.join(', ') : '미편성';
+
+        const row = worksheet.addRow({
+          index: globalRowIdx,
+          year: year,
+          term: termLabel,
+          grade: st.grade ? `${st.grade}` : '1',
+          classNum: st.classNum ? `${st.classNum}` : '1',
+          studentNum: st.studentNum ? `${st.studentNum}` : '',
+          studentCode: code,
+          name: st.name || '',
+          enrollStatus: statusLabel,
+          courseCount: courseCountText,
+          courses: coursesText
+        });
+
+        row.height = 24;
+        row.eachCell((cell, colNum) => {
+          cell.alignment = { vertical: 'middle', horizontal: colNum === 11 ? 'left' : 'center' };
+          cell.font = { name: '맑은 고딕', size: 10, color: { argb: 'FF1E293B' } };
+          this.applyBorder(cell);
+
+          // 행 전체 옅은 파스텔 배경 적용 (1학기: 연하늘, 2학기: 연보라)
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: theme.rowBg } };
+
+          // 학기 열 (col 3): 학기 전용 강조 뱃지 색상
+          if (colNum === 3) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: theme.termBg } };
+            cell.font = { name: '맑은 고딕', bold: true, color: { argb: theme.termText }, size: 10 };
           }
-        }
 
-        // 수강과목수 열 (col 10)
-        if (colNum === 10) {
-          if (!isEnrolled) {
-            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFB45309' } };
-          } else {
-            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF0369A1' } };
+          // 편제상태 열 (col 9): 편제완료(연초록) / 미편성(연주황)
+          if (colNum === 9) {
+            if (isEnrolled) {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF047857' } };
+            } else {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFB45309' } };
+            }
           }
-        }
 
-        // 수강과목목록 열 (col 11)
-        if (colNum === 11 && !isEnrolled) {
-          cell.font = { name: '맑은 고딕', color: { argb: 'FF94A3B8' }, italic: true };
-        }
+          // 수강과목수 열 (col 10)
+          if (colNum === 10) {
+            if (!isEnrolled) {
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFB45309' } };
+            } else {
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: theme.termText } };
+            }
+          }
+
+          // 수강과목목록 열 (col 11)
+          if (colNum === 11 && !isEnrolled) {
+            cell.font = { name: '맑은 고딕', color: { argb: 'FF94A3B8' }, italic: true };
+          }
+        });
+
+        globalRowIdx++;
       });
     });
 

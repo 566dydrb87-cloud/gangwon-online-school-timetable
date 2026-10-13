@@ -1,2375 +1,2640 @@
 {
   "activeYear": "2027",
+  "activeGrade": "2",
   "activeSemester": "2",
   "academicYears": [
     "2026",
     "2027"
   ],
+  "grades": [
+    "2",
+    "3"
+  ],
   "yearsData": {
     "2027": {
-      "1": {
-        "periods": [
-          {
-            "id": "p1",
-            "period": 1,
-            "name": "1교시",
-            "startTime": "09:00",
-            "endTime": "09:50",
-            "isBreak": false
-          },
-          {
-            "id": "p2",
-            "period": 2,
-            "name": "2교시",
-            "startTime": "10:00",
-            "endTime": "10:50",
-            "isBreak": false
-          },
-          {
-            "id": "p3",
-            "period": 3,
-            "name": "3교시",
-            "startTime": "11:00",
-            "endTime": "11:50",
-            "isBreak": false
-          },
-          {
-            "id": "p4",
-            "period": 4,
-            "name": "4교시",
-            "startTime": "12:00",
-            "endTime": "12:50",
-            "isBreak": false
-          },
-          {
-            "id": "p_lunch",
-            "period": null,
-            "name": "점심시간",
-            "startTime": "12:50",
-            "endTime": "13:40",
-            "isBreak": true
-          },
-          {
-            "id": "p5",
-            "period": 5,
-            "name": "5교시",
-            "startTime": "13:40",
-            "endTime": "14:30",
-            "isBreak": false
-          },
-          {
-            "id": "p6",
-            "period": 6,
-            "name": "6교시",
-            "startTime": "14:40",
-            "endTime": "15:30",
-            "isBreak": false
-          },
-          {
-            "id": "p7",
-            "period": 7,
-            "name": "7교시",
-            "startTime": "15:40",
-            "endTime": "16:30",
-            "isBreak": false
-          },
-          {
-            "id": "p8",
-            "period": 8,
-            "name": "8교시",
-            "startTime": "16:40",
-            "endTime": "17:30",
-            "isBreak": false
-          }
-        ],
-        "days": [
-          {
-            "id": "mon",
-            "name": "월",
-            "fullName": "월요일",
-            "isWeekend": false
-          },
-          {
-            "id": "tue",
-            "name": "화",
-            "fullName": "화요일",
-            "isWeekend": false
-          },
-          {
-            "id": "wed",
-            "name": "수",
-            "fullName": "수요일",
-            "isWeekend": false
-          },
-          {
-            "id": "thu",
-            "name": "목",
-            "fullName": "목요일",
-            "isWeekend": false
-          },
-          {
-            "id": "fri",
-            "name": "금",
-            "fullName": "금요일",
-            "isWeekend": false
-          },
-          {
-            "id": "sat",
-            "name": "토",
-            "fullName": "토요일",
-            "isWeekend": true
-          },
-          {
-            "id": "sun",
-            "name": "일",
-            "fullName": "일요일",
-            "isWeekend": true
-          }
-        ],
-        "masterStudents": [
-          {
-            "id": "sm_1791854178869_zsdikp",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 4,
-            "studentCode": "20104",
-            "name": "김소민"
-          },
-          {
-            "id": "sm_1791854178869_8zeeu5",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 5,
-            "studentCode": "20105",
-            "name": "김승찬"
-          },
-          {
-            "id": "sm_1791854178869_niobnu",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 6,
-            "studentCode": "20106",
-            "name": "김예빈"
-          },
-          {
-            "id": "sm_1791854178869_typthh",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 13,
-            "studentCode": "10113",
-            "name": "윤지우"
-          },
-          {
-            "id": "sm_1791854178869_z1g927",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민"
-          },
-          {
-            "id": "sm_1791854178869_m1ks1j",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 15,
-            "studentCode": "10115",
-            "name": "장시우"
-          },
-          {
-            "id": "sm_1791854178869_tt860d",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비"
-          },
-          {
-            "id": "sm_1791854178870_bfvqz7",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 5,
-            "studentCode": "10105",
-            "name": "김민진"
-          },
-          {
-            "id": "sm_1791854178870_msd17w",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 9,
-            "studentCode": "10109",
-            "name": "박재윤"
-          },
-          {
-            "id": "sm_1791854178870_q2laf1",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 20,
-            "studentCode": "10120",
-            "name": "최리"
-          },
-          {
-            "id": "sm_1791854206861_lypwiu",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 5,
-            "studentCode": "20205",
-            "name": "배다정"
-          },
-          {
-            "id": "sm_1791855190842_gm2rjw",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 21,
-            "studentCode": "10221",
-            "name": "현표"
-          },
-          {
-            "id": "sm_1791856690255_yuan8i",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 6,
-            "studentCode": "20206",
-            "name": "배학성"
-          },
-          {
-            "id": "sm_1791870548141_jm0y38",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준"
-          },
-          {
-            "id": "sm_1791870549916_q2gz64",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서"
-          }
-        ],
-        "courseEnrollments": {
-          "물질과 에너지": [
-            "sm_1791854178869_zsdikp",
-            "sm_1791854178869_z1g927",
-            "sm_1791854178869_m1ks1j",
-            "sm_1791854206861_lypwiu",
-            "sm_1791870548141_jm0y38",
-            "sm_1791870549916_q2gz64"
-          ],
-          "화학 반응의 세계": [
-            "sm_1791854178869_zsdikp",
-            "sm_1791854206861_lypwiu"
-          ],
-          "비교 문화": [
-            "sm_1791854178869_8zeeu5",
-            "sm_1791856690255_yuan8i"
-          ],
-          "윤리와 사상": [
-            "sm_1791854178869_8zeeu5",
-            "sm_1791856690255_yuan8i"
-          ],
-          "문학 감상과 비평": [
-            "sm_1791854178869_niobnu"
-          ],
-          "행성우주과학": [
-            "sm_1791854178869_typthh"
-          ],
-          "인간과 철학": [
-            "sm_1791854178869_z1g927",
-            "sm_1791854178869_tt860d",
-            "sm_1791854178870_bfvqz7"
-          ],
-          "게임 프로그래밍": [
-            "sm_1791854178869_tt860d",
-            "sm_1791854178870_msd17w"
-          ],
-          "국제 경제": [
-            "sm_1791854178870_q2laf1"
-          ],
-          "지구과학": [
-            "sm_1791855190842_gm2rjw"
-          ],
-          "고급 지구과학": [
-            "sm_1791855190842_gm2rjw"
-          ]
-        },
-        "courseSchedules": {
-          "지구과학": [],
-          "물질과 에너지": [
-            {
-              "id": "sch_1791860297883_4skzf2",
-              "day": "wed",
-              "periodId": "p5",
-              "period": 5,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791860302418_nffvlm",
-              "day": "wed",
-              "periodId": "p7",
-              "period": 7,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791860305250_gjvfrn",
-              "day": "wed",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            }
-          ],
-          "인간과 철학": [
-            {
-              "id": "sch_1791860389410_cb0sbx",
-              "day": "fri",
-              "periodId": "p6",
-              "period": 6,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791860396989_p23nij",
-              "day": "fri",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            }
-          ],
-          "국제 경제": [
-            {
-              "id": "sch_1791870156598_ppc4ja",
-              "day": "mon",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870160175_0a0gvs",
-              "day": "wed",
-              "periodId": "p7",
-              "period": 7,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870163872_itv1h6",
-              "day": "fri",
-              "periodId": "p6",
-              "period": 6,
-              "status": "confirmed"
-            }
-          ],
-          "화학 반응의 세계": [
-            {
-              "id": "sch_1791870573073_ajb5r7",
-              "day": "fri",
-              "periodId": "p6",
-              "period": 6,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870575956_j34hah",
-              "day": "fri",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870580006_mc5hfc",
-              "day": "thu",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            }
-          ],
-          "문학 감상과 비평": [
-            {
-              "id": "sch_1791870613769_kgpjcj",
-              "day": "wed",
-              "periodId": "p7",
-              "period": 7,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870615642_bi26ho",
-              "day": "fri",
-              "periodId": "p6",
-              "period": 6,
-              "status": "confirmed"
-            }
-          ],
-          "게임 프로그래밍": [
-            {
-              "id": "sch_1791870656722_9hh7w8",
-              "day": "mon",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870658160_6dz4sl",
-              "day": "wed",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870673815_nbt2qi",
-              "day": "wed",
-              "periodId": "p7",
-              "period": 7,
-              "status": "confirmed"
-            }
-          ],
-          "행성우주과학": [
-            {
-              "id": "sch_1791870709704_qw6gk9",
-              "day": "wed",
-              "periodId": "p7",
-              "period": 7,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870712128_rq0ilm",
-              "day": "wed",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870720894_qaxh06",
-              "day": "fri",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            }
-          ],
-          "고급 지구과학": []
-        },
-        "courseStatus": {
-          "물질과 에너지": "adjust",
-          "화학 반응의 세계": "adjust",
-          "비교 문화": "closed",
-          "윤리와 사상": "adjust",
-          "문학 감상과 비평": "closed",
-          "행성우주과학": "adjust",
-          "인간과 철학": "adjust",
-          "인공지능 기초": "open",
-          "게임 프로그래밍": "adjust",
-          "문예 창작의 이해": "open",
-          "국제 경제": "adjust",
-          "지구과학": "closed",
-          "고급 지구과학": "adjust"
-        },
-        "students": [
-          {
-            "id": "assign_게임 프로그래밍_sch_1791870656722_9hh7w8_sm_1791854178869_tt860d",
-            "scheduleId": "sch_1791870656722_9hh7w8",
-            "studentMasterId": "sm_1791854178869_tt860d",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "게임 프로그래밍",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_게임 프로그래밍_sch_1791870656722_9hh7w8_sm_1791854178870_msd17w",
-            "scheduleId": "sch_1791870656722_9hh7w8",
-            "studentMasterId": "sm_1791854178870_msd17w",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 9,
-            "studentCode": "10109",
-            "name": "박재윤",
-            "subject": "게임 프로그래밍",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_게임 프로그래밍_sch_1791870658160_6dz4sl_sm_1791854178869_tt860d",
-            "scheduleId": "sch_1791870658160_6dz4sl",
-            "studentMasterId": "sm_1791854178869_tt860d",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "게임 프로그래밍",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_게임 프로그래밍_sch_1791870658160_6dz4sl_sm_1791854178870_msd17w",
-            "scheduleId": "sch_1791870658160_6dz4sl",
-            "studentMasterId": "sm_1791854178870_msd17w",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 9,
-            "studentCode": "10109",
-            "name": "박재윤",
-            "subject": "게임 프로그래밍",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_게임 프로그래밍_sch_1791870673815_nbt2qi_sm_1791854178869_tt860d",
-            "scheduleId": "sch_1791870673815_nbt2qi",
-            "studentMasterId": "sm_1791854178869_tt860d",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "게임 프로그래밍",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_게임 프로그래밍_sch_1791870673815_nbt2qi_sm_1791854178870_msd17w",
-            "scheduleId": "sch_1791870673815_nbt2qi",
-            "studentMasterId": "sm_1791854178870_msd17w",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 9,
-            "studentCode": "10109",
-            "name": "박재윤",
-            "subject": "게임 프로그래밍",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 지구과학_unassigned_sm_1791855190842_gm2rjw",
-            "studentMasterId": "sm_1791855190842_gm2rjw",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 21,
-            "studentCode": "10221",
-            "name": "현표",
-            "subject": "고급 지구과학",
-            "day": null,
-            "periodId": null,
-            "period": null,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_국제 경제_sch_1791870156598_ppc4ja_sm_1791854178870_q2laf1",
-            "scheduleId": "sch_1791870156598_ppc4ja",
-            "studentMasterId": "sm_1791854178870_q2laf1",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 20,
-            "studentCode": "10120",
-            "name": "최리",
-            "subject": "국제 경제",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_국제 경제_sch_1791870160175_0a0gvs_sm_1791854178870_q2laf1",
-            "scheduleId": "sch_1791870160175_0a0gvs",
-            "studentMasterId": "sm_1791854178870_q2laf1",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 20,
-            "studentCode": "10120",
-            "name": "최리",
-            "subject": "국제 경제",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_국제 경제_sch_1791870163872_itv1h6_sm_1791854178870_q2laf1",
-            "scheduleId": "sch_1791870163872_itv1h6",
-            "studentMasterId": "sm_1791854178870_q2laf1",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 20,
-            "studentCode": "10120",
-            "name": "최리",
-            "subject": "국제 경제",
-            "day": "fri",
-            "periodId": "p6",
-            "period": 6,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_문학 감상과 비평_sch_1791870613769_kgpjcj_sm_1791854178869_niobnu",
-            "scheduleId": "sch_1791870613769_kgpjcj",
-            "studentMasterId": "sm_1791854178869_niobnu",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 6,
-            "studentCode": "20106",
-            "name": "김예빈",
-            "subject": "문학 감상과 비평",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_문학 감상과 비평_sch_1791870615642_bi26ho_sm_1791854178869_niobnu",
-            "scheduleId": "sch_1791870615642_bi26ho",
-            "studentMasterId": "sm_1791854178869_niobnu",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 6,
-            "studentCode": "20106",
-            "name": "김예빈",
-            "subject": "문학 감상과 비평",
-            "day": "fri",
-            "periodId": "p6",
-            "period": 6,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791854178869_zsdikp",
-            "scheduleId": "sch_1791860297883_4skzf2",
-            "studentMasterId": "sm_1791854178869_zsdikp",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 4,
-            "studentCode": "20104",
-            "name": "김소민",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p5",
-            "period": 5,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791854178869_z1g927",
-            "scheduleId": "sch_1791860297883_4skzf2",
-            "studentMasterId": "sm_1791854178869_z1g927",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p5",
-            "period": 5,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791854178869_m1ks1j",
-            "scheduleId": "sch_1791860297883_4skzf2",
-            "studentMasterId": "sm_1791854178869_m1ks1j",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 15,
-            "studentCode": "10115",
-            "name": "장시우",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p5",
-            "period": 5,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791854206861_lypwiu",
-            "scheduleId": "sch_1791860297883_4skzf2",
-            "studentMasterId": "sm_1791854206861_lypwiu",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 5,
-            "studentCode": "20205",
-            "name": "배다정",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p5",
-            "period": 5,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791870548141_jm0y38",
-            "scheduleId": "sch_1791860297883_4skzf2",
-            "studentMasterId": "sm_1791870548141_jm0y38",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p5",
-            "period": 5,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791870549916_q2gz64",
-            "scheduleId": "sch_1791860297883_4skzf2",
-            "studentMasterId": "sm_1791870549916_q2gz64",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p5",
-            "period": 5,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791854178869_zsdikp",
-            "scheduleId": "sch_1791860302418_nffvlm",
-            "studentMasterId": "sm_1791854178869_zsdikp",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 4,
-            "studentCode": "20104",
-            "name": "김소민",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791854178869_z1g927",
-            "scheduleId": "sch_1791860302418_nffvlm",
-            "studentMasterId": "sm_1791854178869_z1g927",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791854178869_m1ks1j",
-            "scheduleId": "sch_1791860302418_nffvlm",
-            "studentMasterId": "sm_1791854178869_m1ks1j",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 15,
-            "studentCode": "10115",
-            "name": "장시우",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791854206861_lypwiu",
-            "scheduleId": "sch_1791860302418_nffvlm",
-            "studentMasterId": "sm_1791854206861_lypwiu",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 5,
-            "studentCode": "20205",
-            "name": "배다정",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791870548141_jm0y38",
-            "scheduleId": "sch_1791860302418_nffvlm",
-            "studentMasterId": "sm_1791870548141_jm0y38",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791870549916_q2gz64",
-            "scheduleId": "sch_1791860302418_nffvlm",
-            "studentMasterId": "sm_1791870549916_q2gz64",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791854178869_zsdikp",
-            "scheduleId": "sch_1791860305250_gjvfrn",
-            "studentMasterId": "sm_1791854178869_zsdikp",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 4,
-            "studentCode": "20104",
-            "name": "김소민",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791854178869_z1g927",
-            "scheduleId": "sch_1791860305250_gjvfrn",
-            "studentMasterId": "sm_1791854178869_z1g927",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791854178869_m1ks1j",
-            "scheduleId": "sch_1791860305250_gjvfrn",
-            "studentMasterId": "sm_1791854178869_m1ks1j",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 15,
-            "studentCode": "10115",
-            "name": "장시우",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791854206861_lypwiu",
-            "scheduleId": "sch_1791860305250_gjvfrn",
-            "studentMasterId": "sm_1791854206861_lypwiu",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 5,
-            "studentCode": "20205",
-            "name": "배다정",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791870548141_jm0y38",
-            "scheduleId": "sch_1791860305250_gjvfrn",
-            "studentMasterId": "sm_1791870548141_jm0y38",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791870549916_q2gz64",
-            "scheduleId": "sch_1791860305250_gjvfrn",
-            "studentMasterId": "sm_1791870549916_q2gz64",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "물질과 에너지",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_비교 문화_unassigned_sm_1791854178869_8zeeu5",
-            "studentMasterId": "sm_1791854178869_8zeeu5",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 5,
-            "studentCode": "20105",
-            "name": "김승찬",
-            "subject": "비교 문화",
-            "day": null,
-            "periodId": null,
-            "period": null,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_비교 문화_unassigned_sm_1791856690255_yuan8i",
-            "studentMasterId": "sm_1791856690255_yuan8i",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 6,
-            "studentCode": "20206",
-            "name": "배학성",
-            "subject": "비교 문화",
-            "day": null,
-            "periodId": null,
-            "period": null,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_윤리와 사상_unassigned_sm_1791854178869_8zeeu5",
-            "studentMasterId": "sm_1791854178869_8zeeu5",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 5,
-            "studentCode": "20105",
-            "name": "김승찬",
-            "subject": "윤리와 사상",
-            "day": null,
-            "periodId": null,
-            "period": null,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_윤리와 사상_unassigned_sm_1791856690255_yuan8i",
-            "studentMasterId": "sm_1791856690255_yuan8i",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 6,
-            "studentCode": "20206",
-            "name": "배학성",
-            "subject": "윤리와 사상",
-            "day": null,
-            "periodId": null,
-            "period": null,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인간과 철학_sch_1791860389410_cb0sbx_sm_1791854178869_z1g927",
-            "scheduleId": "sch_1791860389410_cb0sbx",
-            "studentMasterId": "sm_1791854178869_z1g927",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민",
-            "subject": "인간과 철학",
-            "day": "fri",
-            "periodId": "p6",
-            "period": 6,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인간과 철학_sch_1791860389410_cb0sbx_sm_1791854178869_tt860d",
-            "scheduleId": "sch_1791860389410_cb0sbx",
-            "studentMasterId": "sm_1791854178869_tt860d",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "인간과 철학",
-            "day": "fri",
-            "periodId": "p6",
-            "period": 6,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인간과 철학_sch_1791860389410_cb0sbx_sm_1791854178870_bfvqz7",
-            "scheduleId": "sch_1791860389410_cb0sbx",
-            "studentMasterId": "sm_1791854178870_bfvqz7",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 5,
-            "studentCode": "10105",
-            "name": "김민진",
-            "subject": "인간과 철학",
-            "day": "fri",
-            "periodId": "p6",
-            "period": 6,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인간과 철학_sch_1791860396989_p23nij_sm_1791854178869_z1g927",
-            "scheduleId": "sch_1791860396989_p23nij",
-            "studentMasterId": "sm_1791854178869_z1g927",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민",
-            "subject": "인간과 철학",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인간과 철학_sch_1791860396989_p23nij_sm_1791854178869_tt860d",
-            "scheduleId": "sch_1791860396989_p23nij",
-            "studentMasterId": "sm_1791854178869_tt860d",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "인간과 철학",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인간과 철학_sch_1791860396989_p23nij_sm_1791854178870_bfvqz7",
-            "scheduleId": "sch_1791860396989_p23nij",
-            "studentMasterId": "sm_1791854178870_bfvqz7",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 5,
-            "studentCode": "10105",
-            "name": "김민진",
-            "subject": "인간과 철학",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_지구과학_unassigned_sm_1791855190842_gm2rjw",
-            "studentMasterId": "sm_1791855190842_gm2rjw",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 21,
-            "studentCode": "10221",
-            "name": "현표",
-            "subject": "지구과학",
-            "day": null,
-            "periodId": null,
-            "period": null,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_행성우주과학_sch_1791870709704_qw6gk9_sm_1791854178869_typthh",
-            "scheduleId": "sch_1791870709704_qw6gk9",
-            "studentMasterId": "sm_1791854178869_typthh",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 13,
-            "studentCode": "10113",
-            "name": "윤지우",
-            "subject": "행성우주과학",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_행성우주과학_sch_1791870712128_rq0ilm_sm_1791854178869_typthh",
-            "scheduleId": "sch_1791870712128_rq0ilm",
-            "studentMasterId": "sm_1791854178869_typthh",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 13,
-            "studentCode": "10113",
-            "name": "윤지우",
-            "subject": "행성우주과학",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_행성우주과학_sch_1791870720894_qaxh06_sm_1791854178869_typthh",
-            "scheduleId": "sch_1791870720894_qaxh06",
-            "studentMasterId": "sm_1791854178869_typthh",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 13,
-            "studentCode": "10113",
-            "name": "윤지우",
-            "subject": "행성우주과학",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870573073_ajb5r7_sm_1791854178869_zsdikp",
-            "scheduleId": "sch_1791870573073_ajb5r7",
-            "studentMasterId": "sm_1791854178869_zsdikp",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 4,
-            "studentCode": "20104",
-            "name": "김소민",
-            "subject": "화학 반응의 세계",
-            "day": "fri",
-            "periodId": "p6",
-            "period": 6,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870573073_ajb5r7_sm_1791854206861_lypwiu",
-            "scheduleId": "sch_1791870573073_ajb5r7",
-            "studentMasterId": "sm_1791854206861_lypwiu",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 5,
-            "studentCode": "20205",
-            "name": "배다정",
-            "subject": "화학 반응의 세계",
-            "day": "fri",
-            "periodId": "p6",
-            "period": 6,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870575956_j34hah_sm_1791854178869_zsdikp",
-            "scheduleId": "sch_1791870575956_j34hah",
-            "studentMasterId": "sm_1791854178869_zsdikp",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 4,
-            "studentCode": "20104",
-            "name": "김소민",
-            "subject": "화학 반응의 세계",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870575956_j34hah_sm_1791854206861_lypwiu",
-            "scheduleId": "sch_1791870575956_j34hah",
-            "studentMasterId": "sm_1791854206861_lypwiu",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 5,
-            "studentCode": "20205",
-            "name": "배다정",
-            "subject": "화학 반응의 세계",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870580006_mc5hfc_sm_1791854178869_zsdikp",
-            "scheduleId": "sch_1791870580006_mc5hfc",
-            "studentMasterId": "sm_1791854178869_zsdikp",
-            "grade": 2,
-            "classNum": 1,
-            "studentNum": 4,
-            "studentCode": "20104",
-            "name": "김소민",
-            "subject": "화학 반응의 세계",
-            "day": "thu",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870580006_mc5hfc_sm_1791854206861_lypwiu",
-            "scheduleId": "sch_1791870580006_mc5hfc",
-            "studentMasterId": "sm_1791854206861_lypwiu",
-            "grade": 2,
-            "classNum": 2,
-            "studentNum": 5,
-            "studentCode": "20205",
-            "name": "배다정",
-            "subject": "화학 반응의 세계",
-            "day": "thu",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          }
-        ],
-        "offeredSubjects": [
-          "게임 프로그래밍",
-          "고급 지구과학",
-          "국제 경제",
-          "문학 감상과 비평",
-          "물질과 에너지",
-          "비교 문화",
-          "윤리와 사상",
-          "인간과 철학",
-          "지구과학",
-          "행성우주과학",
-          "화학 반응의 세계"
-        ],
-        "subjectColorMap": {
-          "인공지능": {
-            "bg": "#E0F2FE",
-            "text": "#0369A1",
-            "border": "#BAE6FD",
-            "excelBg": "E0F2FE",
-            "excelText": "0369A1"
-          },
-          "빅데이터 분석": {
-            "bg": "#D1FAE5",
-            "text": "#047857",
-            "border": "#A7F3D0",
-            "excelBg": "D1FAE5",
-            "excelText": "047857"
-          },
-          "프로그래밍": {
-            "bg": "#EDE9FE",
-            "text": "#6D28D9",
-            "border": "#DDD6FE",
-            "excelBg": "EDE9FE",
-            "excelText": "6D28D9"
-          },
-          "물질과 에너지": {
-            "bg": "#E0F2FE",
-            "text": "#0369A1",
-            "border": "#BAE6FD",
-            "excelBg": "E0F2FE",
-            "excelText": "0369A1"
-          },
-          "화학 반응의 세계": {
-            "bg": "#E0F2FE",
-            "text": "#0369A1",
-            "border": "#BAE6FD",
-            "excelBg": "E0F2FE",
-            "excelText": "0369A1"
-          },
-          "인공지능 기초": {
-            "bg": "#D1FAE5",
-            "text": "#047857",
-            "border": "#A7F3D0",
-            "excelBg": "D1FAE5",
-            "excelText": "047857"
-          },
-          "국제 경제": {
-            "bg": "#EDE9FE",
-            "text": "#6D28D9",
-            "border": "#DDD6FE",
-            "excelBg": "EDE9FE",
-            "excelText": "6D28D9"
-          },
-          "문예 창작의 이해": {
-            "bg": "#FFE4E6",
-            "text": "#BE123C",
-            "border": "#FECDD3",
-            "excelBg": "FFE4E6",
-            "excelText": "BE123C"
-          },
-          "문학 감상과 비평": {
-            "bg": "#FEF3C7",
-            "text": "#B45309",
-            "border": "#FDE68A",
-            "excelBg": "FEF3C7",
-            "excelText": "B45309"
-          },
-          "고급 생명과학": {
-            "bg": "#FFEDD5",
-            "text": "#C2410C",
-            "border": "#FED7AA",
-            "excelBg": "FFEDD5",
-            "excelText": "C2410C"
-          },
-          "고급 지구과학": {
-            "bg": "#FFEDD5",
-            "text": "#C2410C",
-            "border": "#FED7AA",
-            "excelBg": "FFEDD5",
-            "excelText": "C2410C"
-          },
-          "비교 문화": {
-            "bg": "#FFEDD5",
-            "text": "#C2410C",
-            "border": "#FED7AA",
-            "excelBg": "FFEDD5",
-            "excelText": "C2410C"
-          },
-          "윤리와 사상": {
-            "bg": "#CCFBF1",
-            "text": "#0F766E",
-            "border": "#99F6E4",
-            "excelBg": "CCFBF1",
-            "excelText": "0F766E"
-          },
-          "행성우주과학": {
-            "bg": "#E0E7FF",
-            "text": "#4338CA",
-            "border": "#C7D2FE",
-            "excelBg": "E0E7FF",
-            "excelText": "4338CA"
-          },
-          "인간과 철학": {
-            "bg": "#ECFCCB",
-            "text": "#4D7C0F",
-            "border": "#D9F99D",
-            "excelBg": "ECFCCB",
-            "excelText": "4D7C0F"
-          },
-          "게임 프로그래밍": {
-            "bg": "#F3E8FF",
-            "text": "#7E22CE",
-            "border": "#E9D5FF",
-            "excelBg": "F3E8FF",
-            "excelText": "7E22CE"
-          },
-          "지구과학": {
-            "bg": "#F3E8FF",
-            "text": "#7E22CE",
-            "border": "#E9D5FF",
-            "excelBg": "F3E8FF",
-            "excelText": "7E22CE"
-          }
-        },
-        "showWeekends": true
-      },
       "2": {
-        "periods": [
-          {
-            "id": "p1",
-            "period": 1,
-            "name": "1교시",
-            "startTime": "09:00",
-            "endTime": "09:50",
-            "isBreak": false
-          },
-          {
-            "id": "p2",
-            "period": 2,
-            "name": "2교시",
-            "startTime": "10:00",
-            "endTime": "10:50",
-            "isBreak": false
-          },
-          {
-            "id": "p3",
-            "period": 3,
-            "name": "3교시",
-            "startTime": "11:00",
-            "endTime": "11:50",
-            "isBreak": false
-          },
-          {
-            "id": "p4",
-            "period": 4,
-            "name": "4교시",
-            "startTime": "12:00",
-            "endTime": "12:50",
-            "isBreak": false
-          },
-          {
-            "id": "p_lunch",
-            "period": null,
-            "name": "점심시간",
-            "startTime": "12:50",
-            "endTime": "13:40",
-            "isBreak": true
-          },
-          {
-            "id": "p5",
-            "period": 5,
-            "name": "5교시",
-            "startTime": "13:40",
-            "endTime": "14:30",
-            "isBreak": false
-          },
-          {
-            "id": "p6",
-            "period": 6,
-            "name": "6교시",
-            "startTime": "14:40",
-            "endTime": "15:30",
-            "isBreak": false
-          },
-          {
-            "id": "p7",
-            "period": 7,
-            "name": "7교시",
-            "startTime": "15:40",
-            "endTime": "16:30",
-            "isBreak": false
-          },
-          {
-            "id": "p8",
-            "period": 8,
-            "name": "8교시",
-            "startTime": "16:40",
-            "endTime": "17:30",
-            "isBreak": false
-          }
-        ],
-        "days": [
-          {
-            "id": "mon",
-            "name": "월",
-            "fullName": "월요일",
-            "isWeekend": false
-          },
-          {
-            "id": "tue",
-            "name": "화",
-            "fullName": "화요일",
-            "isWeekend": false
-          },
-          {
-            "id": "wed",
-            "name": "수",
-            "fullName": "수요일",
-            "isWeekend": false
-          },
-          {
-            "id": "thu",
-            "name": "목",
-            "fullName": "목요일",
-            "isWeekend": false
-          },
-          {
-            "id": "fri",
-            "name": "금",
-            "fullName": "금요일",
-            "isWeekend": false
-          },
-          {
-            "id": "sat",
-            "name": "토",
-            "fullName": "토요일",
-            "isWeekend": true
-          },
-          {
-            "id": "sun",
-            "name": "일",
-            "fullName": "일요일",
-            "isWeekend": true
-          }
-        ],
-        "masterStudents": [
-          {
-            "id": "sm_1791854590586_c0x87s",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 6,
-            "studentCode": "10106",
-            "name": "김승준"
-          },
-          {
-            "id": "sm_1791854590586_sw7iq3",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 21,
-            "studentCode": "10121",
-            "name": "최현서"
-          },
-          {
-            "id": "sm_1791854590586_gqck9p",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서"
-          },
-          {
-            "id": "sm_1791854590586_jszr79",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준"
-          },
-          {
-            "id": "sm_1791854590586_2tr8hv",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 21,
-            "studentCode": "10221",
-            "name": "현표"
-          },
-          {
-            "id": "sm_1791854590586_ix3qnf",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 15,
-            "studentCode": "10215",
-            "name": "이지효"
-          },
-          {
-            "id": "sm_1791854590586_lop5ig",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민"
-          },
-          {
-            "id": "sm_1791866297895_h9vmjz",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비"
-          },
-          {
-            "id": "sm_1791870083787_oy0tpp",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 15,
-            "studentCode": "10115",
-            "name": "장시우"
-          },
-          {
-            "id": "sm_1791870086724_ee11i6",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 9,
-            "studentCode": "10109",
-            "name": "박재윤"
-          }
-        ],
-        "courseEnrollments": {
-          "인공지능 기초": [
-            "sm_1791854590586_c0x87s",
-            "sm_1791870083787_oy0tpp",
-            "sm_1791870086724_ee11i6",
-            "sm_1791866297895_h9vmjz"
-          ],
-          "문학 감상과 비평": [
-            "sm_1791854590586_sw7iq3"
-          ],
-          "고급 생명과학": [
-            "sm_1791854590586_gqck9p",
-            "sm_1791854590586_jszr79"
-          ],
-          "화학 반응의 세계": [
-            "sm_1791854590586_gqck9p",
-            "sm_1791854590586_jszr79",
-            "sm_1791854590586_lop5ig"
-          ],
-          "고급 지구과학": [
-            "sm_1791854590586_2tr8hv"
-          ],
-          "문예 창작의 이해": [
-            "sm_1791854590586_ix3qnf",
-            "sm_1791866297895_h9vmjz"
-          ]
-        },
-        "courseSchedules": {
-          "인공지능 기초": [
+        "1": {
+          "periods": [
             {
-              "id": "sch_1791870133247_y6lliv",
+              "id": "p1",
+              "period": 1,
+              "name": "1교시",
+              "startTime": "09:00",
+              "endTime": "09:50",
+              "isBreak": false
+            },
+            {
+              "id": "p2",
+              "period": 2,
+              "name": "2교시",
+              "startTime": "10:00",
+              "endTime": "10:50",
+              "isBreak": false
+            },
+            {
+              "id": "p3",
+              "period": 3,
+              "name": "3교시",
+              "startTime": "11:00",
+              "endTime": "11:50",
+              "isBreak": false
+            },
+            {
+              "id": "p4",
+              "period": 4,
+              "name": "4교시",
+              "startTime": "12:00",
+              "endTime": "12:50",
+              "isBreak": false
+            },
+            {
+              "id": "p_lunch",
+              "period": null,
+              "name": "점심시간",
+              "startTime": "12:50",
+              "endTime": "13:40",
+              "isBreak": true
+            },
+            {
+              "id": "p5",
+              "period": 5,
+              "name": "5교시",
+              "startTime": "13:40",
+              "endTime": "14:30",
+              "isBreak": false
+            },
+            {
+              "id": "p6",
+              "period": 6,
+              "name": "6교시",
+              "startTime": "14:40",
+              "endTime": "15:30",
+              "isBreak": false
+            },
+            {
+              "id": "p7",
+              "period": 7,
+              "name": "7교시",
+              "startTime": "15:40",
+              "endTime": "16:30",
+              "isBreak": false
+            },
+            {
+              "id": "p8",
+              "period": 8,
+              "name": "8교시",
+              "startTime": "16:40",
+              "endTime": "17:30",
+              "isBreak": false
+            }
+          ],
+          "days": [
+            {
+              "id": "mon",
+              "name": "월",
+              "fullName": "월요일",
+              "isWeekend": false
+            },
+            {
+              "id": "tue",
+              "name": "화",
+              "fullName": "화요일",
+              "isWeekend": false
+            },
+            {
+              "id": "wed",
+              "name": "수",
+              "fullName": "수요일",
+              "isWeekend": false
+            },
+            {
+              "id": "thu",
+              "name": "목",
+              "fullName": "목요일",
+              "isWeekend": false
+            },
+            {
+              "id": "fri",
+              "name": "금",
+              "fullName": "금요일",
+              "isWeekend": false
+            },
+            {
+              "id": "sat",
+              "name": "토",
+              "fullName": "토요일",
+              "isWeekend": true
+            },
+            {
+              "id": "sun",
+              "name": "일",
+              "fullName": "일요일",
+              "isWeekend": true
+            }
+          ],
+          "masterStudents": [
+            {
+              "id": "sm_1791854178869_zsdikp",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 4,
+              "studentCode": "20104",
+              "name": "김소민"
+            },
+            {
+              "id": "sm_1791854178869_8zeeu5",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 5,
+              "studentCode": "20105",
+              "name": "김승찬"
+            },
+            {
+              "id": "sm_1791854178869_niobnu",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 6,
+              "studentCode": "20106",
+              "name": "김예빈"
+            },
+            {
+              "id": "sm_1791854178869_typthh",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 13,
+              "studentCode": "10113",
+              "name": "윤지우"
+            },
+            {
+              "id": "sm_1791854178869_z1g927",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민"
+            },
+            {
+              "id": "sm_1791854178869_m1ks1j",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 15,
+              "studentCode": "10115",
+              "name": "장시우"
+            },
+            {
+              "id": "sm_1791854178869_tt860d",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비"
+            },
+            {
+              "id": "sm_1791854178870_bfvqz7",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 5,
+              "studentCode": "10105",
+              "name": "김민진"
+            },
+            {
+              "id": "sm_1791854178870_msd17w",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 9,
+              "studentCode": "10109",
+              "name": "박재윤"
+            },
+            {
+              "id": "sm_1791854178870_q2laf1",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 20,
+              "studentCode": "10120",
+              "name": "최리"
+            },
+            {
+              "id": "sm_1791854206861_lypwiu",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 5,
+              "studentCode": "20205",
+              "name": "배다정"
+            },
+            {
+              "id": "sm_1791855190842_gm2rjw",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 21,
+              "studentCode": "10221",
+              "name": "현표"
+            },
+            {
+              "id": "sm_1791856690255_yuan8i",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 6,
+              "studentCode": "20206",
+              "name": "배학성"
+            },
+            {
+              "id": "sm_1791870548141_jm0y38",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준"
+            },
+            {
+              "id": "sm_1791870549916_q2gz64",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서"
+            }
+          ],
+          "courseEnrollments": {
+            "물질과 에너지": [
+              "sm_1791854178869_zsdikp",
+              "sm_1791854178869_z1g927",
+              "sm_1791854178869_m1ks1j",
+              "sm_1791854206861_lypwiu",
+              "sm_1791870548141_jm0y38",
+              "sm_1791870549916_q2gz64"
+            ],
+            "화학 반응의 세계": [
+              "sm_1791854178869_zsdikp",
+              "sm_1791854206861_lypwiu"
+            ],
+            "비교 문화": [
+              "sm_1791854178869_8zeeu5",
+              "sm_1791856690255_yuan8i"
+            ],
+            "윤리와 사상": [
+              "sm_1791854178869_8zeeu5",
+              "sm_1791856690255_yuan8i"
+            ],
+            "문학 감상과 비평": [
+              "sm_1791854178869_niobnu"
+            ],
+            "행성우주과학": [
+              "sm_1791854178869_typthh"
+            ],
+            "인간과 철학": [
+              "sm_1791854178869_z1g927",
+              "sm_1791854178869_tt860d",
+              "sm_1791854178870_bfvqz7"
+            ],
+            "게임 프로그래밍": [
+              "sm_1791854178869_tt860d",
+              "sm_1791854178870_msd17w"
+            ],
+            "국제 경제": [
+              "sm_1791854178870_q2laf1"
+            ],
+            "지구과학": [
+              "sm_1791855190842_gm2rjw"
+            ],
+            "고급 지구과학": [
+              "sm_1791855190842_gm2rjw"
+            ]
+          },
+          "courseSchedules": {
+            "지구과학": [],
+            "물질과 에너지": [
+              {
+                "id": "sch_1791860297883_4skzf2",
+                "day": "wed",
+                "periodId": "p5",
+                "period": 5,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791860302418_nffvlm",
+                "day": "wed",
+                "periodId": "p7",
+                "period": 7,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791860305250_gjvfrn",
+                "day": "wed",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ],
+            "인간과 철학": [
+              {
+                "id": "sch_1791860389410_cb0sbx",
+                "day": "fri",
+                "periodId": "p6",
+                "period": 6,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791860396989_p23nij",
+                "day": "fri",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ],
+            "국제 경제": [
+              {
+                "id": "sch_1791870156598_ppc4ja",
+                "day": "mon",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870160175_0a0gvs",
+                "day": "wed",
+                "periodId": "p7",
+                "period": 7,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870163872_itv1h6",
+                "day": "fri",
+                "periodId": "p6",
+                "period": 6,
+                "status": "confirmed"
+              }
+            ],
+            "화학 반응의 세계": [
+              {
+                "id": "sch_1791870573073_ajb5r7",
+                "day": "fri",
+                "periodId": "p6",
+                "period": 6,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870575956_j34hah",
+                "day": "fri",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870580006_mc5hfc",
+                "day": "thu",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ],
+            "문학 감상과 비평": [
+              {
+                "id": "sch_1791870613769_kgpjcj",
+                "day": "wed",
+                "periodId": "p7",
+                "period": 7,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870615642_bi26ho",
+                "day": "fri",
+                "periodId": "p6",
+                "period": 6,
+                "status": "confirmed"
+              }
+            ],
+            "게임 프로그래밍": [
+              {
+                "id": "sch_1791870656722_9hh7w8",
+                "day": "mon",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870658160_6dz4sl",
+                "day": "wed",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870673815_nbt2qi",
+                "day": "wed",
+                "periodId": "p7",
+                "period": 7,
+                "status": "confirmed"
+              }
+            ],
+            "행성우주과학": [
+              {
+                "id": "sch_1791870709704_qw6gk9",
+                "day": "wed",
+                "periodId": "p7",
+                "period": 7,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870712128_rq0ilm",
+                "day": "wed",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870720894_qaxh06",
+                "day": "fri",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ],
+            "고급 지구과학": []
+          },
+          "courseStatus": {
+            "물질과 에너지": "adjust",
+            "화학 반응의 세계": "adjust",
+            "비교 문화": "closed",
+            "윤리와 사상": "adjust",
+            "문학 감상과 비평": "closed",
+            "행성우주과학": "adjust",
+            "인간과 철학": "adjust",
+            "인공지능 기초": "open",
+            "게임 프로그래밍": "adjust",
+            "문예 창작의 이해": "open",
+            "국제 경제": "adjust",
+            "지구과학": "closed",
+            "고급 지구과학": "adjust"
+          },
+          "students": [
+            {
+              "id": "assign_게임 프로그래밍_sch_1791870656722_9hh7w8_sm_1791854178869_tt860d",
+              "scheduleId": "sch_1791870656722_9hh7w8",
+              "studentMasterId": "sm_1791854178869_tt860d",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "게임 프로그래밍",
               "day": "mon",
               "periodId": "p8",
               "period": 8,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870134984_8jnfri",
+              "id": "assign_게임 프로그래밍_sch_1791870656722_9hh7w8_sm_1791854178870_msd17w",
+              "scheduleId": "sch_1791870656722_9hh7w8",
+              "studentMasterId": "sm_1791854178870_msd17w",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 9,
+              "studentCode": "10109",
+              "name": "박재윤",
+              "subject": "게임 프로그래밍",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_게임 프로그래밍_sch_1791870658160_6dz4sl_sm_1791854178869_tt860d",
+              "scheduleId": "sch_1791870658160_6dz4sl",
+              "studentMasterId": "sm_1791854178869_tt860d",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "게임 프로그래밍",
               "day": "wed",
               "periodId": "p8",
               "period": 8,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870135982_r4ojg2",
-              "day": "fri",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            }
-          ],
-          "문예 창작의 이해": [
-            {
-              "id": "sch_1791870185072_a6m3hr",
-              "day": "thu",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            },
-            {
-              "id": "sch_1791870186543_mjs7iu",
-              "day": "fri",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            }
-          ],
-          "문학 감상과 비평": [
-            {
-              "id": "sch_1791870206566_bxbqk6",
-              "day": "thu",
+              "id": "assign_게임 프로그래밍_sch_1791870658160_6dz4sl_sm_1791854178870_msd17w",
+              "scheduleId": "sch_1791870658160_6dz4sl",
+              "studentMasterId": "sm_1791854178870_msd17w",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 9,
+              "studentCode": "10109",
+              "name": "박재윤",
+              "subject": "게임 프로그래밍",
+              "day": "wed",
               "periodId": "p8",
               "period": 8,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870211226_a942ac",
-              "day": "fri",
-              "periodId": "p6",
-              "period": 6,
-              "status": "confirmed"
-            }
-          ],
-          "고급 생명과학": [
-            {
-              "id": "sch_1791870250172_y2lroj",
+              "id": "assign_게임 프로그래밍_sch_1791870673815_nbt2qi_sm_1791854178869_tt860d",
+              "scheduleId": "sch_1791870673815_nbt2qi",
+              "studentMasterId": "sm_1791854178869_tt860d",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "게임 프로그래밍",
               "day": "wed",
               "periodId": "p7",
               "period": 7,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870255784_g3xtgy",
+              "id": "assign_게임 프로그래밍_sch_1791870673815_nbt2qi_sm_1791854178870_msd17w",
+              "scheduleId": "sch_1791870673815_nbt2qi",
+              "studentMasterId": "sm_1791854178870_msd17w",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 9,
+              "studentCode": "10109",
+              "name": "박재윤",
+              "subject": "게임 프로그래밍",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 지구과학_unassigned_sm_1791855190842_gm2rjw",
+              "studentMasterId": "sm_1791855190842_gm2rjw",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 21,
+              "studentCode": "10221",
+              "name": "현표",
+              "subject": "고급 지구과학",
+              "day": null,
+              "periodId": null,
+              "period": null,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_국제 경제_sch_1791870156598_ppc4ja_sm_1791854178870_q2laf1",
+              "scheduleId": "sch_1791870156598_ppc4ja",
+              "studentMasterId": "sm_1791854178870_q2laf1",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 20,
+              "studentCode": "10120",
+              "name": "최리",
+              "subject": "국제 경제",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_국제 경제_sch_1791870160175_0a0gvs_sm_1791854178870_q2laf1",
+              "scheduleId": "sch_1791870160175_0a0gvs",
+              "studentMasterId": "sm_1791854178870_q2laf1",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 20,
+              "studentCode": "10120",
+              "name": "최리",
+              "subject": "국제 경제",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_국제 경제_sch_1791870163872_itv1h6_sm_1791854178870_q2laf1",
+              "scheduleId": "sch_1791870163872_itv1h6",
+              "studentMasterId": "sm_1791854178870_q2laf1",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 20,
+              "studentCode": "10120",
+              "name": "최리",
+              "subject": "국제 경제",
+              "day": "fri",
+              "periodId": "p6",
+              "period": 6,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_문학 감상과 비평_sch_1791870613769_kgpjcj_sm_1791854178869_niobnu",
+              "scheduleId": "sch_1791870613769_kgpjcj",
+              "studentMasterId": "sm_1791854178869_niobnu",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 6,
+              "studentCode": "20106",
+              "name": "김예빈",
+              "subject": "문학 감상과 비평",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_문학 감상과 비평_sch_1791870615642_bi26ho_sm_1791854178869_niobnu",
+              "scheduleId": "sch_1791870615642_bi26ho",
+              "studentMasterId": "sm_1791854178869_niobnu",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 6,
+              "studentCode": "20106",
+              "name": "김예빈",
+              "subject": "문학 감상과 비평",
+              "day": "fri",
+              "periodId": "p6",
+              "period": 6,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791854178869_zsdikp",
+              "scheduleId": "sch_1791860297883_4skzf2",
+              "studentMasterId": "sm_1791854178869_zsdikp",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 4,
+              "studentCode": "20104",
+              "name": "김소민",
+              "subject": "물질과 에너지",
               "day": "wed",
               "periodId": "p5",
               "period": 5,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870257223_5qv8n5",
+              "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791854178869_z1g927",
+              "scheduleId": "sch_1791860297883_4skzf2",
+              "studentMasterId": "sm_1791854178869_z1g927",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민",
+              "subject": "물질과 에너지",
               "day": "wed",
-              "periodId": "p8",
-              "period": 8,
-              "status": "confirmed"
-            }
-          ],
-          "고급 지구과학": [
-            {
-              "id": "sch_1791870279135_4d7fi4",
-              "day": "mon",
-              "periodId": "p8",
-              "period": 8,
+              "periodId": "p5",
+              "period": 5,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870290822_xwizl5",
+              "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791854178869_m1ks1j",
+              "scheduleId": "sch_1791860297883_4skzf2",
+              "studentMasterId": "sm_1791854178869_m1ks1j",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 15,
+              "studentCode": "10115",
+              "name": "장시우",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p5",
+              "period": 5,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791854206861_lypwiu",
+              "scheduleId": "sch_1791860297883_4skzf2",
+              "studentMasterId": "sm_1791854206861_lypwiu",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 5,
+              "studentCode": "20205",
+              "name": "배다정",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p5",
+              "period": 5,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791870548141_jm0y38",
+              "scheduleId": "sch_1791860297883_4skzf2",
+              "studentMasterId": "sm_1791870548141_jm0y38",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p5",
+              "period": 5,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860297883_4skzf2_sm_1791870549916_q2gz64",
+              "scheduleId": "sch_1791860297883_4skzf2",
+              "studentMasterId": "sm_1791870549916_q2gz64",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p5",
+              "period": 5,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791854178869_zsdikp",
+              "scheduleId": "sch_1791860302418_nffvlm",
+              "studentMasterId": "sm_1791854178869_zsdikp",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 4,
+              "studentCode": "20104",
+              "name": "김소민",
+              "subject": "물질과 에너지",
               "day": "wed",
               "periodId": "p7",
               "period": 7,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870293278_e3myop",
+              "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791854178869_z1g927",
+              "scheduleId": "sch_1791860302418_nffvlm",
+              "studentMasterId": "sm_1791854178869_z1g927",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791854178869_m1ks1j",
+              "scheduleId": "sch_1791860302418_nffvlm",
+              "studentMasterId": "sm_1791854178869_m1ks1j",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 15,
+              "studentCode": "10115",
+              "name": "장시우",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791854206861_lypwiu",
+              "scheduleId": "sch_1791860302418_nffvlm",
+              "studentMasterId": "sm_1791854206861_lypwiu",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 5,
+              "studentCode": "20205",
+              "name": "배다정",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791870548141_jm0y38",
+              "scheduleId": "sch_1791860302418_nffvlm",
+              "studentMasterId": "sm_1791870548141_jm0y38",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860302418_nffvlm_sm_1791870549916_q2gz64",
+              "scheduleId": "sch_1791860302418_nffvlm",
+              "studentMasterId": "sm_1791870549916_q2gz64",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791854178869_zsdikp",
+              "scheduleId": "sch_1791860305250_gjvfrn",
+              "studentMasterId": "sm_1791854178869_zsdikp",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 4,
+              "studentCode": "20104",
+              "name": "김소민",
+              "subject": "물질과 에너지",
               "day": "wed",
               "periodId": "p8",
               "period": 8,
               "status": "confirmed"
-            }
-          ],
-          "화학 반응의 세계": [
+            },
             {
-              "id": "sch_1791870456910_nwdjxc",
+              "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791854178869_z1g927",
+              "scheduleId": "sch_1791860305250_gjvfrn",
+              "studentMasterId": "sm_1791854178869_z1g927",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791854178869_m1ks1j",
+              "scheduleId": "sch_1791860305250_gjvfrn",
+              "studentMasterId": "sm_1791854178869_m1ks1j",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 15,
+              "studentCode": "10115",
+              "name": "장시우",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791854206861_lypwiu",
+              "scheduleId": "sch_1791860305250_gjvfrn",
+              "studentMasterId": "sm_1791854206861_lypwiu",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 5,
+              "studentCode": "20205",
+              "name": "배다정",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791870548141_jm0y38",
+              "scheduleId": "sch_1791860305250_gjvfrn",
+              "studentMasterId": "sm_1791870548141_jm0y38",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_물질과 에너지_sch_1791860305250_gjvfrn_sm_1791870549916_q2gz64",
+              "scheduleId": "sch_1791860305250_gjvfrn",
+              "studentMasterId": "sm_1791870549916_q2gz64",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "물질과 에너지",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_비교 문화_unassigned_sm_1791854178869_8zeeu5",
+              "studentMasterId": "sm_1791854178869_8zeeu5",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 5,
+              "studentCode": "20105",
+              "name": "김승찬",
+              "subject": "비교 문화",
+              "day": null,
+              "periodId": null,
+              "period": null,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_비교 문화_unassigned_sm_1791856690255_yuan8i",
+              "studentMasterId": "sm_1791856690255_yuan8i",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 6,
+              "studentCode": "20206",
+              "name": "배학성",
+              "subject": "비교 문화",
+              "day": null,
+              "periodId": null,
+              "period": null,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_윤리와 사상_unassigned_sm_1791854178869_8zeeu5",
+              "studentMasterId": "sm_1791854178869_8zeeu5",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 5,
+              "studentCode": "20105",
+              "name": "김승찬",
+              "subject": "윤리와 사상",
+              "day": null,
+              "periodId": null,
+              "period": null,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_윤리와 사상_unassigned_sm_1791856690255_yuan8i",
+              "studentMasterId": "sm_1791856690255_yuan8i",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 6,
+              "studentCode": "20206",
+              "name": "배학성",
+              "subject": "윤리와 사상",
+              "day": null,
+              "periodId": null,
+              "period": null,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인간과 철학_sch_1791860389410_cb0sbx_sm_1791854178869_z1g927",
+              "scheduleId": "sch_1791860389410_cb0sbx",
+              "studentMasterId": "sm_1791854178869_z1g927",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민",
+              "subject": "인간과 철학",
+              "day": "fri",
+              "periodId": "p6",
+              "period": 6,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인간과 철학_sch_1791860389410_cb0sbx_sm_1791854178869_tt860d",
+              "scheduleId": "sch_1791860389410_cb0sbx",
+              "studentMasterId": "sm_1791854178869_tt860d",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "인간과 철학",
+              "day": "fri",
+              "periodId": "p6",
+              "period": 6,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인간과 철학_sch_1791860389410_cb0sbx_sm_1791854178870_bfvqz7",
+              "scheduleId": "sch_1791860389410_cb0sbx",
+              "studentMasterId": "sm_1791854178870_bfvqz7",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 5,
+              "studentCode": "10105",
+              "name": "김민진",
+              "subject": "인간과 철학",
+              "day": "fri",
+              "periodId": "p6",
+              "period": 6,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인간과 철학_sch_1791860396989_p23nij_sm_1791854178869_z1g927",
+              "scheduleId": "sch_1791860396989_p23nij",
+              "studentMasterId": "sm_1791854178869_z1g927",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민",
+              "subject": "인간과 철학",
               "day": "fri",
               "periodId": "p8",
               "period": 8,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870460943_y9me9k",
+              "id": "assign_인간과 철학_sch_1791860396989_p23nij_sm_1791854178869_tt860d",
+              "scheduleId": "sch_1791860396989_p23nij",
+              "studentMasterId": "sm_1791854178869_tt860d",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "인간과 철학",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인간과 철학_sch_1791860396989_p23nij_sm_1791854178870_bfvqz7",
+              "scheduleId": "sch_1791860396989_p23nij",
+              "studentMasterId": "sm_1791854178870_bfvqz7",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 5,
+              "studentCode": "10105",
+              "name": "김민진",
+              "subject": "인간과 철학",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_지구과학_unassigned_sm_1791855190842_gm2rjw",
+              "studentMasterId": "sm_1791855190842_gm2rjw",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 21,
+              "studentCode": "10221",
+              "name": "현표",
+              "subject": "지구과학",
+              "day": null,
+              "periodId": null,
+              "period": null,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_행성우주과학_sch_1791870709704_qw6gk9_sm_1791854178869_typthh",
+              "scheduleId": "sch_1791870709704_qw6gk9",
+              "studentMasterId": "sm_1791854178869_typthh",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 13,
+              "studentCode": "10113",
+              "name": "윤지우",
+              "subject": "행성우주과학",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_행성우주과학_sch_1791870712128_rq0ilm_sm_1791854178869_typthh",
+              "scheduleId": "sch_1791870712128_rq0ilm",
+              "studentMasterId": "sm_1791854178869_typthh",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 13,
+              "studentCode": "10113",
+              "name": "윤지우",
+              "subject": "행성우주과학",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_행성우주과학_sch_1791870720894_qaxh06_sm_1791854178869_typthh",
+              "scheduleId": "sch_1791870720894_qaxh06",
+              "studentMasterId": "sm_1791854178869_typthh",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 13,
+              "studentCode": "10113",
+              "name": "윤지우",
+              "subject": "행성우주과학",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870573073_ajb5r7_sm_1791854178869_zsdikp",
+              "scheduleId": "sch_1791870573073_ajb5r7",
+              "studentMasterId": "sm_1791854178869_zsdikp",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 4,
+              "studentCode": "20104",
+              "name": "김소민",
+              "subject": "화학 반응의 세계",
+              "day": "fri",
+              "periodId": "p6",
+              "period": 6,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870573073_ajb5r7_sm_1791854206861_lypwiu",
+              "scheduleId": "sch_1791870573073_ajb5r7",
+              "studentMasterId": "sm_1791854206861_lypwiu",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 5,
+              "studentCode": "20205",
+              "name": "배다정",
+              "subject": "화학 반응의 세계",
+              "day": "fri",
+              "periodId": "p6",
+              "period": 6,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870575956_j34hah_sm_1791854178869_zsdikp",
+              "scheduleId": "sch_1791870575956_j34hah",
+              "studentMasterId": "sm_1791854178869_zsdikp",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 4,
+              "studentCode": "20104",
+              "name": "김소민",
+              "subject": "화학 반응의 세계",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870575956_j34hah_sm_1791854206861_lypwiu",
+              "scheduleId": "sch_1791870575956_j34hah",
+              "studentMasterId": "sm_1791854206861_lypwiu",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 5,
+              "studentCode": "20205",
+              "name": "배다정",
+              "subject": "화학 반응의 세계",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870580006_mc5hfc_sm_1791854178869_zsdikp",
+              "scheduleId": "sch_1791870580006_mc5hfc",
+              "studentMasterId": "sm_1791854178869_zsdikp",
+              "grade": 2,
+              "classNum": 1,
+              "studentNum": 4,
+              "studentCode": "20104",
+              "name": "김소민",
+              "subject": "화학 반응의 세계",
               "day": "thu",
               "periodId": "p8",
               "period": 8,
               "status": "confirmed"
             },
             {
-              "id": "sch_1791870464583_t4u32o",
+              "id": "assign_화학 반응의 세계_sch_1791870580006_mc5hfc_sm_1791854206861_lypwiu",
+              "scheduleId": "sch_1791870580006_mc5hfc",
+              "studentMasterId": "sm_1791854206861_lypwiu",
+              "grade": 2,
+              "classNum": 2,
+              "studentNum": 5,
+              "studentCode": "20205",
+              "name": "배다정",
+              "subject": "화학 반응의 세계",
+              "day": "thu",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            }
+          ],
+          "offeredSubjects": [
+            "게임 프로그래밍",
+            "고급 지구과학",
+            "국제 경제",
+            "문학 감상과 비평",
+            "물질과 에너지",
+            "비교 문화",
+            "윤리와 사상",
+            "인간과 철학",
+            "지구과학",
+            "행성우주과학",
+            "화학 반응의 세계"
+          ],
+          "subjectColorMap": {
+            "인공지능": {
+              "bg": "#E0F2FE",
+              "text": "#0369A1",
+              "border": "#BAE6FD",
+              "excelBg": "E0F2FE",
+              "excelText": "0369A1"
+            },
+            "빅데이터 분석": {
+              "bg": "#D1FAE5",
+              "text": "#047857",
+              "border": "#A7F3D0",
+              "excelBg": "D1FAE5",
+              "excelText": "047857"
+            },
+            "프로그래밍": {
+              "bg": "#EDE9FE",
+              "text": "#6D28D9",
+              "border": "#DDD6FE",
+              "excelBg": "EDE9FE",
+              "excelText": "6D28D9"
+            },
+            "물질과 에너지": {
+              "bg": "#E0F2FE",
+              "text": "#0369A1",
+              "border": "#BAE6FD",
+              "excelBg": "E0F2FE",
+              "excelText": "0369A1"
+            },
+            "화학 반응의 세계": {
+              "bg": "#E0F2FE",
+              "text": "#0369A1",
+              "border": "#BAE6FD",
+              "excelBg": "E0F2FE",
+              "excelText": "0369A1"
+            },
+            "인공지능 기초": {
+              "bg": "#D1FAE5",
+              "text": "#047857",
+              "border": "#A7F3D0",
+              "excelBg": "D1FAE5",
+              "excelText": "047857"
+            },
+            "국제 경제": {
+              "bg": "#EDE9FE",
+              "text": "#6D28D9",
+              "border": "#DDD6FE",
+              "excelBg": "EDE9FE",
+              "excelText": "6D28D9"
+            },
+            "문예 창작의 이해": {
+              "bg": "#FFE4E6",
+              "text": "#BE123C",
+              "border": "#FECDD3",
+              "excelBg": "FFE4E6",
+              "excelText": "BE123C"
+            },
+            "문학 감상과 비평": {
+              "bg": "#FEF3C7",
+              "text": "#B45309",
+              "border": "#FDE68A",
+              "excelBg": "FEF3C7",
+              "excelText": "B45309"
+            },
+            "고급 생명과학": {
+              "bg": "#FFEDD5",
+              "text": "#C2410C",
+              "border": "#FED7AA",
+              "excelBg": "FFEDD5",
+              "excelText": "C2410C"
+            },
+            "고급 지구과학": {
+              "bg": "#FFEDD5",
+              "text": "#C2410C",
+              "border": "#FED7AA",
+              "excelBg": "FFEDD5",
+              "excelText": "C2410C"
+            },
+            "비교 문화": {
+              "bg": "#FFEDD5",
+              "text": "#C2410C",
+              "border": "#FED7AA",
+              "excelBg": "FFEDD5",
+              "excelText": "C2410C"
+            },
+            "윤리와 사상": {
+              "bg": "#CCFBF1",
+              "text": "#0F766E",
+              "border": "#99F6E4",
+              "excelBg": "CCFBF1",
+              "excelText": "0F766E"
+            },
+            "행성우주과학": {
+              "bg": "#E0E7FF",
+              "text": "#4338CA",
+              "border": "#C7D2FE",
+              "excelBg": "E0E7FF",
+              "excelText": "4338CA"
+            },
+            "인간과 철학": {
+              "bg": "#ECFCCB",
+              "text": "#4D7C0F",
+              "border": "#D9F99D",
+              "excelBg": "ECFCCB",
+              "excelText": "4D7C0F"
+            },
+            "게임 프로그래밍": {
+              "bg": "#F3E8FF",
+              "text": "#7E22CE",
+              "border": "#E9D5FF",
+              "excelBg": "F3E8FF",
+              "excelText": "7E22CE"
+            },
+            "지구과학": {
+              "bg": "#F3E8FF",
+              "text": "#7E22CE",
+              "border": "#E9D5FF",
+              "excelBg": "F3E8FF",
+              "excelText": "7E22CE"
+            }
+          },
+          "showWeekends": true
+        },
+        "2": {
+          "periods": [
+            {
+              "id": "p1",
+              "period": 1,
+              "name": "1교시",
+              "startTime": "09:00",
+              "endTime": "09:50",
+              "isBreak": false
+            },
+            {
+              "id": "p2",
+              "period": 2,
+              "name": "2교시",
+              "startTime": "10:00",
+              "endTime": "10:50",
+              "isBreak": false
+            },
+            {
+              "id": "p3",
+              "period": 3,
+              "name": "3교시",
+              "startTime": "11:00",
+              "endTime": "11:50",
+              "isBreak": false
+            },
+            {
+              "id": "p4",
+              "period": 4,
+              "name": "4교시",
+              "startTime": "12:00",
+              "endTime": "12:50",
+              "isBreak": false
+            },
+            {
+              "id": "p_lunch",
+              "period": null,
+              "name": "점심시간",
+              "startTime": "12:50",
+              "endTime": "13:40",
+              "isBreak": true
+            },
+            {
+              "id": "p5",
+              "period": 5,
+              "name": "5교시",
+              "startTime": "13:40",
+              "endTime": "14:30",
+              "isBreak": false
+            },
+            {
+              "id": "p6",
+              "period": 6,
+              "name": "6교시",
+              "startTime": "14:40",
+              "endTime": "15:30",
+              "isBreak": false
+            },
+            {
+              "id": "p7",
+              "period": 7,
+              "name": "7교시",
+              "startTime": "15:40",
+              "endTime": "16:30",
+              "isBreak": false
+            },
+            {
+              "id": "p8",
+              "period": 8,
+              "name": "8교시",
+              "startTime": "16:40",
+              "endTime": "17:30",
+              "isBreak": false
+            }
+          ],
+          "days": [
+            {
+              "id": "mon",
+              "name": "월",
+              "fullName": "월요일",
+              "isWeekend": false
+            },
+            {
+              "id": "tue",
+              "name": "화",
+              "fullName": "화요일",
+              "isWeekend": false
+            },
+            {
+              "id": "wed",
+              "name": "수",
+              "fullName": "수요일",
+              "isWeekend": false
+            },
+            {
+              "id": "thu",
+              "name": "목",
+              "fullName": "목요일",
+              "isWeekend": false
+            },
+            {
+              "id": "fri",
+              "name": "금",
+              "fullName": "금요일",
+              "isWeekend": false
+            },
+            {
+              "id": "sat",
+              "name": "토",
+              "fullName": "토요일",
+              "isWeekend": true
+            },
+            {
+              "id": "sun",
+              "name": "일",
+              "fullName": "일요일",
+              "isWeekend": true
+            }
+          ],
+          "masterStudents": [
+            {
+              "id": "sm_1791854590586_c0x87s",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 6,
+              "studentCode": "10106",
+              "name": "김승준"
+            },
+            {
+              "id": "sm_1791854590586_sw7iq3",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 21,
+              "studentCode": "10121",
+              "name": "최현서"
+            },
+            {
+              "id": "sm_1791854590586_gqck9p",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서"
+            },
+            {
+              "id": "sm_1791854590586_jszr79",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준"
+            },
+            {
+              "id": "sm_1791854590586_2tr8hv",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 21,
+              "studentCode": "10221",
+              "name": "현표"
+            },
+            {
+              "id": "sm_1791854590586_ix3qnf",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 15,
+              "studentCode": "10215",
+              "name": "이지효"
+            },
+            {
+              "id": "sm_1791854590586_lop5ig",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민"
+            },
+            {
+              "id": "sm_1791866297895_h9vmjz",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비"
+            },
+            {
+              "id": "sm_1791870083787_oy0tpp",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 15,
+              "studentCode": "10115",
+              "name": "장시우"
+            },
+            {
+              "id": "sm_1791870086724_ee11i6",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 9,
+              "studentCode": "10109",
+              "name": "박재윤"
+            }
+          ],
+          "courseEnrollments": {
+            "인공지능 기초": [
+              "sm_1791854590586_c0x87s",
+              "sm_1791870083787_oy0tpp",
+              "sm_1791870086724_ee11i6",
+              "sm_1791866297895_h9vmjz"
+            ],
+            "문학 감상과 비평": [
+              "sm_1791854590586_sw7iq3"
+            ],
+            "고급 생명과학": [
+              "sm_1791854590586_gqck9p",
+              "sm_1791854590586_jszr79"
+            ],
+            "화학 반응의 세계": [
+              "sm_1791854590586_gqck9p",
+              "sm_1791854590586_jszr79",
+              "sm_1791854590586_lop5ig"
+            ],
+            "고급 지구과학": [
+              "sm_1791854590586_2tr8hv"
+            ],
+            "문예 창작의 이해": [
+              "sm_1791854590586_ix3qnf",
+              "sm_1791866297895_h9vmjz"
+            ]
+          },
+          "courseSchedules": {
+            "인공지능 기초": [
+              {
+                "id": "sch_1791870133247_y6lliv",
+                "day": "mon",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870134984_8jnfri",
+                "day": "wed",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870135982_r4ojg2",
+                "day": "fri",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ],
+            "문예 창작의 이해": [
+              {
+                "id": "sch_1791870185072_a6m3hr",
+                "day": "thu",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870186543_mjs7iu",
+                "day": "fri",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ],
+            "문학 감상과 비평": [
+              {
+                "id": "sch_1791870206566_bxbqk6",
+                "day": "thu",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870211226_a942ac",
+                "day": "fri",
+                "periodId": "p6",
+                "period": 6,
+                "status": "confirmed"
+              }
+            ],
+            "고급 생명과학": [
+              {
+                "id": "sch_1791870250172_y2lroj",
+                "day": "wed",
+                "periodId": "p7",
+                "period": 7,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870255784_g3xtgy",
+                "day": "wed",
+                "periodId": "p5",
+                "period": 5,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870257223_5qv8n5",
+                "day": "wed",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ],
+            "고급 지구과학": [
+              {
+                "id": "sch_1791870279135_4d7fi4",
+                "day": "mon",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870290822_xwizl5",
+                "day": "wed",
+                "periodId": "p7",
+                "period": 7,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870293278_e3myop",
+                "day": "wed",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ],
+            "화학 반응의 세계": [
+              {
+                "id": "sch_1791870456910_nwdjxc",
+                "day": "fri",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870460943_y9me9k",
+                "day": "thu",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              },
+              {
+                "id": "sch_1791870464583_t4u32o",
+                "day": "mon",
+                "periodId": "p8",
+                "period": 8,
+                "status": "confirmed"
+              }
+            ]
+          },
+          "courseStatus": {
+            "인공지능 기초": "adjust",
+            "문학 감상과 비평": "closed",
+            "고급 생명과학": "adjust",
+            "물질과 에너지": "open",
+            "화학 반응의 세계": "adjust",
+            "고급 지구과학": "adjust",
+            "문예 창작의 이해": "adjust"
+          },
+          "students": [
+            {
+              "id": "assign_고급 생명과학_sch_1791870250172_y2lroj_sm_1791854590586_gqck9p",
+              "scheduleId": "sch_1791870250172_y2lroj",
+              "studentMasterId": "sm_1791854590586_gqck9p",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "고급 생명과학",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 생명과학_sch_1791870250172_y2lroj_sm_1791854590586_jszr79",
+              "scheduleId": "sch_1791870250172_y2lroj",
+              "studentMasterId": "sm_1791854590586_jszr79",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "고급 생명과학",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 생명과학_sch_1791870255784_g3xtgy_sm_1791854590586_gqck9p",
+              "scheduleId": "sch_1791870255784_g3xtgy",
+              "studentMasterId": "sm_1791854590586_gqck9p",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "고급 생명과학",
+              "day": "wed",
+              "periodId": "p5",
+              "period": 5,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 생명과학_sch_1791870255784_g3xtgy_sm_1791854590586_jszr79",
+              "scheduleId": "sch_1791870255784_g3xtgy",
+              "studentMasterId": "sm_1791854590586_jszr79",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "고급 생명과학",
+              "day": "wed",
+              "periodId": "p5",
+              "period": 5,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 생명과학_sch_1791870257223_5qv8n5_sm_1791854590586_gqck9p",
+              "scheduleId": "sch_1791870257223_5qv8n5",
+              "studentMasterId": "sm_1791854590586_gqck9p",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "고급 생명과학",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 생명과학_sch_1791870257223_5qv8n5_sm_1791854590586_jszr79",
+              "scheduleId": "sch_1791870257223_5qv8n5",
+              "studentMasterId": "sm_1791854590586_jszr79",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "고급 생명과학",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 지구과학_sch_1791870279135_4d7fi4_sm_1791854590586_2tr8hv",
+              "scheduleId": "sch_1791870279135_4d7fi4",
+              "studentMasterId": "sm_1791854590586_2tr8hv",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 21,
+              "studentCode": "10221",
+              "name": "현표",
+              "subject": "고급 지구과학",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 지구과학_sch_1791870290822_xwizl5_sm_1791854590586_2tr8hv",
+              "scheduleId": "sch_1791870290822_xwizl5",
+              "studentMasterId": "sm_1791854590586_2tr8hv",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 21,
+              "studentCode": "10221",
+              "name": "현표",
+              "subject": "고급 지구과학",
+              "day": "wed",
+              "periodId": "p7",
+              "period": 7,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_고급 지구과학_sch_1791870293278_e3myop_sm_1791854590586_2tr8hv",
+              "scheduleId": "sch_1791870293278_e3myop",
+              "studentMasterId": "sm_1791854590586_2tr8hv",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 21,
+              "studentCode": "10221",
+              "name": "현표",
+              "subject": "고급 지구과학",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_문예 창작의 이해_sch_1791870185072_a6m3hr_sm_1791854590586_ix3qnf",
+              "scheduleId": "sch_1791870185072_a6m3hr",
+              "studentMasterId": "sm_1791854590586_ix3qnf",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 15,
+              "studentCode": "10215",
+              "name": "이지효",
+              "subject": "문예 창작의 이해",
+              "day": "thu",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_문예 창작의 이해_sch_1791870185072_a6m3hr_sm_1791866297895_h9vmjz",
+              "scheduleId": "sch_1791870185072_a6m3hr",
+              "studentMasterId": "sm_1791866297895_h9vmjz",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "문예 창작의 이해",
+              "day": "thu",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_문예 창작의 이해_sch_1791870186543_mjs7iu_sm_1791854590586_ix3qnf",
+              "scheduleId": "sch_1791870186543_mjs7iu",
+              "studentMasterId": "sm_1791854590586_ix3qnf",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 15,
+              "studentCode": "10215",
+              "name": "이지효",
+              "subject": "문예 창작의 이해",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_문예 창작의 이해_sch_1791870186543_mjs7iu_sm_1791866297895_h9vmjz",
+              "scheduleId": "sch_1791870186543_mjs7iu",
+              "studentMasterId": "sm_1791866297895_h9vmjz",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "문예 창작의 이해",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_문학 감상과 비평_sch_1791870206566_bxbqk6_sm_1791854590586_sw7iq3",
+              "scheduleId": "sch_1791870206566_bxbqk6",
+              "studentMasterId": "sm_1791854590586_sw7iq3",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 21,
+              "studentCode": "10121",
+              "name": "최현서",
+              "subject": "문학 감상과 비평",
+              "day": "thu",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_문학 감상과 비평_sch_1791870211226_a942ac_sm_1791854590586_sw7iq3",
+              "scheduleId": "sch_1791870211226_a942ac",
+              "studentMasterId": "sm_1791854590586_sw7iq3",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 21,
+              "studentCode": "10121",
+              "name": "최현서",
+              "subject": "문학 감상과 비평",
+              "day": "fri",
+              "periodId": "p6",
+              "period": 6,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870133247_y6lliv_sm_1791854590586_c0x87s",
+              "scheduleId": "sch_1791870133247_y6lliv",
+              "studentMasterId": "sm_1791854590586_c0x87s",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 6,
+              "studentCode": "10106",
+              "name": "김승준",
+              "subject": "인공지능 기초",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870133247_y6lliv_sm_1791870083787_oy0tpp",
+              "scheduleId": "sch_1791870133247_y6lliv",
+              "studentMasterId": "sm_1791870083787_oy0tpp",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 15,
+              "studentCode": "10115",
+              "name": "장시우",
+              "subject": "인공지능 기초",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870133247_y6lliv_sm_1791870086724_ee11i6",
+              "scheduleId": "sch_1791870133247_y6lliv",
+              "studentMasterId": "sm_1791870086724_ee11i6",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 9,
+              "studentCode": "10109",
+              "name": "박재윤",
+              "subject": "인공지능 기초",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870133247_y6lliv_sm_1791866297895_h9vmjz",
+              "scheduleId": "sch_1791870133247_y6lliv",
+              "studentMasterId": "sm_1791866297895_h9vmjz",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "인공지능 기초",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870134984_8jnfri_sm_1791854590586_c0x87s",
+              "scheduleId": "sch_1791870134984_8jnfri",
+              "studentMasterId": "sm_1791854590586_c0x87s",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 6,
+              "studentCode": "10106",
+              "name": "김승준",
+              "subject": "인공지능 기초",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870134984_8jnfri_sm_1791870083787_oy0tpp",
+              "scheduleId": "sch_1791870134984_8jnfri",
+              "studentMasterId": "sm_1791870083787_oy0tpp",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 15,
+              "studentCode": "10115",
+              "name": "장시우",
+              "subject": "인공지능 기초",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870134984_8jnfri_sm_1791870086724_ee11i6",
+              "scheduleId": "sch_1791870134984_8jnfri",
+              "studentMasterId": "sm_1791870086724_ee11i6",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 9,
+              "studentCode": "10109",
+              "name": "박재윤",
+              "subject": "인공지능 기초",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870134984_8jnfri_sm_1791866297895_h9vmjz",
+              "scheduleId": "sch_1791870134984_8jnfri",
+              "studentMasterId": "sm_1791866297895_h9vmjz",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "인공지능 기초",
+              "day": "wed",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870135982_r4ojg2_sm_1791854590586_c0x87s",
+              "scheduleId": "sch_1791870135982_r4ojg2",
+              "studentMasterId": "sm_1791854590586_c0x87s",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 6,
+              "studentCode": "10106",
+              "name": "김승준",
+              "subject": "인공지능 기초",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870135982_r4ojg2_sm_1791870083787_oy0tpp",
+              "scheduleId": "sch_1791870135982_r4ojg2",
+              "studentMasterId": "sm_1791870083787_oy0tpp",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 15,
+              "studentCode": "10115",
+              "name": "장시우",
+              "subject": "인공지능 기초",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870135982_r4ojg2_sm_1791870086724_ee11i6",
+              "scheduleId": "sch_1791870135982_r4ojg2",
+              "studentMasterId": "sm_1791870086724_ee11i6",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 9,
+              "studentCode": "10109",
+              "name": "박재윤",
+              "subject": "인공지능 기초",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_인공지능 기초_sch_1791870135982_r4ojg2_sm_1791866297895_h9vmjz",
+              "scheduleId": "sch_1791870135982_r4ojg2",
+              "studentMasterId": "sm_1791866297895_h9vmjz",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 8,
+              "studentCode": "10108",
+              "name": "박은비",
+              "subject": "인공지능 기초",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870456910_nwdjxc_sm_1791854590586_gqck9p",
+              "scheduleId": "sch_1791870456910_nwdjxc",
+              "studentMasterId": "sm_1791854590586_gqck9p",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "화학 반응의 세계",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870456910_nwdjxc_sm_1791854590586_jszr79",
+              "scheduleId": "sch_1791870456910_nwdjxc",
+              "studentMasterId": "sm_1791854590586_jszr79",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "화학 반응의 세계",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870456910_nwdjxc_sm_1791854590586_lop5ig",
+              "scheduleId": "sch_1791870456910_nwdjxc",
+              "studentMasterId": "sm_1791854590586_lop5ig",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민",
+              "subject": "화학 반응의 세계",
+              "day": "fri",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870460943_y9me9k_sm_1791854590586_gqck9p",
+              "scheduleId": "sch_1791870460943_y9me9k",
+              "studentMasterId": "sm_1791854590586_gqck9p",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "화학 반응의 세계",
+              "day": "thu",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870460943_y9me9k_sm_1791854590586_jszr79",
+              "scheduleId": "sch_1791870460943_y9me9k",
+              "studentMasterId": "sm_1791854590586_jszr79",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "화학 반응의 세계",
+              "day": "thu",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870460943_y9me9k_sm_1791854590586_lop5ig",
+              "scheduleId": "sch_1791870460943_y9me9k",
+              "studentMasterId": "sm_1791854590586_lop5ig",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민",
+              "subject": "화학 반응의 세계",
+              "day": "thu",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870464583_t4u32o_sm_1791854590586_gqck9p",
+              "scheduleId": "sch_1791870464583_t4u32o",
+              "studentMasterId": "sm_1791854590586_gqck9p",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 22,
+              "studentCode": "10222",
+              "name": "홍준서",
+              "subject": "화학 반응의 세계",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870464583_t4u32o_sm_1791854590586_jszr79",
+              "scheduleId": "sch_1791870464583_t4u32o",
+              "studentMasterId": "sm_1791854590586_jszr79",
+              "grade": 1,
+              "classNum": 2,
+              "studentNum": 13,
+              "studentCode": "10213",
+              "name": "이성준",
+              "subject": "화학 반응의 세계",
+              "day": "mon",
+              "periodId": "p8",
+              "period": 8,
+              "status": "confirmed"
+            },
+            {
+              "id": "assign_화학 반응의 세계_sch_1791870464583_t4u32o_sm_1791854590586_lop5ig",
+              "scheduleId": "sch_1791870464583_t4u32o",
+              "studentMasterId": "sm_1791854590586_lop5ig",
+              "grade": 1,
+              "classNum": 1,
+              "studentNum": 17,
+              "studentCode": "10117",
+              "name": "정수민",
+              "subject": "화학 반응의 세계",
               "day": "mon",
               "periodId": "p8",
               "period": 8,
               "status": "confirmed"
             }
-          ]
+          ],
+          "offeredSubjects": [
+            "고급 생명과학",
+            "고급 지구과학",
+            "문예 창작의 이해",
+            "문학 감상과 비평",
+            "인공지능 기초",
+            "화학 반응의 세계"
+          ],
+          "subjectColorMap": {
+            "인공지능": {
+              "bg": "#E0F2FE",
+              "text": "#0369A1",
+              "border": "#BAE6FD",
+              "excelBg": "E0F2FE",
+              "excelText": "0369A1"
+            },
+            "빅데이터 분석": {
+              "bg": "#D1FAE5",
+              "text": "#047857",
+              "border": "#A7F3D0",
+              "excelBg": "D1FAE5",
+              "excelText": "047857"
+            },
+            "프로그래밍": {
+              "bg": "#EDE9FE",
+              "text": "#6D28D9",
+              "border": "#DDD6FE",
+              "excelBg": "EDE9FE",
+              "excelText": "6D28D9"
+            },
+            "물질과 에너지": {
+              "bg": "#FFE4E6",
+              "text": "#BE123C",
+              "border": "#FECDD3",
+              "excelBg": "FFE4E6",
+              "excelText": "BE123C"
+            },
+            "화학 반응의 세계": {
+              "bg": "#FEF3C7",
+              "text": "#B45309",
+              "border": "#FDE68A",
+              "excelBg": "FEF3C7",
+              "excelText": "B45309"
+            },
+            "비교 문화": {
+              "bg": "#FFEDD5",
+              "text": "#C2410C",
+              "border": "#FED7AA",
+              "excelBg": "FFEDD5",
+              "excelText": "C2410C"
+            },
+            "윤리와 사상": {
+              "bg": "#CCFBF1",
+              "text": "#0F766E",
+              "border": "#99F6E4",
+              "excelBg": "CCFBF1",
+              "excelText": "0F766E"
+            },
+            "문학 감상과 비평": {
+              "bg": "#FCE7F3",
+              "text": "#BE185D",
+              "border": "#FBCFE8",
+              "excelBg": "FCE7F3",
+              "excelText": "BE185D"
+            },
+            "행성우주과학": {
+              "bg": "#E0E7FF",
+              "text": "#4338CA",
+              "border": "#C7D2FE",
+              "excelBg": "E0E7FF",
+              "excelText": "4338CA"
+            },
+            "인간과 철학": {
+              "bg": "#ECFCCB",
+              "text": "#4D7C0F",
+              "border": "#D9F99D",
+              "excelBg": "ECFCCB",
+              "excelText": "4D7C0F"
+            },
+            "인공지능 기초": {
+              "bg": "#CFFAFE",
+              "text": "#0E7490",
+              "border": "#A5F3FC",
+              "excelBg": "CFFAFE",
+              "excelText": "0E7490"
+            },
+            "게임 프로그래밍": {
+              "bg": "#F3E8FF",
+              "text": "#7E22CE",
+              "border": "#E9D5FF",
+              "excelBg": "F3E8FF",
+              "excelText": "7E22CE"
+            },
+            "문예 창작의 이해": {
+              "bg": "#FEE2E2",
+              "text": "#B91C1C",
+              "border": "#FECACA",
+              "excelBg": "FEE2E2",
+              "excelText": "B91C1C"
+            },
+            "국제 경제": {
+              "bg": "#FEF9C3",
+              "text": "#A16207",
+              "border": "#FEF08A",
+              "excelBg": "FEF9C3",
+              "excelText": "A16207"
+            },
+            "고급 생명과학": {
+              "bg": "#E2E8F0",
+              "text": "#334155",
+              "border": "#CBD5E1",
+              "excelBg": "E2E8F0",
+              "excelText": "334155"
+            },
+            "고급 지구과학": {
+              "bg": "#E0F2FE",
+              "text": "#0369A1",
+              "border": "#BAE6FD",
+              "excelBg": "E0F2FE",
+              "excelText": "0369A1"
+            }
+          },
+          "showWeekends": true
+        }
+      },
+      "3": {
+        "1": {
+          "periods": [
+            {
+              "id": "p1",
+              "period": 1,
+              "name": "1교시",
+              "startTime": "09:00",
+              "endTime": "09:50",
+              "isBreak": false
+            },
+            {
+              "id": "p2",
+              "period": 2,
+              "name": "2교시",
+              "startTime": "10:00",
+              "endTime": "10:50",
+              "isBreak": false
+            },
+            {
+              "id": "p3",
+              "period": 3,
+              "name": "3교시",
+              "startTime": "11:00",
+              "endTime": "11:50",
+              "isBreak": false
+            },
+            {
+              "id": "p4",
+              "period": 4,
+              "name": "4교시",
+              "startTime": "12:00",
+              "endTime": "12:50",
+              "isBreak": false
+            },
+            {
+              "id": "p_lunch",
+              "period": null,
+              "name": "점심시간",
+              "startTime": "12:50",
+              "endTime": "13:40",
+              "isBreak": true
+            },
+            {
+              "id": "p5",
+              "period": 5,
+              "name": "5교시",
+              "startTime": "13:40",
+              "endTime": "14:30",
+              "isBreak": false
+            },
+            {
+              "id": "p6",
+              "period": 6,
+              "name": "6교시",
+              "startTime": "14:40",
+              "endTime": "15:30",
+              "isBreak": false
+            },
+            {
+              "id": "p7",
+              "period": 7,
+              "name": "7교시",
+              "startTime": "15:40",
+              "endTime": "16:30",
+              "isBreak": false
+            },
+            {
+              "id": "p8",
+              "period": 8,
+              "name": "8교시",
+              "startTime": "16:40",
+              "endTime": "17:30",
+              "isBreak": false
+            }
+          ],
+          "days": [
+            {
+              "id": "mon",
+              "name": "월",
+              "fullName": "월요일",
+              "isWeekend": false
+            },
+            {
+              "id": "tue",
+              "name": "화",
+              "fullName": "화요일",
+              "isWeekend": false
+            },
+            {
+              "id": "wed",
+              "name": "수",
+              "fullName": "수요일",
+              "isWeekend": false
+            },
+            {
+              "id": "thu",
+              "name": "목",
+              "fullName": "목요일",
+              "isWeekend": false
+            },
+            {
+              "id": "fri",
+              "name": "금",
+              "fullName": "금요일",
+              "isWeekend": false
+            },
+            {
+              "id": "sat",
+              "name": "토",
+              "fullName": "토요일",
+              "isWeekend": true
+            },
+            {
+              "id": "sun",
+              "name": "일",
+              "fullName": "일요일",
+              "isWeekend": true
+            }
+          ],
+          "masterStudents": [],
+          "courseEnrollments": {},
+          "courseSchedules": {},
+          "courseStatus": {},
+          "students": [],
+          "offeredSubjects": [],
+          "subjectColorMap": {},
+          "showWeekends": true
         },
-        "courseStatus": {
-          "인공지능 기초": "adjust",
-          "문학 감상과 비평": "closed",
-          "고급 생명과학": "adjust",
-          "물질과 에너지": "open",
-          "화학 반응의 세계": "adjust",
-          "고급 지구과학": "adjust",
-          "문예 창작의 이해": "adjust"
-        },
-        "students": [
-          {
-            "id": "assign_고급 생명과학_sch_1791870250172_y2lroj_sm_1791854590586_gqck9p",
-            "scheduleId": "sch_1791870250172_y2lroj",
-            "studentMasterId": "sm_1791854590586_gqck9p",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "고급 생명과학",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 생명과학_sch_1791870250172_y2lroj_sm_1791854590586_jszr79",
-            "scheduleId": "sch_1791870250172_y2lroj",
-            "studentMasterId": "sm_1791854590586_jszr79",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "고급 생명과학",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 생명과학_sch_1791870255784_g3xtgy_sm_1791854590586_gqck9p",
-            "scheduleId": "sch_1791870255784_g3xtgy",
-            "studentMasterId": "sm_1791854590586_gqck9p",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "고급 생명과학",
-            "day": "wed",
-            "periodId": "p5",
-            "period": 5,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 생명과학_sch_1791870255784_g3xtgy_sm_1791854590586_jszr79",
-            "scheduleId": "sch_1791870255784_g3xtgy",
-            "studentMasterId": "sm_1791854590586_jszr79",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "고급 생명과학",
-            "day": "wed",
-            "periodId": "p5",
-            "period": 5,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 생명과학_sch_1791870257223_5qv8n5_sm_1791854590586_gqck9p",
-            "scheduleId": "sch_1791870257223_5qv8n5",
-            "studentMasterId": "sm_1791854590586_gqck9p",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "고급 생명과학",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 생명과학_sch_1791870257223_5qv8n5_sm_1791854590586_jszr79",
-            "scheduleId": "sch_1791870257223_5qv8n5",
-            "studentMasterId": "sm_1791854590586_jszr79",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "고급 생명과학",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 지구과학_sch_1791870279135_4d7fi4_sm_1791854590586_2tr8hv",
-            "scheduleId": "sch_1791870279135_4d7fi4",
-            "studentMasterId": "sm_1791854590586_2tr8hv",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 21,
-            "studentCode": "10221",
-            "name": "현표",
-            "subject": "고급 지구과학",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 지구과학_sch_1791870290822_xwizl5_sm_1791854590586_2tr8hv",
-            "scheduleId": "sch_1791870290822_xwizl5",
-            "studentMasterId": "sm_1791854590586_2tr8hv",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 21,
-            "studentCode": "10221",
-            "name": "현표",
-            "subject": "고급 지구과학",
-            "day": "wed",
-            "periodId": "p7",
-            "period": 7,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_고급 지구과학_sch_1791870293278_e3myop_sm_1791854590586_2tr8hv",
-            "scheduleId": "sch_1791870293278_e3myop",
-            "studentMasterId": "sm_1791854590586_2tr8hv",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 21,
-            "studentCode": "10221",
-            "name": "현표",
-            "subject": "고급 지구과학",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_문예 창작의 이해_sch_1791870185072_a6m3hr_sm_1791854590586_ix3qnf",
-            "scheduleId": "sch_1791870185072_a6m3hr",
-            "studentMasterId": "sm_1791854590586_ix3qnf",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 15,
-            "studentCode": "10215",
-            "name": "이지효",
-            "subject": "문예 창작의 이해",
-            "day": "thu",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_문예 창작의 이해_sch_1791870185072_a6m3hr_sm_1791866297895_h9vmjz",
-            "scheduleId": "sch_1791870185072_a6m3hr",
-            "studentMasterId": "sm_1791866297895_h9vmjz",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "문예 창작의 이해",
-            "day": "thu",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_문예 창작의 이해_sch_1791870186543_mjs7iu_sm_1791854590586_ix3qnf",
-            "scheduleId": "sch_1791870186543_mjs7iu",
-            "studentMasterId": "sm_1791854590586_ix3qnf",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 15,
-            "studentCode": "10215",
-            "name": "이지효",
-            "subject": "문예 창작의 이해",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_문예 창작의 이해_sch_1791870186543_mjs7iu_sm_1791866297895_h9vmjz",
-            "scheduleId": "sch_1791870186543_mjs7iu",
-            "studentMasterId": "sm_1791866297895_h9vmjz",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "문예 창작의 이해",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_문학 감상과 비평_sch_1791870206566_bxbqk6_sm_1791854590586_sw7iq3",
-            "scheduleId": "sch_1791870206566_bxbqk6",
-            "studentMasterId": "sm_1791854590586_sw7iq3",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 21,
-            "studentCode": "10121",
-            "name": "최현서",
-            "subject": "문학 감상과 비평",
-            "day": "thu",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_문학 감상과 비평_sch_1791870211226_a942ac_sm_1791854590586_sw7iq3",
-            "scheduleId": "sch_1791870211226_a942ac",
-            "studentMasterId": "sm_1791854590586_sw7iq3",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 21,
-            "studentCode": "10121",
-            "name": "최현서",
-            "subject": "문학 감상과 비평",
-            "day": "fri",
-            "periodId": "p6",
-            "period": 6,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870133247_y6lliv_sm_1791854590586_c0x87s",
-            "scheduleId": "sch_1791870133247_y6lliv",
-            "studentMasterId": "sm_1791854590586_c0x87s",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 6,
-            "studentCode": "10106",
-            "name": "김승준",
-            "subject": "인공지능 기초",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870133247_y6lliv_sm_1791870083787_oy0tpp",
-            "scheduleId": "sch_1791870133247_y6lliv",
-            "studentMasterId": "sm_1791870083787_oy0tpp",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 15,
-            "studentCode": "10115",
-            "name": "장시우",
-            "subject": "인공지능 기초",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870133247_y6lliv_sm_1791870086724_ee11i6",
-            "scheduleId": "sch_1791870133247_y6lliv",
-            "studentMasterId": "sm_1791870086724_ee11i6",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 9,
-            "studentCode": "10109",
-            "name": "박재윤",
-            "subject": "인공지능 기초",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870133247_y6lliv_sm_1791866297895_h9vmjz",
-            "scheduleId": "sch_1791870133247_y6lliv",
-            "studentMasterId": "sm_1791866297895_h9vmjz",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "인공지능 기초",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870134984_8jnfri_sm_1791854590586_c0x87s",
-            "scheduleId": "sch_1791870134984_8jnfri",
-            "studentMasterId": "sm_1791854590586_c0x87s",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 6,
-            "studentCode": "10106",
-            "name": "김승준",
-            "subject": "인공지능 기초",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870134984_8jnfri_sm_1791870083787_oy0tpp",
-            "scheduleId": "sch_1791870134984_8jnfri",
-            "studentMasterId": "sm_1791870083787_oy0tpp",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 15,
-            "studentCode": "10115",
-            "name": "장시우",
-            "subject": "인공지능 기초",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870134984_8jnfri_sm_1791870086724_ee11i6",
-            "scheduleId": "sch_1791870134984_8jnfri",
-            "studentMasterId": "sm_1791870086724_ee11i6",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 9,
-            "studentCode": "10109",
-            "name": "박재윤",
-            "subject": "인공지능 기초",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870134984_8jnfri_sm_1791866297895_h9vmjz",
-            "scheduleId": "sch_1791870134984_8jnfri",
-            "studentMasterId": "sm_1791866297895_h9vmjz",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "인공지능 기초",
-            "day": "wed",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870135982_r4ojg2_sm_1791854590586_c0x87s",
-            "scheduleId": "sch_1791870135982_r4ojg2",
-            "studentMasterId": "sm_1791854590586_c0x87s",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 6,
-            "studentCode": "10106",
-            "name": "김승준",
-            "subject": "인공지능 기초",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870135982_r4ojg2_sm_1791870083787_oy0tpp",
-            "scheduleId": "sch_1791870135982_r4ojg2",
-            "studentMasterId": "sm_1791870083787_oy0tpp",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 15,
-            "studentCode": "10115",
-            "name": "장시우",
-            "subject": "인공지능 기초",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870135982_r4ojg2_sm_1791870086724_ee11i6",
-            "scheduleId": "sch_1791870135982_r4ojg2",
-            "studentMasterId": "sm_1791870086724_ee11i6",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 9,
-            "studentCode": "10109",
-            "name": "박재윤",
-            "subject": "인공지능 기초",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_인공지능 기초_sch_1791870135982_r4ojg2_sm_1791866297895_h9vmjz",
-            "scheduleId": "sch_1791870135982_r4ojg2",
-            "studentMasterId": "sm_1791866297895_h9vmjz",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 8,
-            "studentCode": "10108",
-            "name": "박은비",
-            "subject": "인공지능 기초",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870456910_nwdjxc_sm_1791854590586_gqck9p",
-            "scheduleId": "sch_1791870456910_nwdjxc",
-            "studentMasterId": "sm_1791854590586_gqck9p",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "화학 반응의 세계",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870456910_nwdjxc_sm_1791854590586_jszr79",
-            "scheduleId": "sch_1791870456910_nwdjxc",
-            "studentMasterId": "sm_1791854590586_jszr79",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "화학 반응의 세계",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870456910_nwdjxc_sm_1791854590586_lop5ig",
-            "scheduleId": "sch_1791870456910_nwdjxc",
-            "studentMasterId": "sm_1791854590586_lop5ig",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민",
-            "subject": "화학 반응의 세계",
-            "day": "fri",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870460943_y9me9k_sm_1791854590586_gqck9p",
-            "scheduleId": "sch_1791870460943_y9me9k",
-            "studentMasterId": "sm_1791854590586_gqck9p",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "화학 반응의 세계",
-            "day": "thu",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870460943_y9me9k_sm_1791854590586_jszr79",
-            "scheduleId": "sch_1791870460943_y9me9k",
-            "studentMasterId": "sm_1791854590586_jszr79",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "화학 반응의 세계",
-            "day": "thu",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870460943_y9me9k_sm_1791854590586_lop5ig",
-            "scheduleId": "sch_1791870460943_y9me9k",
-            "studentMasterId": "sm_1791854590586_lop5ig",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민",
-            "subject": "화학 반응의 세계",
-            "day": "thu",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870464583_t4u32o_sm_1791854590586_gqck9p",
-            "scheduleId": "sch_1791870464583_t4u32o",
-            "studentMasterId": "sm_1791854590586_gqck9p",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 22,
-            "studentCode": "10222",
-            "name": "홍준서",
-            "subject": "화학 반응의 세계",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870464583_t4u32o_sm_1791854590586_jszr79",
-            "scheduleId": "sch_1791870464583_t4u32o",
-            "studentMasterId": "sm_1791854590586_jszr79",
-            "grade": 1,
-            "classNum": 2,
-            "studentNum": 13,
-            "studentCode": "10213",
-            "name": "이성준",
-            "subject": "화학 반응의 세계",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          },
-          {
-            "id": "assign_화학 반응의 세계_sch_1791870464583_t4u32o_sm_1791854590586_lop5ig",
-            "scheduleId": "sch_1791870464583_t4u32o",
-            "studentMasterId": "sm_1791854590586_lop5ig",
-            "grade": 1,
-            "classNum": 1,
-            "studentNum": 17,
-            "studentCode": "10117",
-            "name": "정수민",
-            "subject": "화학 반응의 세계",
-            "day": "mon",
-            "periodId": "p8",
-            "period": 8,
-            "status": "confirmed"
-          }
-        ],
-        "offeredSubjects": [
-          "고급 생명과학",
-          "고급 지구과학",
-          "문예 창작의 이해",
-          "문학 감상과 비평",
-          "인공지능 기초",
-          "화학 반응의 세계"
-        ],
-        "subjectColorMap": {
-          "인공지능": {
-            "bg": "#E0F2FE",
-            "text": "#0369A1",
-            "border": "#BAE6FD",
-            "excelBg": "E0F2FE",
-            "excelText": "0369A1"
-          },
-          "빅데이터 분석": {
-            "bg": "#D1FAE5",
-            "text": "#047857",
-            "border": "#A7F3D0",
-            "excelBg": "D1FAE5",
-            "excelText": "047857"
-          },
-          "프로그래밍": {
-            "bg": "#EDE9FE",
-            "text": "#6D28D9",
-            "border": "#DDD6FE",
-            "excelBg": "EDE9FE",
-            "excelText": "6D28D9"
-          },
-          "물질과 에너지": {
-            "bg": "#FFE4E6",
-            "text": "#BE123C",
-            "border": "#FECDD3",
-            "excelBg": "FFE4E6",
-            "excelText": "BE123C"
-          },
-          "화학 반응의 세계": {
-            "bg": "#FEF3C7",
-            "text": "#B45309",
-            "border": "#FDE68A",
-            "excelBg": "FEF3C7",
-            "excelText": "B45309"
-          },
-          "비교 문화": {
-            "bg": "#FFEDD5",
-            "text": "#C2410C",
-            "border": "#FED7AA",
-            "excelBg": "FFEDD5",
-            "excelText": "C2410C"
-          },
-          "윤리와 사상": {
-            "bg": "#CCFBF1",
-            "text": "#0F766E",
-            "border": "#99F6E4",
-            "excelBg": "CCFBF1",
-            "excelText": "0F766E"
-          },
-          "문학 감상과 비평": {
-            "bg": "#FCE7F3",
-            "text": "#BE185D",
-            "border": "#FBCFE8",
-            "excelBg": "FCE7F3",
-            "excelText": "BE185D"
-          },
-          "행성우주과학": {
-            "bg": "#E0E7FF",
-            "text": "#4338CA",
-            "border": "#C7D2FE",
-            "excelBg": "E0E7FF",
-            "excelText": "4338CA"
-          },
-          "인간과 철학": {
-            "bg": "#ECFCCB",
-            "text": "#4D7C0F",
-            "border": "#D9F99D",
-            "excelBg": "ECFCCB",
-            "excelText": "4D7C0F"
-          },
-          "인공지능 기초": {
-            "bg": "#CFFAFE",
-            "text": "#0E7490",
-            "border": "#A5F3FC",
-            "excelBg": "CFFAFE",
-            "excelText": "0E7490"
-          },
-          "게임 프로그래밍": {
-            "bg": "#F3E8FF",
-            "text": "#7E22CE",
-            "border": "#E9D5FF",
-            "excelBg": "F3E8FF",
-            "excelText": "7E22CE"
-          },
-          "문예 창작의 이해": {
-            "bg": "#FEE2E2",
-            "text": "#B91C1C",
-            "border": "#FECACA",
-            "excelBg": "FEE2E2",
-            "excelText": "B91C1C"
-          },
-          "국제 경제": {
-            "bg": "#FEF9C3",
-            "text": "#A16207",
-            "border": "#FEF08A",
-            "excelBg": "FEF9C3",
-            "excelText": "A16207"
-          },
-          "고급 생명과학": {
-            "bg": "#E2E8F0",
-            "text": "#334155",
-            "border": "#CBD5E1",
-            "excelBg": "E2E8F0",
-            "excelText": "334155"
-          },
-          "고급 지구과학": {
-            "bg": "#E0F2FE",
-            "text": "#0369A1",
-            "border": "#BAE6FD",
-            "excelBg": "E0F2FE",
-            "excelText": "0369A1"
-          }
-        },
-        "showWeekends": true
+        "2": {
+          "periods": [
+            {
+              "id": "p1",
+              "period": 1,
+              "name": "1교시",
+              "startTime": "09:00",
+              "endTime": "09:50",
+              "isBreak": false
+            },
+            {
+              "id": "p2",
+              "period": 2,
+              "name": "2교시",
+              "startTime": "10:00",
+              "endTime": "10:50",
+              "isBreak": false
+            },
+            {
+              "id": "p3",
+              "period": 3,
+              "name": "3교시",
+              "startTime": "11:00",
+              "endTime": "11:50",
+              "isBreak": false
+            },
+            {
+              "id": "p4",
+              "period": 4,
+              "name": "4교시",
+              "startTime": "12:00",
+              "endTime": "12:50",
+              "isBreak": false
+            },
+            {
+              "id": "p_lunch",
+              "period": null,
+              "name": "점심시간",
+              "startTime": "12:50",
+              "endTime": "13:40",
+              "isBreak": true
+            },
+            {
+              "id": "p5",
+              "period": 5,
+              "name": "5교시",
+              "startTime": "13:40",
+              "endTime": "14:30",
+              "isBreak": false
+            },
+            {
+              "id": "p6",
+              "period": 6,
+              "name": "6교시",
+              "startTime": "14:40",
+              "endTime": "15:30",
+              "isBreak": false
+            },
+            {
+              "id": "p7",
+              "period": 7,
+              "name": "7교시",
+              "startTime": "15:40",
+              "endTime": "16:30",
+              "isBreak": false
+            },
+            {
+              "id": "p8",
+              "period": 8,
+              "name": "8교시",
+              "startTime": "16:40",
+              "endTime": "17:30",
+              "isBreak": false
+            }
+          ],
+          "days": [
+            {
+              "id": "mon",
+              "name": "월",
+              "fullName": "월요일",
+              "isWeekend": false
+            },
+            {
+              "id": "tue",
+              "name": "화",
+              "fullName": "화요일",
+              "isWeekend": false
+            },
+            {
+              "id": "wed",
+              "name": "수",
+              "fullName": "수요일",
+              "isWeekend": false
+            },
+            {
+              "id": "thu",
+              "name": "목",
+              "fullName": "목요일",
+              "isWeekend": false
+            },
+            {
+              "id": "fri",
+              "name": "금",
+              "fullName": "금요일",
+              "isWeekend": false
+            },
+            {
+              "id": "sat",
+              "name": "토",
+              "fullName": "토요일",
+              "isWeekend": true
+            },
+            {
+              "id": "sun",
+              "name": "일",
+              "fullName": "일요일",
+              "isWeekend": true
+            }
+          ],
+          "masterStudents": [],
+          "courseEnrollments": {},
+          "courseSchedules": {},
+          "courseStatus": {},
+          "students": [],
+          "offeredSubjects": [],
+          "subjectColorMap": {},
+          "showWeekends": true
+        }
       }
     }
   },
@@ -3400,5 +3665,5 @@
     }
   },
   "showWeekends": true,
-  "lastUpdated": "2026-10-13T07:03:00.322Z"
+  "lastUpdated": "2026-10-13T07:08:59.034Z"
 }

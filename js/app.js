@@ -954,22 +954,67 @@ class TimetableApp {
   }
 
   // ==========================================
-  // 1단계 좌측 패널: 학생 명단 및 과목 편제 현황 엑셀 다운로드
+  // 1단계 좌측 패널: 학생 명단 및 과목 편제 현황 엑셀 다운로드 (1학기 + 2학기 연속 출력)
   // ==========================================
   exportStep1StudentRosterExcel() {
-    if (!this.masterStudents || this.masterStudents.length === 0) {
-      this.showToast('등록된 학생 명단이 없습니다. 학생을 먼저 등록해주세요.');
+    // 1. 현재 작업 중인 활성 학기 데이터를 확실히 저장 동기화
+    this.saveActiveYearSemesterData();
+
+    const targetYear = this.activeYear || '2026';
+    const targetGrade = this.activeGrade || '2';
+
+    this.ensureYearSemesterData(targetYear, targetGrade, '1');
+    this.ensureYearSemesterData(targetYear, targetGrade, '2');
+
+    const sem1Data = (this.yearsData[targetYear] && this.yearsData[targetYear][targetGrade] && this.yearsData[targetYear][targetGrade]['1']) || {};
+    const sem2Data = (this.yearsData[targetYear] && this.yearsData[targetYear][targetGrade] && this.yearsData[targetYear][targetGrade]['2']) || {};
+
+    const sem1Enrollments = sem1Data.courseEnrollments || {};
+    const sem2Enrollments = sem2Data.courseEnrollments || {};
+
+    // 학생 정렬 헬퍼 (미편성 최상단 + 학번순)
+    const sortRosterStudents = (students, enrollments) => {
+      if (!students || !Array.isArray(students)) return [];
+      const list = [...students];
+      list.sort((a, b) => {
+        let countA = 0;
+        let countB = 0;
+        Object.values(enrollments || {}).forEach(ids => {
+          if (ids && ids.includes(a.id)) countA++;
+          if (ids && ids.includes(b.id)) countB++;
+        });
+        const unassignedA = countA === 0 ? 0 : 1;
+        const unassignedB = countB === 0 ? 0 : 1;
+        if (unassignedA !== unassignedB) {
+          return unassignedA - unassignedB; // 미편성(0) 학생 우선 배치
+        }
+        const codeA = a.studentCode || ExcelService.getStudentCode(a);
+        const codeB = b.studentCode || ExcelService.getStudentCode(b);
+        return codeA.localeCompare(codeB, undefined, { numeric: true });
+      });
+      return list;
+    };
+
+    const sortedSem1Students = sortRosterStudents(sem1Data.masterStudents || [], sem1Enrollments);
+    const sortedSem2Students = sortRosterStudents(sem2Data.masterStudents || [], sem2Enrollments);
+
+    const totalCount = sortedSem1Students.length + sortedSem2Students.length;
+    if (totalCount === 0) {
+      this.showToast('등록된 학생 명단이 없습니다. 학생 명부를 먼저 등록해주세요.');
       return;
     }
 
-    const studentsToExport = this.getFilteredMasterStudents();
-    ExcelService.exportStudentRosterExcel(
-      studentsToExport,
-      this.courseEnrollments,
-      this.activeYear,
-      this.activeSemester
-    );
-    this.showToast(`[${this.activeYear}학년도 ${this.activeGrade}학년 ${this.activeSemester}학기] 학생 명단(${studentsToExport.length}명) 엑셀이 다운로드되었습니다.`, true);
+    ExcelService.exportStudentRosterExcel({
+      academicYear: targetYear,
+      grade: targetGrade,
+      schoolName: '강원온라인학교',
+      sem1Students: sortedSem1Students,
+      sem1Enrollments: sem1Enrollments,
+      sem2Students: sortedSem2Students,
+      sem2Enrollments: sem2Enrollments
+    });
+
+    this.showToast(`[${targetYear}학년도 ${targetGrade}학년] 1·2학기 통합 명단(1학기 ${sortedSem1Students.length}명, 2학기 ${sortedSem2Students.length}명) 엑셀이 다운로드되었습니다.`, true);
   }
 
   /**
