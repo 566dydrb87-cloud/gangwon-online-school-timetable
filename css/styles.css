@@ -218,6 +218,42 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
+/* 과목 하이라이트(선택 강조) 전용 스타일 */
+.subject-card.is-highlighted {
+  border: 2.5px solid #4F46E5 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.45), 0 10px 25px -5px rgba(79, 70, 229, 0.3) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+  z-index: 30 !important;
+  animation: pulse-highlight 2s infinite ease-in-out;
+}
+
+@keyframes pulse-highlight {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.45), 0 8px 20px rgba(79, 70, 229, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.7), 0 14px 28px rgba(79, 70, 229, 0.4);
+  }
+}
+
+.subject-card.is-dimmed {
+  opacity: 0.2 !important;
+  filter: grayscale(40%) !important;
+  transition: opacity 0.2s ease, filter 0.2s ease !important;
+}
+
+.subject-card.is-dimmed:hover {
+  opacity: 0.8 !important;
+  filter: none !important;
+}
+
+/* 하이라이트된 과목이 위치한 시간표 셀 */
+.timetable-cell.has-highlight {
+  background-color: #EEF2FF !important;
+  outline: 2px dashed #818CF8 !important;
+  outline-offset: -2px;
+}
+
 /* Print Optimization */
 @media print {
   @page {

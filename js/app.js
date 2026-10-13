@@ -3053,20 +3053,21 @@ class TimetableApp {
 
     // 과목 하이라이트 활성화 알림 바
     if (this.highlightedSubject) {
+      const scheduledCount = (this.courseSchedules[this.highlightedSubject] || []).length;
       html += `
         <div class="p-2.5 mb-2 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between shadow-2xs">
           <div class="flex items-center gap-1.5 min-w-0">
-            <span class="w-2 h-2 rounded-full bg-indigo-600 animate-ping shrink-0"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-ping shrink-0"></span>
             <span class="text-xs font-bold text-indigo-950 truncate">
-              [${this.highlightedSubject}] 시간표 하이라이트 중
+              [${this.highlightedSubject}] 시간표 ${scheduledCount}시간 하이라이트 중
             </span>
           </div>
           <button type="button" 
                   onclick="event.stopPropagation(); window.app.clearSubjectHighlight()"
-                  class="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-white hover:bg-indigo-100 px-2 py-0.5 rounded-lg border border-indigo-300 transition shrink-0 flex items-center gap-0.5"
+                  class="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-white hover:bg-indigo-100 px-2.5 py-0.5 rounded-lg border border-indigo-300 transition shrink-0 flex items-center gap-1 cursor-pointer shadow-2xs"
                   title="강조 표시 해제 (단축키: ESC)">
             <span>해제</span>
-            <span>✕</span>
+            <span class="font-bold">✕</span>
           </button>
         </div>
       `;
@@ -3076,7 +3077,7 @@ class TimetableApp {
       const color = this.getSubjectColor(sub);
       const studentIds = this.courseEnrollments[sub] || [];
       const schedules = this.courseSchedules[sub] || [];
-      const safeSub = sub.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      const safeSub = encodeURIComponent(sub);
       const status = this.getSubjectStatus(sub);
       const isSelected = this.highlightedSubject === sub;
       const isDimmed = Boolean(this.highlightedSubject && !isSelected);
@@ -3086,13 +3087,13 @@ class TimetableApp {
           status === 'closed' ? 'opacity-60 bg-slate-100 border-slate-300' : ''
         } ${
           isSelected 
-            ? 'ring-2 ring-indigo-600 ring-offset-2 border-indigo-600 shadow-md scale-[1.02]' 
+            ? 'ring-2 ring-indigo-600 ring-offset-2 border-indigo-600 shadow-md scale-[1.02] bg-indigo-50/30' 
             : (isDimmed ? 'opacity-40 hover:opacity-80' : '')
         }"
-             style="background-color: ${status === 'closed' ? '#F8FAFC' : color.bg}; border-color: ${isSelected ? '#4F46E5' : (status === 'closed' ? '#CBD5E1' : color.border)};"
+             style="background-color: ${isSelected ? undefined : (status === 'closed' ? '#F8FAFC' : color.bg)}; border-color: ${isSelected ? '#4F46E5' : (status === 'closed' ? '#CBD5E1' : color.border)};"
              draggable="true"
-             onclick="window.app.toggleHighlightSubject('${safeSub}')"
-             ondragstart="window.app.handlePaletteDragStart(event, '${safeSub}')"
+             onclick="if(!window.app.isDraggingPalette) window.app.toggleHighlightSubject(decodeURIComponent('${safeSub}'))"
+             ondragstart="window.app.handlePaletteDragStart(event, decodeURIComponent('${safeSub}'))"
              ondragend="window.app.handlePaletteDragEnd(event)"
              title="클릭: 오른쪽 시간표에서 이 과목 하이라이트 (토글) / 드래그: 시간표에 배치">
           
@@ -3101,10 +3102,19 @@ class TimetableApp {
               <i data-lucide="grip-vertical" class="w-3.5 h-3.5 shrink-0" style="color: ${status === 'closed' ? '#94A3B8' : color.text};"></i>
               <span class="font-bold text-xs truncate ${status === 'closed' ? 'line-through text-slate-400' : ''}" style="color: ${status === 'closed' ? '#64748B' : color.text};">${sub}</span>
             </div>
-            <div class="flex items-center gap-1">
-              ${isSelected ? `
-                <span class="text-[10px] font-black px-1.5 py-0.2 rounded bg-indigo-600 text-white shadow-2xs">✨ 선택됨</span>
-              ` : ''}
+            <div class="flex items-center gap-1 pointer-events-auto">
+              <!-- 원클릭 하이라이트 버튼 -->
+              <button type="button" 
+                      onclick="event.stopPropagation(); window.app.toggleHighlightSubject(decodeURIComponent('${safeSub}'))" 
+                      class="px-2 py-0.5 text-[11px] font-black rounded-lg transition shadow-2xs cursor-pointer flex items-center gap-1 shrink-0 ${
+                        isSelected 
+                          ? 'bg-indigo-600 text-white hover:bg-indigo-700 ring-2 ring-indigo-400 ring-offset-1' 
+                          : 'bg-white/95 text-indigo-700 hover:bg-indigo-50 border border-indigo-200'
+                      }"
+                      title="오른쪽 시간표에서 '${sub}' 과목 하이라이트 토글">
+                <i data-lucide="sparkles" class="w-3 h-3 ${isSelected ? 'text-amber-300' : 'text-indigo-600'}"></i>
+                <span>${isSelected ? '강조중' : '강조'}</span>
+              </button>
               ${status === 'closed' ? `
                 <span class="text-[10px] font-black px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 border border-rose-300">✖️ 폐강</span>
               ` : (status === 'adjust' ? `
@@ -3141,8 +3151,19 @@ class TimetableApp {
   toggleHighlightSubject(subjectName) {
     if (this.highlightedSubject === subjectName) {
       this.highlightedSubject = null;
+      this.showToast('과목 강조 표시가 해제되었습니다.');
     } else {
       this.highlightedSubject = subjectName;
+      const count = (this.courseSchedules[subjectName] || []).length;
+      this.showToast(`'${subjectName}' 과목이 시간표에서 강조 표시되었습니다. (총 ${count}시간 배치됨)`, true);
+      
+      // 첫 번째 강조 카드로 부드럽게 스크롤
+      setTimeout(() => {
+        const firstCard = document.querySelector('.subject-card.is-highlighted');
+        if (firstCard) {
+          firstCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        }
+      }, 80);
     }
     this.renderStep2Palette();
     this.renderTimetable();
@@ -3151,11 +3172,13 @@ class TimetableApp {
   // 과목 하이라이트 즉시 해제
   clearSubjectHighlight() {
     this.highlightedSubject = null;
+    this.showToast('과목 강조 표시가 해제되었습니다.');
     this.renderStep2Palette();
     this.renderTimetable();
   }
 
   handlePaletteDragStart(e, subjectName) {
+    this.isDraggingPalette = true;
     this.dragData = {
       type: 'palette-subject',
       subjectName: subjectName
@@ -3170,6 +3193,9 @@ class TimetableApp {
 
   handlePaletteDragEnd(e) {
     this.dragData = null;
+    setTimeout(() => {
+      this.isDraggingPalette = false;
+    }, 120);
     if (e.currentTarget) e.currentTarget.classList.remove('is-dragging');
     document.querySelectorAll('.timetable-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
   }
@@ -3239,17 +3265,6 @@ class TimetableApp {
 
         // 각 요일 셀
         activeDays.forEach(day => {
-          bodyHtml += `
-            <td class="timetable-cell p-1.5 border-l border-slate-200 align-top ${day.isWeekend ? 'bg-red-50/20' : ''}"
-                data-day="${day.id}"
-                data-period-id="${period.id}"
-                ondragover="window.app.handleTimetableCellDragOver(event)"
-                ondragleave="window.app.handleTimetableCellDragLeave(event)"
-                ondrop="window.app.handleTimetableCellDrop(event, '${day.id}', '${period.id}')">
-              
-              <div class="min-h-[72px] flex flex-col gap-1.5">
-          `;
-
           // 이 셀에 배치된 과목들 검색
           const scheduledEntries = [];
           Object.entries(this.courseSchedules).forEach(([subject, schedules]) => {
@@ -3262,6 +3277,25 @@ class TimetableApp {
               }
             });
           });
+
+          // 현재 팔레트에서 선택/하이라이트된 과목이 이 셀에 배치되어 있는지 여부
+          const isCellHighlighted = Boolean(
+            this.highlightedSubject && 
+            scheduledEntries.some(e => e.subject === this.highlightedSubject)
+          );
+
+          bodyHtml += `
+            <td class="timetable-cell p-1.5 border-l border-slate-200 align-top transition-colors ${
+              day.isWeekend ? 'bg-red-50/20' : ''
+            } ${isCellHighlighted ? 'has-highlight' : ''}"
+                data-day="${day.id}"
+                data-period-id="${period.id}"
+                ondragover="window.app.handleTimetableCellDragOver(event)"
+                ondragleave="window.app.handleTimetableCellDragLeave(event)"
+                ondrop="window.app.handleTimetableCellDrop(event, '${day.id}', '${period.id}')">
+              
+              <div class="min-h-[72px] flex flex-col gap-1.5">
+          `;
 
           if (scheduledEntries.length > 0) {
             scheduledEntries.forEach(({ subject, schedule }) => {
@@ -3327,12 +3361,12 @@ class TimetableApp {
               const isCardDimmed = Boolean(this.highlightedSubject && this.highlightedSubject !== subject);
 
               bodyHtml += `
-                <div class="subject-card p-2 rounded-lg border text-xs transition-all duration-150 relative select-none cursor-grab active:cursor-grabbing ${
+                <div class="subject-card p-2 rounded-lg border text-xs transition-all duration-200 relative select-none cursor-grab active:cursor-grabbing ${
                   isCanceled ? 'is-canceled' : ''
                 } ${isAdjust ? 'is-adjust' : ''} ${
                   isCardHighlighted 
-                    ? 'ring-4 ring-indigo-500 ring-offset-2 shadow-2xl scale-[1.04] z-20 font-black' 
-                    : (isCardDimmed ? 'opacity-25 grayscale-[30%] blur-[0.3px] hover:opacity-75 transition-opacity' : '')
+                    ? 'is-highlighted font-black' 
+                    : (isCardDimmed ? 'is-dimmed' : '')
                 }"
                      style="background-color: ${isCanceled ? '#E2E8F0' : color.bg}; border-color: ${isCardHighlighted ? '#4F46E5' : (isCanceled ? '#CBD5E1' : color.border)};"
                      draggable="true"
@@ -3342,7 +3376,7 @@ class TimetableApp {
                   <!-- 카드 상단: 상태 기호 + 과목명 + 충돌 경고 + 삭제 버튼 -->
                   <div class="flex items-center justify-between gap-1 mb-1 pointer-events-auto">
                     <div class="flex items-center gap-1 min-w-0 flex-wrap">
-                      ${isCardHighlighted ? '<span class="text-xs text-amber-500 font-extrabold animate-bounce shrink-0" title="선택된 과목">⭐</span>' : ''}
+                      ${isCardHighlighted ? '<span class="inline-flex items-center gap-0.5 text-[10px] font-black text-white bg-indigo-600 px-1.5 py-0.2 rounded shadow-2xs shrink-0 animate-pulse">✨ 강조</span>' : ''}
                       <!-- 상태 토글 버튼 (확정 -> 조정 -> 폐강) -->
                       <button type="button" 
                               onclick="event.stopPropagation(); window.app.toggleCourseScheduleStatus('${safeSub}', '${schedule.id || (day.id + '_' + period.id)}')"
