@@ -911,6 +911,25 @@ class TimetableApp {
     }
   }
 
+  // ==========================================
+  // 1단계 좌측 패널: 학생 명단 및 과목 편제 현황 엑셀 다운로드
+  // ==========================================
+  exportStep1StudentRosterExcel() {
+    if (!this.masterStudents || this.masterStudents.length === 0) {
+      this.showToast('등록된 학생 명단이 없습니다. 학생을 먼저 등록해주세요.');
+      return;
+    }
+
+    const studentsToExport = this.getFilteredMasterStudents();
+    ExcelService.exportStudentRosterExcel(
+      studentsToExport,
+      this.courseEnrollments,
+      this.activeYear,
+      this.activeSemester
+    );
+    this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 학생 명단(${studentsToExport.length}명) 엑셀이 다운로드되었습니다.`, true);
+  }
+
   /**
    * 임의의 학기 데이터(semData)로부터 flat student 목록을 완벽하게 생성하는 헬퍼
    */

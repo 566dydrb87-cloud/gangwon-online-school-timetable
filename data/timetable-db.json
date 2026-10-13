@@ -442,17 +442,18 @@
           ]
         },
         "courseStatus": {
-          "물질과 에너지": "open",
-          "화학 반응의 세계": "open",
-          "비교 문화": "open",
-          "윤리와 사상": "open",
-          "문학 감상과 비평": "open",
-          "행성우주과학": "open",
-          "인간과 철학": "open",
+          "물질과 에너지": "adjust",
+          "화학 반응의 세계": "adjust",
+          "비교 문화": "adjust",
+          "윤리와 사상": "adjust",
+          "문학 감상과 비평": "adjust",
+          "행성우주과학": "adjust",
+          "인간과 철학": "adjust",
           "인공지능 기초": "open",
-          "게임 프로그래밍": "open",
+          "게임 프로그래밍": "adjust",
           "문예 창작의 이해": "open",
-          "국제 경제": "open"
+          "국제 경제": "adjust",
+          "지구과학": "adjust"
         },
         "students": [
           {
@@ -1676,13 +1677,13 @@
           ]
         },
         "courseStatus": {
-          "인공지능 기초": "open",
-          "문학 감상과 비평": "open",
-          "고급 생명과학": "open",
+          "인공지능 기초": "adjust",
+          "문학 감상과 비평": "adjust",
+          "고급 생명과학": "adjust",
           "물질과 에너지": "open",
-          "화학 반응의 세계": "open",
-          "고급 지구과학": "open",
-          "문예 창작의 이해": "open"
+          "화학 반응의 세계": "adjust",
+          "고급 지구과학": "adjust",
+          "문예 창작의 이해": "adjust"
         },
         "students": [
           {
@@ -3518,17 +3519,18 @@
     ]
   },
   "courseStatus": {
-    "물질과 에너지": "open",
-    "화학 반응의 세계": "open",
-    "비교 문화": "open",
-    "윤리와 사상": "open",
-    "문학 감상과 비평": "open",
-    "행성우주과학": "open",
-    "인간과 철학": "open",
+    "물질과 에너지": "adjust",
+    "화학 반응의 세계": "adjust",
+    "비교 문화": "adjust",
+    "윤리와 사상": "adjust",
+    "문학 감상과 비평": "adjust",
+    "행성우주과학": "adjust",
+    "인간과 철학": "adjust",
     "인공지능 기초": "open",
-    "게임 프로그래밍": "open",
+    "게임 프로그래밍": "adjust",
     "문예 창작의 이해": "open",
-    "국제 경제": "open"
+    "국제 경제": "adjust",
+    "지구과학": "adjust"
   },
   "offeredSubjects": [
     "게임 프로그래밍",
@@ -3664,5 +3666,5 @@
     }
   },
   "showWeekends": true,
-  "lastUpdated": "2026-10-13T06:11:41.025Z"
+  "lastUpdated": "2026-10-13T06:17:21.011Z"
 }

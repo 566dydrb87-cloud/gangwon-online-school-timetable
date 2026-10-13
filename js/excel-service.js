@@ -1044,6 +1044,107 @@ const ExcelService = {
     this.saveFile(buffer, `${filePrefix}_시간표_통합데이터_${this.getTimestamp()}.xlsx`);
   },
 
+  // -------------------------------------------------------------
+  // 8. 1단계 전용: 학생 및 과목 편제 명단 엑셀 다운로드
+  // -------------------------------------------------------------
+  async exportStudentRosterExcel(students, courseEnrollments, academicYear = '2026', semester = '1', schoolName = '강원온라인학교') {
+    const workbook = new ExcelJS.Workbook();
+    const filePrefix = `${academicYear}학년도_${semester}학기_${schoolName}`;
+    workbook.creator = `${schoolName} 시간표 시스템`;
+    const worksheet = workbook.addWorksheet(`${academicYear}학년도_${semester}학기_학생명단`, { views: [{ showGridLines: true }] });
+
+    worksheet.columns = [
+      { header: '순번', key: 'index', width: 8 },
+      { header: '학년도', key: 'year', width: 10 },
+      { header: '학기', key: 'term', width: 10 },
+      { header: '학년', key: 'grade', width: 8 },
+      { header: '반', key: 'classNum', width: 8 },
+      { header: '번호', key: 'studentNum', width: 8 },
+      { header: '학번', key: 'studentCode', width: 12 },
+      { header: '성명', key: 'name', width: 14 },
+      { header: '편제상태', key: 'enrollStatus', width: 12 },
+      { header: '수강과목수', key: 'courseCount', width: 12 },
+      { header: '수강과목목록', key: 'courses', width: 36 }
+    ];
+
+    const headerRow = worksheet.getRow(1);
+    headerRow.height = 30;
+    headerRow.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } }; // 진한 틸/에메랄드
+      cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      this.applyBorder(cell);
+    });
+
+    (students || []).forEach((st, idx) => {
+      const code = st.studentCode || this.getStudentCode(st);
+      const courses = [];
+      Object.entries(courseEnrollments || {}).forEach(([sub, ids]) => {
+        if (ids && ids.includes(st.id)) courses.push(sub);
+      });
+
+      const isEnrolled = courses.length > 0;
+      const statusLabel = isEnrolled ? '편제완료' : '미편성';
+      const courseCountText = `${courses.length}과목`;
+      const coursesText = isEnrolled ? courses.join(', ') : '미편성';
+
+      const row = worksheet.addRow({
+        index: idx + 1,
+        year: academicYear,
+        term: `${semester}학기`,
+        grade: st.grade ? `${st.grade}` : '1',
+        classNum: st.classNum ? `${st.classNum}` : '1',
+        studentNum: st.studentNum ? `${st.studentNum}` : '',
+        studentCode: code,
+        name: st.name || '',
+        enrollStatus: statusLabel,
+        courseCount: courseCountText,
+        courses: coursesText
+      });
+
+      row.height = 24;
+      row.eachCell((cell, colNum) => {
+        cell.alignment = { vertical: 'middle', horizontal: colNum === 11 ? 'left' : 'center' };
+        cell.font = { name: '맑은 고딕', size: 10 };
+        this.applyBorder(cell);
+
+        // 편제상태 열 (col 9)
+        if (colNum === 9) {
+          if (isEnrolled) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF047857' } };
+          } else {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFB45309' } };
+          }
+        }
+
+        // 수강과목수 열 (col 10)
+        if (colNum === 10) {
+          if (!isEnrolled) {
+            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFB45309' } };
+          } else {
+            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF0369A1' } };
+          }
+        }
+
+        // 수강과목목록 열 (col 11)
+        if (colNum === 11 && !isEnrolled) {
+          cell.font = { name: '맑은 고딕', color: { argb: 'FF94A3B8' }, italic: true };
+        }
+      });
+    });
+
+    // 자동 필터 적용
+    worksheet.autoFilter = {
+      from: { row: 1, column: 1 },
+      to: { row: 1, column: 11 }
+    };
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    this.saveFile(buffer, `${filePrefix}_학생_과목편제명단_${this.getTimestamp()}.xlsx`);
+  },
+
   applyBorder(cell) {
     cell.border = {
       top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
