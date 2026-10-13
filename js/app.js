@@ -1017,6 +1017,329 @@ class TimetableApp {
     this.showToast(`[${targetYear}학년도 ${targetGrade}학년] 1·2학기 통합 명단(1학기 ${sortedSem1Students.length}명, 2학기 ${sortedSem2Students.length}명) 엑셀이 다운로드되었습니다.`, true);
   }
 
+  // ==========================================
+  // 학기·과목별 수강자 명단 수집 헬퍼 (1학기 -> 2학기, 학년/반/번호 순 정렬)
+  // ==========================================
+  collectSubjectRosterData(targetYear = this.activeYear || '2026') {
+    this.saveActiveYearSemesterData();
+
+    const yearData = this.yearsData[targetYear] || {};
+    const gradeKeys = Object.keys(yearData);
+
+    // 학생 정렬: 1학년 먼저, 다음 2학년 등 (학년 -> 반 -> 번호 -> 이름순)
+    const compareStudents = (a, b) => {
+      const gA = Number(a.grade) || 999;
+      const gB = Number(b.grade) || 999;
+      if (gA !== gB) return gA - gB; // 1학년 먼저, 2학년, 3학년 순
+
+      const cA = Number(a.classNum) || 999;
+      const cB = Number(b.classNum) || 999;
+      if (cA !== cB) return cA - cB; // 반 오름차순
+
+      const nA = Number(a.studentNum) || 999;
+      const nB = Number(b.studentNum) || 999;
+      if (nA !== nB) return nA - nB; // 번호 오름차순
+
+      const nameA = a.name || '';
+      const nameB = b.name || '';
+      return nameA.localeCompare(nameB, 'ko');
+    };
+
+    const collectForSemester = (sem) => {
+      const subjectMap = new Map(); // subject -> { subject, status, studentMap }
+
+      gradeKeys.forEach(gKey => {
+        this.ensureYearSemesterData(targetYear, gKey, sem);
+        const semObj = (yearData[gKey] && yearData[gKey][sem]) || {};
+        const offered = semObj.offeredSubjects || [];
+        const enrollments = semObj.courseEnrollments || {};
+        const masters = semObj.masterStudents || [];
+        const masterMap = new Map(masters.map(s => [s.id, s]));
+        const courseStatus = semObj.courseStatus || {};
+
+        offered.forEach(sub => {
+          if (!subjectMap.has(sub)) {
+            subjectMap.set(sub, {
+              subject: sub,
+              status: courseStatus[sub] || 'confirmed',
+              studentMap: new Map()
+            });
+          }
+          const subInfo = subjectMap.get(sub);
+          if (courseStatus[sub]) subInfo.status = courseStatus[sub];
+
+          const studentIds = enrollments[sub] || [];
+          studentIds.forEach(id => {
+            const st = masterMap.get(id);
+            if (st) {
+              subInfo.studentMap.set(id, st);
+            }
+          });
+        });
+      });
+
+      // 과목명 가나다순 정렬
+      const sortedSubjects = Array.from(subjectMap.values()).sort((a, b) => a.subject.localeCompare(b.subject, 'ko'));
+      return sortedSubjects.map(item => {
+        const studentList = Array.from(item.studentMap.values()).sort(compareStudents);
+        return {
+          subject: item.subject,
+          status: item.status,
+          count: studentList.length,
+          students: studentList
+        };
+      });
+    };
+
+    const sem1Subjects = collectForSemester('1');
+    const sem2Subjects = collectForSemester('2');
+
+    return {
+      academicYear: targetYear,
+      schoolName: '강원온라인학교',
+      sem1Subjects,
+      sem2Subjects
+    };
+  }
+
+  // ==========================================
+  // 학기·과목별 수강자 명단 엑셀 다운로드
+  // ==========================================
+  exportSubjectRosterExcel() {
+    const data = this.collectSubjectRosterData();
+    const totalCount = data.sem1Subjects.reduce((acc, s) => acc + s.count, 0) + 
+                       data.sem2Subjects.reduce((acc, s) => acc + s.count, 0);
+
+    if (data.sem1Subjects.length === 0 && data.sem2Subjects.length === 0) {
+      this.showToast('등록된 개설 과목이 없습니다.');
+      return;
+    }
+
+    ExcelService.exportSubjectRosterExcel(data);
+    this.showToast(`[${data.academicYear}학년도] 학기·과목별 수강자 명단 엑셀이 다운로드되었습니다. (총 ${totalCount}명 수강 편제)`, true);
+  }
+
+  // ==========================================
+  // 학기·과목별 수강자 명단 모달 보기 제어
+  // ==========================================
+  openSubjectRosterModal() {
+    this.subjectRosterFilterSem = 'all'; // 'all', '1', '2'
+    this.subjectRosterSearch = '';
+    const modal = document.getElementById('modal-subject-roster');
+    if (!modal) return;
+
+    const searchInput = document.getElementById('subject-roster-search-input');
+    if (searchInput) searchInput.value = '';
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    this.renderSubjectRosterModal();
+  }
+
+  closeSubjectRosterModal() {
+    const modal = document.getElementById('modal-subject-roster');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  setSubjectRosterFilterSemester(sem) {
+    this.subjectRosterFilterSem = sem;
+    this.renderSubjectRosterModal();
+  }
+
+  handleSubjectRosterSearch(e) {
+    this.subjectRosterSearch = (e.target.value || '').trim().toLowerCase();
+    this.renderSubjectRosterModal();
+  }
+
+  renderSubjectRosterModal() {
+    const data = this.collectSubjectRosterData();
+    const container = document.getElementById('subject-roster-list-container');
+    const badge = document.getElementById('subject-roster-stat-badge');
+    const titleYear = document.getElementById('subject-roster-modal-year');
+    if (!container) return;
+
+    if (titleYear) {
+      titleYear.textContent = `${data.academicYear}학년도`;
+    }
+
+    const totalSem1Count = data.sem1Subjects.reduce((acc, s) => acc + s.count, 0);
+    const totalSem2Count = data.sem2Subjects.reduce((acc, s) => acc + s.count, 0);
+
+    if (badge) {
+      badge.innerHTML = `
+        <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold">1학기 ${data.sem1Subjects.length}개 과목 (${totalSem1Count}명)</span>
+        <span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 font-bold">2학기 ${data.sem2Subjects.length}개 과목 (${totalSem2Count}명)</span>
+      `;
+    }
+
+    // 탭 버튼 스타일 갱신
+    ['all', '1', '2'].forEach(t => {
+      const btn = document.getElementById(`tab-roster-sem-${t}`);
+      if (btn) {
+        if (this.subjectRosterFilterSem === t) {
+          btn.className = 'px-3 py-1 text-xs font-bold rounded-lg bg-blue-600 text-white shadow-xs transition';
+        } else {
+          btn.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition';
+        }
+      }
+    });
+
+    const q = (this.subjectRosterSearch || '').toLowerCase();
+
+    // 과목 카드 렌더링 헬퍼
+    const renderSubjectBlock = (semNum, subjects, theme) => {
+      let filtered = subjects;
+      if (q) {
+        filtered = subjects.filter(s => {
+          if (s.subject.toLowerCase().includes(q)) return true;
+          return (s.students || []).some(st => {
+            const name = (st.name || '').toLowerCase();
+            const code = (st.studentCode || ExcelService.getStudentCode(st)).toLowerCase();
+            return name.includes(q) || code.includes(q);
+          });
+        });
+      }
+
+      if (filtered.length === 0) {
+        return `
+          <div class="p-6 text-center text-xs text-slate-400 border border-dashed rounded-xl bg-slate-50/50">
+            ${q ? `'${q}' 검색 조건에 맞는 과목이 없습니다.` : '등록된 과목이 없습니다.'}
+          </div>
+        `;
+      }
+
+      let subHtml = '<div class="space-y-4">';
+      filtered.forEach((subItem, sIdx) => {
+        const isClosed = subItem.status === 'canceled';
+        const isAdjusted = subItem.status === 'adjusted';
+        const statusBadge = isClosed 
+          ? '<span class="text-[10px] px-2 py-0.5 rounded bg-red-100 text-red-700 font-bold">폐강</span>'
+          : (isAdjusted ? '<span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">조정</span>' : '<span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">정상</span>');
+
+        subHtml += `
+          <div class="border rounded-xl overflow-hidden shadow-2xs ${theme.cardBorder} bg-white">
+            <!-- 과목 헤더 바 -->
+            <div class="px-4 py-2.5 flex items-center justify-between gap-3 ${theme.headerBg} border-b ${theme.cardBorder}">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${theme.seqBadge}">
+                  ${sIdx + 1}
+                </span>
+                <span class="text-sm font-bold ${theme.titleColor} truncate">
+                  ${subItem.subject}
+                </span>
+                ${statusBadge}
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-full ${theme.countBadge}">
+                  수강 <strong class="text-sm">${subItem.count}</strong>명
+                </span>
+              </div>
+            </div>
+
+            <!-- 학생 목록 테이블 -->
+            <div class="p-3">
+              ${subItem.students.length === 0 ? `
+                <div class="py-3 text-center text-xs text-slate-400">수강 신청 학생이 없습니다.</div>
+              ` : `
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="text-[11px] font-bold text-slate-500 border-b border-slate-200 bg-slate-50/70">
+                        <th class="py-1.5 px-2.5 w-12 text-center">번호</th>
+                        <th class="py-1.5 px-2.5 w-16 text-center">학년</th>
+                        <th class="py-1.5 px-2.5 w-16 text-center">반</th>
+                        <th class="py-1.5 px-2.5 w-16 text-center">번호</th>
+                        <th class="py-1.5 px-2.5 w-24 text-center">학번</th>
+                        <th class="py-1.5 px-3">성명</th>
+                        <th class="py-1.5 px-2.5 text-right text-slate-400">비고</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      ${subItem.students.map((st, idx) => {
+                        const code = st.studentCode || ExcelService.getStudentCode(st);
+                        const matchHighlight = q && ((st.name || '').toLowerCase().includes(q) || code.toLowerCase().includes(q));
+                        return `
+                          <tr class="${matchHighlight ? 'bg-amber-50 font-bold' : (idx % 2 === 1 ? 'bg-slate-50/40' : '')} hover:bg-blue-50/50 transition">
+                            <td class="py-1.5 px-2.5 text-center text-slate-400 text-[11px]">${idx + 1}</td>
+                            <td class="py-1.5 px-2.5 text-center font-bold text-slate-800">${st.grade || '1'}학년</td>
+                            <td class="py-1.5 px-2.5 text-center text-slate-700">${st.classNum || '1'}반</td>
+                            <td class="py-1.5 px-2.5 text-center text-slate-700">${st.studentNum || '-'}번</td>
+                            <td class="py-1.5 px-2.5 text-center font-mono font-semibold text-slate-600">${code}</td>
+                            <td class="py-1.5 px-3 font-bold text-slate-900">${st.name || '-'}</td>
+                            <td class="py-1.5 px-2.5 text-right text-[11px] text-emerald-600 font-medium">수강</td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      });
+      subHtml += '</div>';
+      return subHtml;
+    };
+
+    let fullHtml = '';
+
+    // 1학기 섹션
+    if (this.subjectRosterFilterSem === 'all' || this.subjectRosterFilterSem === '1') {
+      const sem1Theme = {
+        cardBorder: 'border-blue-200',
+        headerBg: 'bg-blue-50/80',
+        seqBadge: 'bg-blue-600 text-white',
+        titleColor: 'text-blue-950',
+        countBadge: 'bg-blue-100 text-blue-900 border border-blue-200'
+      };
+
+      fullHtml += `
+        <div class="mb-8">
+          <div class="flex items-center gap-2 mb-3 pb-2 border-b-2 border-blue-400">
+            <span class="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-xs font-bold flex items-center gap-1 shadow-xs">
+              <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+              <span>1학기</span>
+            </span>
+            <h3 class="text-sm font-bold text-blue-950">1학기 과목별 수강자 명단</h3>
+            <span class="text-xs text-slate-500 ml-auto font-medium">총 ${data.sem1Subjects.length}개 과목 · ${totalSem1Count}명</span>
+          </div>
+          ${renderSubjectBlock('1', data.sem1Subjects, sem1Theme)}
+        </div>
+      `;
+    }
+
+    // 2학기 섹션
+    if (this.subjectRosterFilterSem === 'all' || this.subjectRosterFilterSem === '2') {
+      const sem2Theme = {
+        cardBorder: 'border-purple-200',
+        headerBg: 'bg-purple-50/80',
+        seqBadge: 'bg-purple-600 text-white',
+        titleColor: 'text-purple-950',
+        countBadge: 'bg-purple-100 text-purple-900 border border-purple-200'
+      };
+
+      fullHtml += `
+        <div>
+          <div class="flex items-center gap-2 mb-3 pb-2 border-b-2 border-purple-400">
+            <span class="px-2.5 py-1 rounded-lg bg-purple-600 text-white text-xs font-bold flex items-center gap-1 shadow-xs">
+              <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+              <span>2학기</span>
+            </span>
+            <h3 class="text-sm font-bold text-purple-950">2학기 과목별 수강자 명단</h3>
+            <span class="text-xs text-slate-500 ml-auto font-medium">총 ${data.sem2Subjects.length}개 과목 · ${totalSem2Count}명</span>
+          </div>
+          ${renderSubjectBlock('2', data.sem2Subjects, sem2Theme)}
+        </div>
+      `;
+    }
+
+    container.innerHTML = fullHtml;
+    if (window.lucide) window.lucide.createIcons();
+  }
+
   /**
    * 임의의 학기 데이터(semData)로부터 flat student 목록을 완벽하게 생성하는 헬퍼
    */
@@ -3203,28 +3526,6 @@ class TimetableApp {
     }
 
     let html = '';
-
-    // 과목 하이라이트 활성화 알림 바
-    if (this.highlightedSubject) {
-      const scheduledCount = (this.courseSchedules[this.highlightedSubject] || []).length;
-      html += `
-        <div class="p-2.5 mb-2 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between shadow-2xs">
-          <div class="flex items-center gap-1.5 min-w-0">
-            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-ping shrink-0"></span>
-            <span class="text-xs font-bold text-indigo-950 truncate">
-              [${this.highlightedSubject}] 시간표 ${scheduledCount}시간 하이라이트 중
-            </span>
-          </div>
-          <button type="button" 
-                  onclick="event.stopPropagation(); window.app.clearSubjectHighlight()"
-                  class="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-white hover:bg-indigo-100 px-2.5 py-0.5 rounded-lg border border-indigo-300 transition shrink-0 flex items-center gap-1 cursor-pointer shadow-2xs"
-                  title="강조 표시 해제 (단축키: ESC)">
-            <span>해제</span>
-            <span class="font-bold">✕</span>
-          </button>
-        </div>
-      `;
-    }
 
     this.offeredSubjects.forEach(sub => {
       const color = this.getSubjectColor(sub);

@@ -455,14 +455,32 @@
             </p>
           </div>
 
-          <!-- 새 과목 바구니 생성 폼 -->
-          <form id="form-create-subject-bucket" class="flex items-center gap-1.5">
-            <input type="text" id="input-new-bucket-name" placeholder="새 과목명 입력 (예: 데이터 과학)" required class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 w-52 sm:w-60 font-medium">
-            <button type="submit" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow-xs transition flex items-center gap-1 whitespace-nowrap">
-              <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i>
-              <span>+ 과목 바구니 생성</span>
+          <!-- 과목별 수강자 명단 버튼 그룹 및 새 과목 생성 폼 -->
+          <div class="flex items-center flex-wrap gap-2">
+            <button type="button" 
+                    onclick="window.app.openSubjectRosterModal()" 
+                    class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-lg border border-blue-200 shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
+                    title="1·2학기 과목별 수강자 명단 및 인원 확인 (화면 모달)">
+              <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-blue-600"></i>
+              <span>과목별 수강자 명단</span>
             </button>
-          </form>
+            <button type="button" 
+                    onclick="window.app.exportSubjectRosterExcel()" 
+                    class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-lg border border-emerald-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
+                    title="1·2학기 과목별 수강자 명단 엑셀 다운로드 (학년·반·번호 순 정렬)">
+              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>과목별 명단 엑셀</span>
+            </button>
+
+            <!-- 새 과목 바구니 생성 폼 -->
+            <form id="form-create-subject-bucket" class="flex items-center gap-1.5">
+              <input type="text" id="input-new-bucket-name" placeholder="새 과목명 입력 (예: 데이터 과학)" required class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 w-44 sm:w-52 font-medium">
+              <button type="submit" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow-xs transition flex items-center gap-1 whitespace-nowrap">
+                <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i>
+                <span>+ 과목 바구니 생성</span>
+              </button>
+            </form>
+          </div>
         </div>
 
         <!-- 본문 2분할 레이아웃: 좌측 과목 목록 / 우측 과목 바구니 -->
@@ -1357,6 +1375,83 @@
     </div>
   </div>
 
+  <!-- ============================================================== -->
+  <!-- [모달] 학기·과목별 수강자 명단 및 인원 확인 모달 -->
+  <!-- ============================================================== -->
+  <div id="modal-subject-roster" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- 모달 헤더 -->
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-blue-400"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-sm font-bold text-white">학기·과목별 수강자 명단 및 인원 현황</h2>
+              <span id="subject-roster-modal-year" class="text-[11px] px-2 py-0.5 rounded-full bg-blue-600/60 text-blue-200 font-semibold">2026학년도</span>
+            </div>
+            <p class="text-[11px] text-slate-400">1학기 및 2학기 개설 과목별 수강 학생 목록 (학년, 반, 번호 순 정렬)</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- 엑셀 다운로드 버튼 -->
+          <button type="button" 
+                  onclick="window.app.exportSubjectRosterExcel()" 
+                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                  title="1·2학기 과목별 수강자 명단 엑셀 다운로드">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>엑셀 다운로드</span>
+          </button>
+          <button type="button" onclick="window.app.closeSubjectRosterModal()" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 상단 컨트롤 바 (학기 필터 탭 & 실시간 검색 & 통계 배지) -->
+      <div class="px-5 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center flex-wrap gap-2">
+          <div class="inline-flex items-center p-0.5 bg-slate-200 rounded-lg gap-1 text-xs">
+            <button type="button" id="tab-roster-sem-all" onclick="window.app.setSubjectRosterFilterSemester('all')" class="px-3 py-1 text-xs font-bold rounded-md bg-blue-600 text-white shadow-xs">
+              전체 (1·2학기 연속)
+            </button>
+            <button type="button" id="tab-roster-sem-1" onclick="window.app.setSubjectRosterFilterSemester('1')" class="px-3 py-1 text-xs font-semibold rounded-md bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+              1학기만
+            </button>
+            <button type="button" id="tab-roster-sem-2" onclick="window.app.setSubjectRosterFilterSemester('2')" class="px-3 py-1 text-xs font-semibold rounded-md bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+              2학기만
+            </button>
+          </div>
+          <div id="subject-roster-stat-badge" class="flex items-center gap-1 text-[11px]">
+            <!-- JS 동적 생성 -->
+          </div>
+        </div>
+
+        <!-- 실시간 검색 인풋 -->
+        <div class="relative w-56 sm:w-64">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+          <input type="text" id="subject-roster-search-input" oninput="window.app.handleSubjectRosterSearch(event)" placeholder="과목명 또는 학생명 검색..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
+        </div>
+      </div>
+
+      <!-- 모달 본문 (과목별 수강자 리스트) -->
+      <div id="subject-roster-list-container" class="flex-1 overflow-y-auto p-5 space-y-6">
+        <!-- JS 동적 렌더링 -->
+      </div>
+
+      <!-- 하단 닫기 풋터 -->
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+        <span class="text-[11px] text-slate-500">※ 학생 정렬: 1학년 우선, 학년·반·번호 오름차순으로 정렬되어 있습니다.</span>
+        <button type="button" onclick="window.app.closeSubjectRosterModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">
+          닫기
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- 푸터 -->
   <footer class="bg-white border-t border-slate-200 py-3 px-4 text-center text-xs text-slate-500 no-print mt-auto">
     <div class="max-w-[1780px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
@@ -1372,9 +1467,9 @@
 
   <!-- Scripts -->
   <script src="js/sample-data.js"></script>
-  <script src="js/excel-service.js?v=20261013_13"></script>
+  <script src="js/excel-service.js?v=20261013_14"></script>
   <script src="js/cloud-sync.js"></script>
-  <script src="js/app.js?v=20261013_13"></script>
+  <script src="js/app.js?v=20261013_14"></script>
   <script>
     lucide.createIcons();
 

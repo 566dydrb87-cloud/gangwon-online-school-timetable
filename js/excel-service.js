@@ -1215,6 +1215,281 @@ const ExcelService = {
     this.saveFile(buffer, `${filePrefix}_학생_과목편제명단_${this.getTimestamp()}.xlsx`);
   },
 
+  // -------------------------------------------------------------
+  // 9. 학기-과목별 수강자 명단 및 인원 엑셀 다운로드 (1학기 -> 2학기 연속 출력, 학년/반/번호 정렬)
+  // -------------------------------------------------------------
+  async exportSubjectRosterExcel({ academicYear = '2026', schoolName = '강원온라인학교', sem1Subjects = [], sem2Subjects = [] }) {
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = `${schoolName} 시간표 시스템`;
+    const filePrefix = `${academicYear}학년도_${schoolName}_학기_과목별_수강자명단`;
+
+    // -----------------------------------------------------------
+    // 시트 1: 과목별 상세 수강자 명단
+    // -----------------------------------------------------------
+    const detailSheet = workbook.addWorksheet(`${academicYear}학년도_과목별수강명단`, { views: [{ showGridLines: true }] });
+    detailSheet.columns = [
+      { header: '순번', key: 'index', width: 8 },
+      { header: '학기', key: 'term', width: 10 },
+      { header: '과목명', key: 'subject', width: 26 },
+      { header: '과목 수강인원', key: 'subjectTotal', width: 14 },
+      { header: '과목내 번호', key: 'subjectSeq', width: 12 },
+      { header: '학년', key: 'grade', width: 8 },
+      { header: '반', key: 'classNum', width: 8 },
+      { header: '번호', key: 'studentNum', width: 8 },
+      { header: '학번', key: 'studentCode', width: 12 },
+      { header: '성명', key: 'name', width: 14 },
+      { header: '상태', key: 'status', width: 12 }
+    ];
+
+    const headerRow1 = detailSheet.getRow(1);
+    headerRow1.height = 30;
+    headerRow1.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } }; // 세련된 딥 슬레이트
+      cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      this.applyBorder(cell);
+    });
+
+    let globalRowIdx = 1;
+
+    // 학기별 파스텔 테마 (1학기: 연한 하늘색, 2학기: 연한 보라색)
+    const semesterThemes = {
+      '1': {
+        rowBg: 'FFF0F9FF',        // 행 전체 은은한 연하늘색
+        termBg: 'FFE0F2FE',       // 학기 셀 연하늘 뱃지
+        termText: 'FF0369A1',     // 학기 셀 진파랑 볼드
+        subText: 'FF0C4A6E'       // 과목명 진파랑
+      },
+      '2': {
+        rowBg: 'FFFAF5FF',        // 행 전체 은은한 연보라색
+        termBg: 'FFEDE9FE',       // 학기 셀 연보라 뱃지
+        termText: 'FF6D28D9',     // 학기 셀 진보라 볼드
+        subText: 'FF581C87'       // 과목명 진보라
+      }
+    };
+
+    const processSemesterData = (semester, subjectList) => {
+      const termLabel = `${semester}학기`;
+      const theme = semesterThemes[String(semester)] || semesterThemes['1'];
+
+      (subjectList || []).forEach(subItem => {
+        const subName = subItem.subject || '';
+        const count = subItem.count || (subItem.students ? subItem.students.length : 0);
+        const countText = `${count}명`;
+        const students = subItem.students || [];
+        const statusText = subItem.status === 'canceled' ? '폐강' : (subItem.status === 'adjusted' ? '조정' : '개설');
+
+        if (students.length === 0) {
+          // 수강생이 없는 과목도 명단에 1행으로 명시
+          const row = detailSheet.addRow({
+            index: globalRowIdx,
+            term: termLabel,
+            subject: subName,
+            subjectTotal: '0명',
+            subjectSeq: '-',
+            grade: '-',
+            classNum: '-',
+            studentNum: '-',
+            studentCode: '-',
+            name: '(수강생 없음)',
+            status: statusText
+          });
+          row.height = 24;
+          row.eachCell((cell, colNum) => {
+            cell.alignment = { vertical: 'middle', horizontal: colNum === 3 ? 'left' : 'center' };
+            cell.font = { name: '맑은 고딕', size: 10, color: { argb: 'FF94A3B8' } };
+            this.applyBorder(cell);
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: theme.rowBg } };
+            if (colNum === 2) {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: theme.termBg } };
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: theme.termText }, size: 10 };
+            }
+            if (colNum === 3) {
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: theme.subText }, size: 10 };
+            }
+          });
+          globalRowIdx++;
+          return;
+        }
+
+        students.forEach((st, sIdx) => {
+          const code = st.studentCode || this.getStudentCode(st);
+          const row = detailSheet.addRow({
+            index: globalRowIdx,
+            term: termLabel,
+            subject: subName,
+            subjectTotal: countText,
+            subjectSeq: `${sIdx + 1} / ${count}`,
+            grade: st.grade ? `${st.grade}` : '',
+            classNum: st.classNum ? `${st.classNum}` : '',
+            studentNum: st.studentNum ? `${st.studentNum}` : '',
+            studentCode: code,
+            name: st.name || '',
+            status: statusText
+          });
+
+          row.height = 24;
+          row.eachCell((cell, colNum) => {
+            cell.alignment = { vertical: 'middle', horizontal: colNum === 3 ? 'left' : 'center' };
+            cell.font = { name: '맑은 고딕', size: 10, color: { argb: 'FF1E293B' } };
+            this.applyBorder(cell);
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: theme.rowBg } };
+
+            // 학기 열 (col 2)
+            if (colNum === 2) {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: theme.termBg } };
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: theme.termText }, size: 10 };
+            }
+            // 과목명 열 (col 3)
+            if (colNum === 3) {
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: theme.subText }, size: 10 };
+            }
+            // 과목 수강인원 열 (col 4)
+            if (colNum === 4) {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: theme.termBg } };
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: theme.termText }, size: 10 };
+            }
+            // 과목내 번호 열 (col 5)
+            if (colNum === 5) {
+              cell.font = { name: '맑은 고딕', size: 9, color: { argb: 'FF64748B' } };
+            }
+            // 성명 열 (col 10)
+            if (colNum === 10) {
+              cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF0F172A' } };
+            }
+            // 상태 열 (col 11)
+            if (colNum === 11) {
+              if (subItem.status === 'canceled') {
+                cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFDC2626' } };
+              } else {
+                cell.font = { name: '맑은 고딕', color: { argb: 'FF059669' } };
+              }
+            }
+          });
+
+          globalRowIdx++;
+        });
+      });
+    };
+
+    // 1학기 먼저 출력, 이어서 2학기 연속 출력
+    processSemesterData('1', sem1Subjects);
+    processSemesterData('2', sem2Subjects);
+
+    detailSheet.autoFilter = {
+      from: { row: 1, column: 1 },
+      to: { row: 1, column: 11 }
+    };
+
+    // -----------------------------------------------------------
+    // 시트 2: 과목별 수강인원 한눈에 보는 요약 통계
+    // -----------------------------------------------------------
+    const summarySheet = workbook.addWorksheet(`${academicYear}학년도_수강인원요약`, { views: [{ showGridLines: true }] });
+    summarySheet.columns = [
+      { header: '순번', key: 'idx', width: 8 },
+      { header: '과목명', key: 'subject', width: 28 },
+      { header: '1학기 수강인원', key: 'sem1Count', width: 16 },
+      { header: '2학기 수강인원', key: 'sem2Count', width: 16 },
+      { header: '연간 총 수강건수', key: 'totalCount', width: 18 },
+      { header: '개설 상태', key: 'status', width: 14 }
+    ];
+
+    const headerRow2 = summarySheet.getRow(1);
+    headerRow2.height = 30;
+    headerRow2.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } }; // 진한 에메랄드/틸
+      cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      this.applyBorder(cell);
+    });
+
+    // 1학기와 2학기 과목 통합 맵 구성
+    const summaryMap = new Map();
+    (sem1Subjects || []).forEach(s => {
+      if (!summaryMap.has(s.subject)) {
+        summaryMap.set(s.subject, { subject: s.subject, sem1: s.count || 0, sem2: 0, status: s.status || 'confirmed' });
+      } else {
+        summaryMap.get(s.subject).sem1 = s.count || 0;
+      }
+    });
+    (sem2Subjects || []).forEach(s => {
+      if (!summaryMap.has(s.subject)) {
+        summaryMap.set(s.subject, { subject: s.subject, sem1: 0, sem2: s.count || 0, status: s.status || 'confirmed' });
+      } else {
+        summaryMap.get(s.subject).sem2 = s.count || 0;
+      }
+    });
+
+    const sortedSummary = Array.from(summaryMap.values()).sort((a, b) => a.subject.localeCompare(b.subject, 'ko'));
+    let totalSem1 = 0;
+    let totalSem2 = 0;
+
+    sortedSummary.forEach((item, sIdx) => {
+      const sum = item.sem1 + item.sem2;
+      totalSem1 += item.sem1;
+      totalSem2 += item.sem2;
+      const statusLabel = item.status === 'canceled' ? '폐강' : '정상 개설';
+
+      const row = summarySheet.addRow({
+        idx: sIdx + 1,
+        subject: item.subject,
+        sem1Count: `${item.sem1}명`,
+        sem2Count: `${item.sem2}명`,
+        totalCount: `${sum}명`,
+        status: statusLabel
+      });
+
+      row.height = 24;
+      row.eachCell((cell, colNum) => {
+        cell.alignment = { vertical: 'middle', horizontal: colNum === 2 ? 'left' : 'center' };
+        cell.font = { name: '맑은 고딕', size: 10 };
+        this.applyBorder(cell);
+
+        // 줄무늬 배경
+        if (sIdx % 2 === 1) {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+        }
+        // 1학기 셀 (연하늘 폰트)
+        if (colNum === 3 && item.sem1 > 0) {
+          cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF0369A1' } };
+        }
+        // 2학기 셀 (연보라 폰트)
+        if (colNum === 4 && item.sem2 > 0) {
+          cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF6D28D9' } };
+        }
+        // 총 수강건수 셀
+        if (colNum === 5) {
+          cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FF0F172A' } };
+        }
+      });
+    });
+
+    // 합계 요약 행
+    const sumRow = summarySheet.addRow({
+      idx: '합계',
+      subject: `총 ${sortedSummary.length}개 과목`,
+      sem1Count: `${totalSem1}명`,
+      sem2Count: `${totalSem2}명`,
+      totalCount: `${totalSem1 + totalSem2}명`,
+      status: '-'
+    });
+    sumRow.height = 28;
+    sumRow.eachCell((cell, colNum) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+      cell.font = { name: '맑은 고딕', bold: true, size: 10, color: { argb: 'FF0F172A' } };
+      cell.alignment = { vertical: 'middle', horizontal: colNum === 2 ? 'left' : 'center' };
+      this.applyBorder(cell);
+    });
+
+    summarySheet.autoFilter = {
+      from: { row: 1, column: 1 },
+      to: { row: 1, column: 6 }
+    };
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    this.saveFile(buffer, `${filePrefix}_${this.getTimestamp()}.xlsx`);
+  },
+
   applyBorder(cell) {
     cell.border = {
       top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
