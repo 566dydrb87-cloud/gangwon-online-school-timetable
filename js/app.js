@@ -47,6 +47,7 @@ class TimetableApp {
     this.isCtrlPressed = false;
     this.dragData = null; // { type, studentId, studentIds, subjectName, fromDay, fromPeriodId }
     this.undoStack = []; // 실행 취소(되돌리기) 스냅샷 스택
+    this.redoStack = []; // 다시 실행(재실행) 스냅샷 스택
     this.maxUndoDepth = 15;
 
     this.init();
@@ -630,14 +631,24 @@ class TimetableApp {
   bindEvents() {
     // 1. 키보드 Ctrl/Cmd 키 추적 (복사 모드 토글) 및 Ctrl+Z 실행 취소
     window.addEventListener('keydown', (e) => {
-      // Ctrl + Z (또는 Cmd + Z) 실행 취소 (입력창 내부가 아닐 때 동작)
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
-        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-        const isInput = activeTag === 'input' || activeTag === 'textarea' || document.activeElement.isContentEditable;
-        if (!isInput) {
-          e.preventDefault();
-          this.handleUndo();
-          return;
+      // Ctrl + Z 실행 취소 / Ctrl + Y 또는 Ctrl + Shift + Z 다시 실행
+      if (e.ctrlKey || e.metaKey) {
+        const isZ = e.key === 'z' || e.key === 'Z';
+        const isY = e.key === 'y' || e.key === 'Y';
+        if (isZ || isY) {
+          const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+          const isInput = activeTag === 'input' || activeTag === 'textarea' || document.activeElement.isContentEditable;
+          if (!isInput) {
+            if (isZ && !e.shiftKey) {
+              e.preventDefault();
+              this.handleUndo();
+              return;
+            } else if (isY || (isZ && e.shiftKey)) {
+              e.preventDefault();
+              this.handleRedo();
+              return;
+            }
+          }
         }
       }
 
@@ -847,7 +858,7 @@ class TimetableApp {
   }
 
   // ==========================================
-  // 실행 취소 (되돌리기 / Undo) 시스템
+  // 실행 취소(되돌리기 / Undo) & 다시 실행(재실행 / Redo) 시스템
   // ==========================================
   pushUndoSnapshot(description = '작업 변경') {
     try {
@@ -864,7 +875,9 @@ class TimetableApp {
       if (this.undoStack.length > this.maxUndoDepth) {
         this.undoStack.shift();
       }
-      this.updateUndoButtonUI();
+      // 새로운 작업이 수행되면 다시 실행(Redo) 스택은 초기화
+      this.redoStack = [];
+      this.updateUndoRedoButtonUI();
     } catch (e) {
       console.error('Failed to create undo snapshot:', e);
     }
@@ -874,6 +887,22 @@ class TimetableApp {
     if (!this.undoStack || this.undoStack.length === 0) {
       this.showToast('되돌릴 이전 작업 내역이 없습니다.');
       return;
+    }
+
+    // 현재 상태를 다시 실행(Redo) 스택에 보관
+    this.saveActiveYearSemesterData();
+    const currentSnapshot = {
+      description: this.undoStack[this.undoStack.length - 1]?.description || '되돌리기 전 상태',
+      timestamp: Date.now(),
+      activeYear: this.activeYear,
+      activeSemester: this.activeSemester,
+      academicYears: JSON.parse(JSON.stringify(this.academicYears)),
+      yearsData: JSON.parse(JSON.stringify(this.yearsData))
+    };
+    if (!this.redoStack) this.redoStack = [];
+    this.redoStack.push(currentSnapshot);
+    if (this.redoStack.length > this.maxUndoDepth) {
+      this.redoStack.shift();
     }
 
     const snapshot = this.undoStack.pop();
@@ -889,32 +918,99 @@ class TimetableApp {
     this.buildSubjectColorMap();
     this.saveState();
     this.render();
-    this.updateUndoButtonUI();
+    this.updateUndoRedoButtonUI();
 
-    this.showToast(`[실행 취소 완료] '${snapshot.description}' 이전 상태로 되돌렸습니다.`, false);
+    this.showToast(`[실행 취소 완료] '${snapshot.description}' 이전 상태로 되돌렸습니다. (재실행 가능: Ctrl+Y)`, false);
+  }
+
+  handleRedo() {
+    if (!this.redoStack || this.redoStack.length === 0) {
+      this.showToast('다시 실행할 내역이 없습니다.');
+      return;
+    }
+
+    // 현재 상태를 되돌리기(Undo) 스택에 보관
+    this.saveActiveYearSemesterData();
+    const currentSnapshot = {
+      description: '다시 실행 전 상태',
+      timestamp: Date.now(),
+      activeYear: this.activeYear,
+      activeSemester: this.activeSemester,
+      academicYears: JSON.parse(JSON.stringify(this.academicYears)),
+      yearsData: JSON.parse(JSON.stringify(this.yearsData))
+    };
+    if (!this.undoStack) this.undoStack = [];
+    this.undoStack.push(currentSnapshot);
+    if (this.undoStack.length > this.maxUndoDepth) {
+      this.undoStack.shift();
+    }
+
+    const snapshot = this.redoStack.pop();
+    if (!snapshot) return;
+
+    this.activeYear = snapshot.activeYear;
+    this.activeSemester = snapshot.activeSemester;
+    this.academicYears = snapshot.academicYears;
+    this.yearsData = snapshot.yearsData;
+
+    this.loadActiveYearSemesterData();
+    this.sortPeriods();
+    this.buildSubjectColorMap();
+    this.saveState();
+    this.render();
+    this.updateUndoRedoButtonUI();
+
+    this.showToast(`[다시 실행 완료] '${snapshot.description}' 작업을 다시 적용했습니다.`, false);
+  }
+
+  updateUndoRedoButtonUI() {
+    // 1. 실행 취소(되돌리기) 버튼
+    const undoBtn = document.getElementById('btn-app-undo');
+    const undoBadge = document.getElementById('app-undo-count-badge');
+    if (undoBtn) {
+      const undoCount = this.undoStack ? this.undoStack.length : 0;
+      if (undoCount > 0) {
+        const lastAction = this.undoStack[this.undoStack.length - 1].description;
+        undoBtn.disabled = false;
+        undoBtn.className = 'px-2.5 py-1.5 text-xs font-bold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0';
+        undoBtn.title = `클릭 시 실행 취소: '${lastAction}' 이전 상태로 복구 (Ctrl+Z)`;
+        if (undoBadge) {
+          undoBadge.textContent = `${undoCount}`;
+          undoBadge.classList.remove('hidden');
+        }
+      } else {
+        undoBtn.disabled = true;
+        undoBtn.className = 'px-2.5 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-400 border border-slate-200 transition flex items-center gap-1.5 cursor-not-allowed opacity-60 shadow-2xs shrink-0';
+        undoBtn.title = '되돌릴 이전 작업 내역이 없습니다 (Ctrl+Z)';
+        if (undoBadge) undoBadge.classList.add('hidden');
+      }
+    }
+
+    // 2. 다시 실행(재실행) 버튼
+    const redoBtn = document.getElementById('btn-app-redo');
+    const redoBadge = document.getElementById('app-redo-count-badge');
+    if (redoBtn) {
+      const redoCount = this.redoStack ? this.redoStack.length : 0;
+      if (redoCount > 0) {
+        const nextAction = this.redoStack[this.redoStack.length - 1].description;
+        redoBtn.disabled = false;
+        redoBtn.className = 'px-2.5 py-1.5 text-xs font-bold rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0';
+        redoBtn.title = `클릭 시 다시 실행: '${nextAction}' 적용 (Ctrl+Y, Ctrl+Shift+Z)`;
+        if (redoBadge) {
+          redoBadge.textContent = `${redoCount}`;
+          redoBadge.classList.remove('hidden');
+        }
+      } else {
+        redoBtn.disabled = true;
+        redoBtn.className = 'px-2.5 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-400 border border-slate-200 transition flex items-center gap-1.5 cursor-not-allowed opacity-60 shadow-2xs shrink-0';
+        redoBtn.title = '다시 실행할 내역이 없습니다 (Ctrl+Y, Ctrl+Shift+Z)';
+        if (redoBadge) redoBadge.classList.add('hidden');
+      }
+    }
   }
 
   updateUndoButtonUI() {
-    const btn = document.getElementById('btn-app-undo');
-    const countBadge = document.getElementById('app-undo-count-badge');
-    if (!btn) return;
-
-    const count = this.undoStack ? this.undoStack.length : 0;
-    if (count > 0) {
-      const lastAction = this.undoStack[this.undoStack.length - 1].description;
-      btn.disabled = false;
-      btn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0';
-      btn.title = `클릭 시 실행 취소: '${lastAction}' 이전 상태로 복구 (Ctrl+Z)`;
-      if (countBadge) {
-        countBadge.textContent = `${count}`;
-        countBadge.classList.remove('hidden');
-      }
-    } else {
-      btn.disabled = true;
-      btn.className = 'px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-400 border border-slate-200 transition flex items-center gap-1.5 cursor-not-allowed opacity-60 shadow-2xs shrink-0';
-      btn.title = '되돌릴 이전 작업 내역이 없습니다 (Ctrl+Z)';
-      if (countBadge) countBadge.classList.add('hidden');
-    }
+    this.updateUndoRedoButtonUI();
   }
 
   // ==========================================

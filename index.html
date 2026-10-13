@@ -188,14 +188,23 @@
           </button>
         </div>
 
-        <!-- 3. [실행 취소(되돌리기) 버튼] -->
-        <button type="button" id="btn-app-undo" onclick="window.app.handleUndo()" disabled
-                class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-400 border border-slate-200 transition flex items-center gap-1.5 cursor-not-allowed opacity-60 shadow-2xs shrink-0"
-                title="되돌릴 이전 작업 내역이 없습니다 (Ctrl+Z)">
-          <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
-          <span>되돌리기</span>
-          <span id="app-undo-count-badge" class="hidden text-[10px] font-black px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900">0</span>
-        </button>
+        <!-- 3. [실행 취소(되돌리기) & 다시 실행(재실행) 버튼 그룹] -->
+        <div class="inline-flex items-center gap-1.5 shrink-0">
+          <button type="button" id="btn-app-undo" onclick="window.app.handleUndo()" disabled
+                  class="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-400 border border-slate-200 transition flex items-center gap-1.5 cursor-not-allowed opacity-60 shadow-2xs shrink-0"
+                  title="되돌릴 이전 작업 내역이 없습니다 (Ctrl+Z)">
+            <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
+            <span>되돌리기</span>
+            <span id="app-undo-count-badge" class="hidden text-[10px] font-black px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900">0</span>
+          </button>
+          <button type="button" id="btn-app-redo" onclick="window.app.handleRedo()" disabled
+                  class="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-400 border border-slate-200 transition flex items-center gap-1.5 cursor-not-allowed opacity-60 shadow-2xs shrink-0"
+                  title="다시 실행할 내역이 없습니다 (Ctrl+Y, Ctrl+Shift+Z)">
+            <i data-lucide="redo-2" class="w-3.5 h-3.5"></i>
+            <span>재실행</span>
+            <span id="app-redo-count-badge" class="hidden text-[10px] font-black px-1.5 py-0.2 rounded-full bg-blue-200 text-blue-900">0</span>
+          </button>
+        </div>
       </div>
 
       <!-- 도움말 안내 배너 -->
