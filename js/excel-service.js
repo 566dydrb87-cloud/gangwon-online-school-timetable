@@ -702,45 +702,57 @@ const ExcelService = {
           });
 
           if (assigned.length > 0) {
-            // 시간표 셀 표기: 상태기호 과목명(학번성명)
-            const textLines = assigned.map(s => this.getTimetableCardLabel(s));
-            cell.value = textLines.join('\n');
+            // 셀 배경은 흰색으로 통일하여 특정 과목 하나의 색으로 전체가 덮이지 않도록 함
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFFFFFFF' }
+            };
+
+            // 셀 내 각 과목별 텍스트 음영(폰트 컬러) 처리 (ExcelJS RichText 활용)
+            const richTextItems = [];
+
+            assigned.forEach((s, aIdx) => {
+              if (aIdx > 0) {
+                richTextItems.push({ text: '\n' });
+              }
+
+              const label = this.getTimetableCardLabel(s);
+              const isCanceled = s.status === 'canceled' || s.status === '폐강';
+
+              if (isCanceled) {
+                // 폐강 과목: 은은한 회색 + 취소선
+                richTextItems.push({
+                  text: label,
+                  font: {
+                    name: '맑은 고딕',
+                    size: assigned.length > 2 ? 8.5 : 9.5,
+                    strike: true,
+                    color: { argb: 'FF94A3B8' }
+                  }
+                });
+              } else {
+                // 개설/조정 과목: 과목 고유의 선명한 글자색 + 굵게 (흰 배경에서 완벽한 가독성)
+                const subName = s.subject || '';
+                const colorInfo = subjectColorMap[subName] || { excelBg: 'E0F2FE', excelText: '0369A1' };
+                const textColor = colorInfo.excelText || '0369A1';
+
+                richTextItems.push({
+                  text: label,
+                  font: {
+                    name: '맑은 고딕',
+                    bold: true,
+                    size: assigned.length > 2 ? 8.5 : 9.5,
+                    color: { argb: 'FF' + textColor }
+                  }
+                });
+              }
+            });
+
+            cell.value = { richText: richTextItems };
             cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
 
-            const firstItem = assigned[0];
-            const isCanceled = firstItem.status === 'canceled';
-
-            if (isCanceled) {
-              // 폐강인 경우 회색 배경 + 취소선
-              cell.fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'FFE2E8F0' } // 회색
-              };
-              cell.font = {
-                name: '맑은 고딕',
-                strike: true,
-                size: assigned.length > 2 ? 8 : 9,
-                color: { argb: 'FF64748B' }
-              };
-            } else {
-              // 확정 및 조정: 고유 파스텔 배경
-              const firstSubject = firstItem.subject;
-              const colorInfo = subjectColorMap[firstSubject] || { excelBg: 'E0F2FE', excelText: '0369A1' };
-              cell.fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'FF' + colorInfo.excelBg }
-              };
-              cell.font = {
-                name: '맑은 고딕',
-                bold: true,
-                size: assigned.length > 2 ? 8 : 9,
-                color: { argb: 'FF' + colorInfo.excelText }
-              };
-            }
-
-            const neededHeight = Math.max(55, assigned.length * 20);
+            const neededHeight = Math.max(55, assigned.length * 22);
             if (row.height < neededHeight) {
               row.height = neededHeight;
             }
