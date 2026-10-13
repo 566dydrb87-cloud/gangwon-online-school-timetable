@@ -1316,10 +1316,24 @@ class TimetableApp {
       // 1. 실행 취소 스냅샷 저장
       this.pushUndoSnapshot('엑셀 업로드 반영');
 
+      // 2. 무결한 학생명부 풀 (this.excelStudentPool) 인덱스 구성 (성명 기준)
+      const poolByName = new Map();
+      (this.excelStudentPool || []).forEach(p => {
+        const clean = String(p.name || '').trim().replace(/\s+/g, '');
+        if (!clean) return;
+        if (!poolByName.has(clean)) poolByName.set(clean, []);
+        poolByName.get(clean).push(p);
+      });
+
+      const hasMasterPool = (this.excelStudentPool || []).length > 0;
+
       let totalParsed = 0;
       let successFiles = 0;
       let totalEnrolledCount = 0;
       let totalScheduledSlots = 0;
+      let exactCount = 0;
+      const reconciledList = []; // 명부 기준으로 학년/반/번호가 자동 보정된 학생들
+      const unmatchedList = [];  // 명부에 없어서 엑셀 기재 정보로 신규 등록된 학생들
       const newSubjectsAdded = new Set();
       const allExtractedSubjects = new Set();
 
@@ -1327,7 +1341,98 @@ class TimetableApp {
         try {
           const parsed = await ExcelService.parseStudentExcel(file);
           if (parsed && parsed.length > 0) {
+
+            // 만약 이번 업로드 파일이 '과목 정보가 없는 순수 학생명부'인 경우 무결한 기준 풀로 갱신
+            const isPureRosterFile = parsed.every(st => 
+              (!st.subjects || st.subjects.length === 0) && (!st.subject || st.subject === '-' || st.subject === '미입력')
+            );
+
+            if (isPureRosterFile && !hasMasterPool) {
+              this.excelStudentPool = parsed.map(st => ({
+                grade: st.grade,
+                classNum: st.classNum,
+                studentNum: st.studentNum,
+                studentCode: st.studentCode || ExcelService.getStudentCode(st),
+                name: st.name
+              }));
+              this.saveExcelStudentPool();
+              poolByName.clear();
+              this.excelStudentPool.forEach(p => {
+                const clean = String(p.name || '').trim().replace(/\s+/g, '');
+                if (!clean) return;
+                if (!poolByName.has(clean)) poolByName.set(clean, []);
+                poolByName.get(clean).push(p);
+              });
+            }
+
             parsed.forEach(st => {
+              const rawName = String(st.name || '').trim();
+              const cleanName = rawName.replace(/\s+/g, '');
+              const candidates = poolByName.get(cleanName) || [];
+              let matchedPool = null;
+
+              if (candidates.length === 1) {
+                matchedPool = candidates[0];
+              } else if (candidates.length > 1) {
+                // 동명이인이 있는 경우 학번 또는 학년/반/번호로 가장 일치하는 학생 매칭
+                matchedPool = candidates.find(c => {
+                  if (st.studentCode && c.studentCode && st.studentCode === c.studentCode) return true;
+                  if (st.grade === c.grade && st.classNum === c.classNum && st.studentNum === c.studentNum) return true;
+                  if (st.grade === c.grade && st.classNum === c.classNum) return true;
+                  return false;
+                }) || candidates[0];
+              }
+
+              // 신청 과목 추출
+              const subs = (st.subjects && Array.isArray(st.subjects) && st.subjects.length > 0)
+                ? st.subjects
+                : (st.subject ? [st.subject] : []);
+
+              const validSubs = subs.map(s => String(s).trim()).filter(s => s && s !== '-' && s !== '미배정' && s !== '미입력');
+
+              // 학생명부 대조 & 학년/반/번호 자동 보정
+              if (matchedPool) {
+                const origGrade = st.grade;
+                const origClass = st.classNum;
+                const origNum = st.studentNum;
+                const origCode = st.studentCode;
+
+                const isMismatch = (origGrade && origGrade !== matchedPool.grade) ||
+                                   (origClass && origClass !== matchedPool.classNum) ||
+                                   (origNum && matchedPool.studentNum && origNum !== matchedPool.studentNum);
+
+                const isMissingInfo = !origGrade || !origClass || !origNum;
+
+                if (isMismatch || isMissingInfo) {
+                  reconciledList.push({
+                    name: rawName,
+                    origInfo: `${origGrade || '?'}학년 ${origClass || '?'}반 ${origNum || '-'}번`,
+                    correctedInfo: `${matchedPool.grade}학년 ${matchedPool.classNum}반 ${matchedPool.studentNum || '-'}번`,
+                    origCode: origCode || '-',
+                    correctedCode: matchedPool.studentCode || ExcelService.getStudentCode(matchedPool)
+                  });
+                } else {
+                  exactCount++;
+                }
+
+                // 무결한 학생명부의 정보로 자동 보정 및 최신화
+                st.grade = matchedPool.grade;
+                st.classNum = matchedPool.classNum;
+                st.studentNum = matchedPool.studentNum;
+                st.studentCode = matchedPool.studentCode || ExcelService.getStudentCode(matchedPool);
+              } else {
+                // 학생명부에 없는 학생 -> "해당 학생은 등록은 되기는 하는 거야."
+                if (hasMasterPool) {
+                  unmatchedList.push({
+                    name: rawName,
+                    info: `${st.grade || 1}학년 ${st.classNum || 1}반 ${st.studentNum || '-'}번`,
+                    code: st.studentCode || ExcelService.getStudentCode(st),
+                    subjects: validSubs.length > 0 ? validSubs.join(', ') : '과목 미배정'
+                  });
+                }
+              }
+
+              // 학번 키 생성
               const code = st.studentCode || ExcelService.getStudentCode(st);
               const key = `${code}_${st.name}`;
               
@@ -1351,14 +1456,7 @@ class TimetableApp {
               }
 
               // 2) 신청 과목이 존재하는 경우 과목 바구니 자동 생성 및 학생 자동 편제
-              const subs = (st.subjects && Array.isArray(st.subjects) && st.subjects.length > 0)
-                ? st.subjects
-                : (st.subject ? [st.subject] : []);
-
-              subs.forEach(rawSub => {
-                const sub = String(rawSub).trim();
-                if (!sub || sub === '-' || sub === '미배정' || sub === '미입력') return;
-
+              validSubs.forEach(sub => {
                 allExtractedSubjects.add(sub);
 
                 // 개설 과목 목록에 없으면 새 과목 바구니로 자동 등록
@@ -1473,12 +1571,22 @@ class TimetableApp {
       this.switchWorkflowTab('step1');
       this.render();
 
-      if (totalScheduledSlots > 0) {
-        this.showToast(`🎉 통합 엑셀 반영 완료: 학생 ${masterMap.size}명, ${allExtractedSubjects.size}개 과목(${totalEnrolledCount}건 편제), 시간표 ${totalScheduledSlots}건 배치가 완료되었습니다.`, true);
-      } else if (allExtractedSubjects.size > 0) {
-        this.showToast(`🎉 수강신청 엑셀 반영 완료: 총 ${masterMap.size}명의 학생과 ${allExtractedSubjects.size}개 과목(${totalEnrolledCount}건 수강)이 '1. 학생·과목 등록 및 편제'에 자동 반영되었습니다.`, true);
+      // 5. 학생명부 대조 결과 알림 모달 노출 여부 판별
+      if (reconciledList.length > 0 || unmatchedList.length > 0) {
+        this.openStudentReconcileModal({
+          total: masterMap.size,
+          exact: exactCount,
+          reconciledList: reconciledList,
+          unmatchedList: unmatchedList
+        });
       } else {
-        this.showToast(`총 ${masterMap.size}명의 학생 명단이 등록되었습니다. 과목 바구니로 드래그하여 편제하세요.`, true);
+        if (totalScheduledSlots > 0) {
+          this.showToast(`🎉 통합 엑셀 반영 완료: 학생 ${masterMap.size}명(명부 100% 일치), ${allExtractedSubjects.size}개 과목, 시간표 ${totalScheduledSlots}건 배치가 완료되었습니다.`, true);
+        } else if (allExtractedSubjects.size > 0) {
+          this.showToast(`🎉 수강신청 엑셀 반영 완료: 학생 ${masterMap.size}명(명부 100% 일치), ${allExtractedSubjects.size}개 과목 편제가 완료되었습니다.`, true);
+        } else {
+          this.showToast(`총 ${masterMap.size}명의 학생 명단이 무결한 학생명부로 등록되었습니다.`, true);
+        }
       }
 
       // 검색창에 포커스
@@ -1491,6 +1599,88 @@ class TimetableApp {
       }
     } catch (err) {
       alert('학생 명단 엑셀 처리 실패: ' + err.message);
+    }
+  }
+
+  openStudentReconcileModal({ total, exact, reconciledList, unmatchedList }) {
+    const modal = document.getElementById('student-reconcile-modal');
+    if (!modal) return;
+
+    // 통계 표시
+    const elTotal = document.getElementById('reconcile-stat-total');
+    const elExact = document.getElementById('reconcile-stat-exact');
+    const elReconciled = document.getElementById('reconcile-stat-reconciled');
+    const elUnmatched = document.getElementById('reconcile-stat-unmatched');
+
+    if (elTotal) elTotal.textContent = `${total || 0}명`;
+    if (elExact) elExact.textContent = `${exact || 0}명`;
+    if (elReconciled) elReconciled.textContent = `${reconciledList?.length || 0}명`;
+    if (elUnmatched) elUnmatched.textContent = `${unmatchedList?.length || 0}명`;
+
+    // 1. 보정 목록 바인딩
+    const secCorrected = document.getElementById('reconcile-section-corrected');
+    const badgeCorrected = document.getElementById('reconcile-badge-corrected');
+    const tbodyCorrected = document.getElementById('reconcile-table-corrected');
+
+    if (reconciledList && reconciledList.length > 0) {
+      if (secCorrected) secCorrected.classList.remove('hidden');
+      if (badgeCorrected) badgeCorrected.textContent = `${reconciledList.length}명`;
+      if (tbodyCorrected) {
+        tbodyCorrected.innerHTML = reconciledList.map(item => `
+          <tr class="hover:bg-amber-50/40 transition">
+            <td class="py-2 px-3 font-bold text-slate-800">${item.name}</td>
+            <td class="py-2 px-3 text-slate-500 line-through decoration-red-400">
+              <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px]">${item.origInfo}</span>
+            </td>
+            <td class="py-2 px-3 text-center text-amber-500 font-bold">➔</td>
+            <td class="py-2 px-3 font-bold text-emerald-700">
+              <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] inline-flex items-center gap-1 font-bold">
+                <i data-lucide="check" class="w-3 h-3 text-emerald-600"></i> ${item.correctedInfo}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      }
+    } else {
+      if (secCorrected) secCorrected.classList.add('hidden');
+    }
+
+    // 2. 미등록 목록 바인딩
+    const secUnmatched = document.getElementById('reconcile-section-unmatched');
+    const badgeUnmatched = document.getElementById('reconcile-badge-unmatched');
+    const tbodyUnmatched = document.getElementById('reconcile-table-unmatched');
+
+    if (unmatchedList && unmatchedList.length > 0) {
+      if (secUnmatched) secUnmatched.classList.remove('hidden');
+      if (badgeUnmatched) badgeUnmatched.textContent = `${unmatchedList.length}명`;
+      if (tbodyUnmatched) {
+        tbodyUnmatched.innerHTML = unmatchedList.map(item => `
+          <tr class="hover:bg-blue-50/40 transition">
+            <td class="py-2 px-3 font-bold text-slate-800">${item.name}</td>
+            <td class="py-2 px-3 text-slate-700 font-medium">${item.info}</td>
+            <td class="py-2 px-3 text-slate-600 truncate max-w-xs" title="${item.subjects}">${item.subjects}</td>
+            <td class="py-2 px-3 text-center">
+              <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">
+                정상 등록 완료 (신규)
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      }
+    } else {
+      if (secUnmatched) secUnmatched.classList.add('hidden');
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  closeStudentReconcileModal() {
+    const modal = document.getElementById('student-reconcile-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
     }
   }
 

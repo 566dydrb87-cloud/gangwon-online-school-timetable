@@ -1195,9 +1195,115 @@
           <button type="button" onclick="window.app.closeAcademicYearModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition">
             닫기
           </button>
+  </div>
+
+  <!-- ==================== 4. 학생명부 대조 & 자동 보정 결과 안내 모달 ==================== -->
+  <div id="student-reconcile-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+      
+      <!-- 헤더 -->
+      <div class="px-5 py-4 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base">학생명부 대조 및 자동 보정 안내</h3>
+            <p class="text-[11px] text-blue-200">무결한 학생명부와 대조하여 학년·반·번호를 최신화하였으며, 모든 학생이 정상 등록되었습니다.</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.app.closeStudentReconcileModal()" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- 요약 통계 바 -->
+      <div class="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-around gap-2 text-center shrink-0">
+        <div class="px-3 py-1.5 bg-white rounded-xl border border-slate-200 shadow-2xs flex-1">
+          <div class="text-[11px] text-slate-500 font-medium">총 반영 학생</div>
+          <div id="reconcile-stat-total" class="text-base font-extrabold text-slate-800">0명</div>
+        </div>
+        <div class="px-3 py-1.5 bg-emerald-50 rounded-xl border border-emerald-200 shadow-2xs flex-1">
+          <div class="text-[11px] text-emerald-700 font-medium">명부 완전 일치</div>
+          <div id="reconcile-stat-exact" class="text-base font-extrabold text-emerald-700">0명</div>
+        </div>
+        <div class="px-3 py-1.5 bg-amber-50 rounded-xl border border-amber-200 shadow-2xs flex-1">
+          <div class="text-[11px] text-amber-700 font-medium">명부 기준 자동 보정</div>
+          <div id="reconcile-stat-reconciled" class="text-base font-extrabold text-amber-700">0명</div>
+        </div>
+        <div class="px-3 py-1.5 bg-blue-50 rounded-xl border border-blue-200 shadow-2xs flex-1">
+          <div class="text-[11px] text-blue-700 font-medium">명부 외 신규 등록</div>
+          <div id="reconcile-stat-unmatched" class="text-base font-extrabold text-blue-700">0명</div>
+        </div>
+      </div>
+
+      <!-- 본문 스크롤 영역 -->
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        
+        <!-- 1. 명부 기준 학년·반·번호 자동 보정 목록 -->
+        <div id="reconcile-section-corrected" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>학생명부 기준 학년·반·번호 자동 보정 내역</span>
+              <span id="reconcile-badge-corrected" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">0명</span>
+            </h4>
+            <span class="text-[11px] text-slate-400">엑셀 기재 오류를 무결한 명부 정보로 자동 일치시켰습니다.</span>
+          </div>
+          <div class="border border-amber-200 rounded-xl overflow-hidden shadow-2xs">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-amber-50/80 text-[11px] font-bold text-amber-950 border-b border-amber-200">
+                <tr>
+                  <th class="py-2 px-3">성명</th>
+                  <th class="py-2 px-3">엑셀 기재 정보</th>
+                  <th class="py-2 px-3 text-center">➔</th>
+                  <th class="py-2 px-3 text-emerald-800 font-bold">무결한 학생명부 (반영값)</th>
+                </tr>
+              </thead>
+              <tbody id="reconcile-table-corrected" class="divide-y divide-amber-100 bg-white">
+                <!-- JS 동적 생성 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. 학생명부에 없어 신규 등록된 학생 목록 -->
+        <div id="reconcile-section-unmatched" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5 text-blue-600"></i>
+              <span>학생명부 미등록 학생 (엑셀 기재 정보로 정상 등록 완료)</span>
+              <span id="reconcile-badge-unmatched" class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">0명</span>
+            </h4>
+            <span class="text-[11px] text-slate-400">누락 없이 정상 편제되었으며 명부 풀에도 추가되었습니다.</span>
+          </div>
+          <div class="border border-blue-200 rounded-xl overflow-hidden shadow-2xs">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-blue-50/80 text-[11px] font-bold text-blue-950 border-b border-blue-200">
+                <tr>
+                  <th class="py-2 px-3">성명</th>
+                  <th class="py-2 px-3">엑셀 기재 학적</th>
+                  <th class="py-2 px-3">수강/배정 과목</th>
+                  <th class="py-2 px-3 text-center">상태</th>
+                </tr>
+              </thead>
+              <tbody id="reconcile-table-unmatched" class="divide-y divide-blue-100 bg-white">
+                <!-- JS 동적 생성 -->
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>
+
+      <!-- 하단 닫기 버튼 -->
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+        <span class="text-[11px] text-slate-500">※ 변경 내역은 언제든 상단 되돌리기(Ctrl+Z)로 이전 상태로 복구할 수 있습니다.</span>
+        <button type="button" onclick="window.app.closeStudentReconcileModal()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-xs">
+          확인 완료
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -1216,9 +1322,9 @@
 
   <!-- Scripts -->
   <script src="js/sample-data.js"></script>
-  <script src="js/excel-service.js?v=20261013_02"></script>
+  <script src="js/excel-service.js?v=20261013_03"></script>
   <script src="js/cloud-sync.js"></script>
-  <script src="js/app.js?v=20261013_02"></script>
+  <script src="js/app.js?v=20261013_03"></script>
   <script>
     lucide.createIcons();
 
