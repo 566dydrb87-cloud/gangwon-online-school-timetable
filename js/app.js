@@ -57,6 +57,7 @@ class TimetableApp {
     this.loadState();
     this.loadExcelStudentPool();
     this.sortPeriods();
+    this.sortOfferedSubjects();
     this.syncOfferedSubjects();
     this.buildSubjectColorMap();
     this.bindEvents();
@@ -204,7 +205,8 @@ class TimetableApp {
     this.courseEnrollments = d.courseEnrollments || {};
     this.courseSchedules = d.courseSchedules || {};
     this.courseStatus = d.courseStatus || {};
-    this.offeredSubjects = d.offeredSubjects;
+    this.offeredSubjects = d.offeredSubjects || [];
+    this.sortOfferedSubjects();
     this.subjectColorMap = d.subjectColorMap;
     this.showWeekends = d.showWeekends !== undefined ? d.showWeekends : true;
 
@@ -236,6 +238,7 @@ class TimetableApp {
 
   saveActiveYearSemesterData() {
     this.sortPeriods();
+    this.sortOfferedSubjects();
     this.rebuildStudentAssignments();
     this.ensureYearSemesterData(this.activeYear, this.activeSemester);
     this.yearsData[this.activeYear][this.activeSemester] = {
@@ -583,6 +586,17 @@ class TimetableApp {
   // ==========================================
   sortPeriods() {
     this.periods.sort((a, b) => this.comparePeriods(a, b));
+  }
+
+  // ==========================================
+  // 과목 목록 정렬 (과목명 이름 순 ㄱ부터 가나다순 정렬)
+  // ==========================================
+  sortOfferedSubjects() {
+    if (!this.offeredSubjects || !Array.isArray(this.offeredSubjects)) {
+      this.offeredSubjects = [];
+      return;
+    }
+    this.offeredSubjects.sort((a, b) => (a || '').localeCompare(b || '', 'ko'));
   }
 
   comparePeriods(a, b) {
@@ -2303,6 +2317,7 @@ class TimetableApp {
   }
 
   populateBatchSubjectSelect() {
+    this.sortOfferedSubjects();
     const sel = document.getElementById('step1-batch-subject-select');
     if (!sel) return;
     sel.innerHTML = this.offeredSubjects.map(sub => {
@@ -2441,6 +2456,7 @@ class TimetableApp {
   }
 
   renderSubjectBuckets() {
+    this.sortOfferedSubjects();
     const container = document.getElementById('subject-buckets-container');
     const sideListContainer = document.getElementById('side-subject-list-container');
     const sideCountBadge = document.getElementById('side-subject-count-badge');
@@ -2598,6 +2614,25 @@ class TimetableApp {
                   <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
+
+              <!-- 과목명 오른쪽: 학생 이름 검색 및 엔터 즉시 등록 입력창 -->
+              <div class="flex items-center bg-white/95 border border-indigo-200 rounded-lg px-2 py-0.5 shadow-2xs focus-within:ring-2 focus-within:ring-indigo-400 focus-within:border-indigo-400 transition" 
+                   onclick="event.stopPropagation()">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5 text-indigo-500 mr-1 shrink-0"></i>
+                <input type="text" 
+                       id="input-enroll-student-${safeSub}" 
+                       placeholder="학생명 입력 후 Enter" 
+                       class="text-xs bg-transparent border-none outline-none w-28 sm:w-36 text-slate-800 placeholder:text-slate-400 font-medium py-0.5" 
+                       onkeydown="if(event.key === 'Enter') { event.preventDefault(); window.app.handleQuickEnrollStudentByEnter(decodeURIComponent('${safeSub}'), this); }" 
+                       title="학생 이름을 입력하고 Enter를 누르면 기준 학생명부에서 찾아 '${sub}' 과목에 즉시 등록됩니다.">
+                <button type="button" 
+                        onclick="event.stopPropagation(); const inp = document.getElementById('input-enroll-student-${safeSub}'); if(inp) window.app.handleQuickEnrollStudentByEnter(decodeURIComponent('${safeSub}'), inp);" 
+                        class="ml-1 text-indigo-600 hover:text-indigo-800 p-0.5 rounded transition cursor-pointer" 
+                        title="등록">
+                  <i data-lucide="corner-down-left" class="w-3 h-3"></i>
+                </button>
+              </div>
+
               <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/90 border text-slate-800 shadow-2xs">
                 ${studentIds.length}명 수강
               </span>
@@ -2824,6 +2859,123 @@ class TimetableApp {
     } else {
       this.showToast(`이미 '${subjectName}' 과목에 편제된 학생입니다.`);
     }
+  }
+
+  // ==========================================
+  // 과목 바구니: 기준 학생명부 기반 학생 검색 및 엔터 즉시 등록
+  // ==========================================
+  handleQuickEnrollStudentByEnter(subjectName, inputEl) {
+    if (!inputEl) return;
+    const rawVal = inputEl.value.trim();
+    if (!rawVal) {
+      this.showToast('등록할 학생의 이름을 입력하세요.');
+      return;
+    }
+
+    const cleanQuery = rawVal.replace(/\s+/g, '').toLowerCase();
+
+    // 1. 기준 학생명부(excelStudentPool)에서 정확 일치 검색
+    let matches = (this.excelStudentPool || []).filter(s => {
+      const sName = String(s.name || '').trim().replace(/\s+/g, '').toLowerCase();
+      return sName === cleanQuery;
+    });
+
+    // 1-1. 정확 일치가 없다면 이름 포함 검색
+    if (matches.length === 0) {
+      matches = (this.excelStudentPool || []).filter(s => {
+        const sName = String(s.name || '').trim().replace(/\s+/g, '').toLowerCase();
+        return sName.includes(cleanQuery);
+      });
+    }
+
+    // 1-2. 기준 학생명부에 없다면 현재 학기 등록 학생(masterStudents)에서 보조 검색
+    if (matches.length === 0 && this.masterStudents && this.masterStudents.length > 0) {
+      matches = this.masterStudents.filter(s => {
+        const sName = String(s.name || '').trim().replace(/\s+/g, '').toLowerCase();
+        return sName === cleanQuery || sName.includes(cleanQuery);
+      });
+    }
+
+    // 일치하는 학생이 전혀 없는 경우
+    if (matches.length === 0) {
+      this.showToast(`기준 학생명부에서 '${rawVal}' 학생을 찾을 수 없습니다. 학생명부를 확인해 주세요.`);
+      return;
+    }
+
+    // 동명이인 (2명 이상)일 경우 prompt로 선택
+    let target = null;
+    if (matches.length === 1) {
+      target = matches[0];
+    } else {
+      const listStr = matches.map((m, idx) => {
+        const code = m.studentCode || (window.ExcelService ? window.ExcelService.getStudentCode(m) : `${m.grade}${String(m.classNum).padStart(2, '0')}${String(m.studentNum || 0).padStart(2, '0')}`);
+        return `${idx + 1}. ${m.name} (${m.grade}학년 ${m.classNum}반 ${m.studentNum || '-'}번 / 학번: ${code})`;
+      }).join('\n');
+
+      const ans = prompt(`'${rawVal}' 이름으로 여러 명의 학생이 검색되었습니다.\n등록할 학생의 번호를 입력하세요:\n\n${listStr}`, '1');
+      if (!ans) return;
+      const selectedIdx = parseInt(ans.trim(), 10) - 1;
+      if (isNaN(selectedIdx) || selectedIdx < 0 || selectedIdx >= matches.length) {
+        this.showToast('선택한 번호가 올바르지 않아 등록이 취소되었습니다.');
+        return;
+      }
+      target = matches[selectedIdx];
+    }
+
+    // 2. 현재 활성 학기 masterStudents에 등록되어 있는지 확인 및 없으면 추가
+    let masterStudent = null;
+    const targetCode = target.studentCode || (window.ExcelService ? window.ExcelService.getStudentCode(target) : `${target.grade}${String(target.classNum).padStart(2, '0')}${String(target.studentNum || 0).padStart(2, '0')}`);
+
+    if (target.id) {
+      masterStudent = this.masterStudents.find(s => s.id === target.id);
+    }
+    if (!masterStudent) {
+      masterStudent = this.masterStudents.find(s => {
+        const mCode = s.studentCode || (window.ExcelService ? window.ExcelService.getStudentCode(s) : `${s.grade}${String(s.classNum).padStart(2, '0')}${String(s.studentNum || 0).padStart(2, '0')}`);
+        return mCode === targetCode && s.name === target.name;
+      });
+    }
+
+    if (!masterStudent) {
+      masterStudent = {
+        id: `sm_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+        grade: target.grade,
+        classNum: target.classNum,
+        studentNum: target.studentNum,
+        studentCode: targetCode,
+        name: target.name
+      };
+      this.masterStudents.push(masterStudent);
+    }
+
+    // 3. 해당 과목에 학생 등록
+    if (!this.courseEnrollments[subjectName]) {
+      this.courseEnrollments[subjectName] = [];
+    }
+
+    if (this.courseEnrollments[subjectName].includes(masterStudent.id)) {
+      this.showToast(`'${masterStudent.name}' 학생은 이미 '${subjectName}' 과목에 등록되어 있습니다.`);
+      inputEl.value = '';
+      return;
+    }
+
+    this.pushUndoSnapshot(`'${subjectName}' 과목에 '${masterStudent.name}' 학생 등록`);
+    this.courseEnrollments[subjectName].push(masterStudent.id);
+    this.rebuildStudentAssignments();
+    this.saveState();
+    this.render();
+
+    this.showToast(`'${masterStudent.name}' 학생이 '${subjectName}' 과목에 등록되었습니다!`, true);
+
+    // 4. 화면 리렌더링 후 해당 과목 인풋에 다시 포커스를 주어 연속 입력 지원
+    setTimeout(() => {
+      const safeSub = encodeURIComponent(subjectName);
+      const nextInput = document.getElementById(`input-enroll-student-${safeSub}`);
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.value = '';
+      }
+    }, 50);
   }
 
   handleRemoveStudentFromCourse(subjectName, studentId) {
