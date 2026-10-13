@@ -1205,9 +1205,13 @@ class TimetableApp {
         masterMap.set(`${code}_${st.name}`, st);
       });
 
+      // 1. 실행 취소 스냅샷 저장
+      this.pushUndoSnapshot('엑셀 업로드 반영');
+
       let totalParsed = 0;
       let successFiles = 0;
       let totalEnrolledCount = 0;
+      let totalScheduledSlots = 0;
       const newSubjectsAdded = new Set();
       const allExtractedSubjects = new Set();
 
@@ -1232,6 +1236,10 @@ class TimetableApp {
                 };
                 masterMap.set(key, mStudent);
                 this.masterStudents.push(mStudent);
+              } else {
+                if (!mStudent.studentNum && st.studentNum) mStudent.studentNum = st.studentNum;
+                if (!mStudent.grade && st.grade) mStudent.grade = st.grade;
+                if (!mStudent.classNum && st.classNum) mStudent.classNum = st.classNum;
               }
 
               // 2) 신청 과목이 존재하는 경우 과목 바구니 자동 생성 및 학생 자동 편제
@@ -1241,7 +1249,7 @@ class TimetableApp {
 
               subs.forEach(rawSub => {
                 const sub = String(rawSub).trim();
-                if (!sub || sub === '-' || sub === '미배정') return;
+                if (!sub || sub === '-' || sub === '미배정' || sub === '미입력') return;
 
                 allExtractedSubjects.add(sub);
 
@@ -1260,6 +1268,64 @@ class TimetableApp {
                 if (!this.courseEnrollments[sub].includes(mStudent.id)) {
                   this.courseEnrollments[sub].push(mStudent.id);
                   totalEnrolledCount++;
+                }
+              });
+
+              // 3) 시간표 배치 정보 및 개설상태 반영 (통합 엑셀 왕복 데이터 처리)
+              (st.schedules || []).forEach(sch => {
+                const sub = sch.subject;
+                if (!sub || sub === '-' || sub === '미배정' || sub === '미입력') return;
+
+                // 개설 상태 반영 (확정/조정/폐강)
+                if (sch.courseStatus) {
+                  if (!this.courseStatus) this.courseStatus = {};
+                  this.courseStatus[sub] = sch.courseStatus;
+                }
+
+                // 요일 및 교시가 명시된 경우 (미입력이 아닌 경우) -> 시간표 셀 자동 배치
+                if (sch.day && (sch.period || sch.periodName || sch.startTime)) {
+                  let periodObj = this.periods.find(p => {
+                    if (sch.period && !p.isBreak && p.period === sch.period) return true;
+                    if (sch.periodName && p.name === sch.periodName) return true;
+                    if (sch.startTime && p.startTime === sch.startTime) return true;
+                    return false;
+                  });
+
+                  // 일과표에 해당 교시가 없으면 자동 등록
+                  if (!periodObj && (sch.period || sch.periodName)) {
+                    const newPid = `p_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+                    periodObj = {
+                      id: newPid,
+                      period: sch.period || (this.periods.filter(p => !p.isBreak).length + 1),
+                      name: sch.periodName || `${sch.period}교시`,
+                      startTime: sch.startTime || '09:00',
+                      endTime: sch.endTime || '09:50',
+                      isBreak: false
+                    };
+                    this.periods.push(periodObj);
+                    this.sortPeriods();
+                  }
+
+                  if (sch.day === 'sat' || sch.day === 'sun') {
+                    this.showWeekends = true;
+                  }
+
+                  if (periodObj) {
+                    if (!this.courseSchedules[sub]) this.courseSchedules[sub] = [];
+                    const exists = this.courseSchedules[sub].some(s => 
+                      s.day === sch.day && (s.periodId === periodObj.id || (!s.periodId && s.period === periodObj.period))
+                    );
+                    if (!exists) {
+                      this.courseSchedules[sub].push({
+                        id: `sch_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+                        day: sch.day,
+                        periodId: periodObj.id,
+                        period: periodObj.period,
+                        status: sch.scheduleStatus || 'confirmed'
+                      });
+                      totalScheduledSlots++;
+                    }
+                  }
                 }
               });
 
@@ -1299,10 +1365,12 @@ class TimetableApp {
       this.switchWorkflowTab('step1');
       this.render();
 
-      if (allExtractedSubjects.size > 0) {
-        this.showToast(`🎉 수강신청 엑셀 반영 완료: 총 ${masterMap.size}명의 학생과 ${allExtractedSubjects.size}개 과목(${totalEnrolledCount}건 수강)이 '1. 학생·과목 등록 및 편제'에 자동 반영되었습니다.`);
+      if (totalScheduledSlots > 0) {
+        this.showToast(`🎉 통합 엑셀 반영 완료: 학생 ${masterMap.size}명, ${allExtractedSubjects.size}개 과목(${totalEnrolledCount}건 편제), 시간표 ${totalScheduledSlots}건 배치가 완료되었습니다.`, true);
+      } else if (allExtractedSubjects.size > 0) {
+        this.showToast(`🎉 수강신청 엑셀 반영 완료: 총 ${masterMap.size}명의 학생과 ${allExtractedSubjects.size}개 과목(${totalEnrolledCount}건 수강)이 '1. 학생·과목 등록 및 편제'에 자동 반영되었습니다.`, true);
       } else {
-        this.showToast(`총 ${masterMap.size}명의 학생 명단이 등록되었습니다. 과목 바구니로 드래그하여 편제하세요.`);
+        this.showToast(`총 ${masterMap.size}명의 학생 명단이 등록되었습니다. 과목 바구니로 드래그하여 편제하세요.`, true);
       }
 
       // 검색창에 포커스

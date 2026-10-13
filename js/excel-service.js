@@ -68,6 +68,19 @@ const ExcelService = {
     return '확정(🟢)';
   },
 
+  // 상태 문자열 표준화 (개설/확정, 조정, 폐강)
+  normalizeStatus(val) {
+    if (!val) return { courseStatus: 'open', scheduleStatus: 'confirmed', label: '확정' };
+    const str = String(val).trim().toLowerCase();
+    if (str.includes('조정') || str.includes('▲') || str.includes('adjust')) {
+      return { courseStatus: 'adjust', scheduleStatus: 'adjust', label: '조정' };
+    }
+    if (str.includes('폐강') || str.includes('✖') || str.includes('x') || str.includes('closed') || str.includes('cancel')) {
+      return { courseStatus: 'closed', scheduleStatus: 'canceled', label: '폐강' };
+    }
+    return { courseStatus: 'open', scheduleStatus: 'confirmed', label: '확정' };
+  },
+
   // 시간표 카드 표기: 과목명(학번성명)
   getTimetableCardLabel(student) {
     const sub = student.subject || '과목';
@@ -168,54 +181,78 @@ const ExcelService = {
     return periods;
   },
 
-  // 3. 수강생 명단 표준 양식 다운로드
+  // 3. 수강생 명단 및 시간표 통합 표준 양식 다운로드 (일원화 양식)
   async downloadStudentTemplate() {
     const workbook = new ExcelJS.Workbook();
     workbook.creator = '강원온라인학교 시간표 시스템';
-    const worksheet = workbook.addWorksheet('편성학생 명단');
+    const worksheet = workbook.addWorksheet('시간표_통합데이터', { views: [{ showGridLines: true }] });
 
     worksheet.columns = [
+      { header: '순번', key: 'index', width: 8 },
       { header: '학년도', key: 'year', width: 10 },
       { header: '학기', key: 'term', width: 8 },
-      { header: '학년', key: 'grade', width: 10 },
-      { header: '편제명', key: 'track', width: 14 },
-      { header: '개설과목(학점)', key: 'subject', width: 22 },
-      { header: '개설강의실', key: 'room', width: 14 },
-      { header: '계열/학년/학과', key: 'dept', width: 18 },
+      { header: '학년', key: 'grade', width: 8 },
       { header: '반', key: 'classNum', width: 8 },
       { header: '번호', key: 'studentNum', width: 8 },
-      { header: '성명', key: 'name', width: 16 },
+      { header: '학번', key: 'studentCode', width: 12 },
+      { header: '성명', key: 'name', width: 14 },
+      { header: '과목명', key: 'subject', width: 22 },
+      { header: '개설상태', key: 'status', width: 12 },
+      { header: '배정요일', key: 'day', width: 12 },
+      { header: '배정교시', key: 'periodName', width: 14 },
+      { header: '시작시간', key: 'startTime', width: 12 },
+      { header: '종료시간', key: 'endTime', width: 12 },
+      { header: '비고', key: 'memo', width: 16 },
     ];
 
     const headerRow = worksheet.getRow(1);
-    headerRow.height = 28;
+    headerRow.height = 30;
     headerRow.eachCell((cell) => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } };
-      cell.font = { bold: true, color: { argb: 'FF1E3A8A' }, size: 11 };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
+      cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       this.applyBorder(cell);
     });
 
     const samples = [
-      { year: 2026, term: 1, grade: 1, track: '선택교육과정', subject: '인공지능 기초(3)', room: '온라인1실', dept: '일반/1/공통', classNum: 1, studentNum: 1, name: '홍길동' },
-      { year: 2026, term: 1, grade: 1, track: '선택교육과정', subject: '인공지능 기초(3)', room: '온라인1실', dept: '일반/1/공통', classNum: 1, studentNum: 2, name: '이순신' },
-      { year: 2026, term: 1, grade: 2, track: '선택교육과정', subject: '빅데이터 분석(3)', room: '온라인2실', dept: '일반/2/공통', classNum: 2, studentNum: 5, name: '강감찬' },
+      { index: 1, year: 2026, term: '1학기', grade: 1, classNum: 1, studentNum: 1, studentCode: '10101', name: '홍길동', subject: '인공지능 기초', status: '확정', day: '월요일', periodName: '1교시', startTime: '09:00', endTime: '09:50', memo: '온라인1실' },
+      { index: 2, year: 2026, term: '1학기', grade: 1, classNum: 1, studentNum: 1, studentCode: '10101', name: '홍길동', subject: '정보과학', status: '확정', day: '수요일', periodName: '3교시', startTime: '11:00', endTime: '11:50', memo: '온라인2실' },
+      { index: 3, year: 2026, term: '1학기', grade: 1, classNum: 1, studentNum: 2, studentCode: '10102', name: '이순신', subject: '인공지능 기초', status: '확정', day: '월요일', periodName: '1교시', startTime: '09:00', endTime: '09:50', memo: '온라인1실' },
+      { index: 4, year: 2026, term: '1학기', grade: 2, classNum: 1, studentNum: 5, studentCode: '20105', name: '강감찬', subject: '빅데이터 분석', status: '조정', day: '미입력', periodName: '미입력', startTime: '미입력', endTime: '미입력', memo: '시간표 배치 대기' },
+      { index: 5, year: 2026, term: '1학기', grade: 2, classNum: 2, studentNum: 12, studentCode: '20212', name: '신사임당', subject: '한국사 탐구', status: '확정', day: '금요일', periodName: '4교시', startTime: '12:00', endTime: '12:50', memo: '' },
     ];
 
     samples.forEach((row) => {
       const addedRow = worksheet.addRow(row);
       addedRow.height = 24;
-      addedRow.eachCell((cell) => {
+      addedRow.eachCell((cell, colNum) => {
         cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.font = { name: '맑은 고딕', size: 10 };
         this.applyBorder(cell);
+
+        // 개설상태 열 (col 10)
+        if (colNum === 10) {
+          if (row.status === '확정') {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+            cell.font = { bold: true, color: { argb: 'FF065F46' } };
+          } else if (row.status === '조정') {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+            cell.font = { bold: true, color: { argb: 'FFB45309' } };
+          }
+        }
+        // 미입력 셀 스타일
+        if ([11, 12, 13, 14].includes(colNum) && cell.value === '미입력') {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+          cell.font = { color: { argb: 'FF94A3B8' } };
+        }
       });
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
-    this.saveFile(buffer, '수강신청_편성학생_양식.xlsx');
+    this.saveFile(buffer, '시간표_통합데이터_표준양식.xlsx');
   },
 
-  // 4. 수강생 명단 및 수강신청 엑셀 업로드 파싱 (학생 정보 및 과목명 동시 추출)
+  // 4. 수강생 명단 및 시간표 통합 엑셀 업로드 파싱 (통합 양식 & 나이스 양식 완벽 호환)
   async parseStudentExcel(file) {
     const workbook = new ExcelJS.Workbook();
     const buffer = await file.arrayBuffer();
@@ -223,12 +260,21 @@ const ExcelService = {
     const worksheet = workbook.worksheets[0];
 
     let headerRowIndex = -1;
+    let colIndex = -1;
+    let colYear = -1;
+    let colSemester = -1;
     let colGrade = -1;
     let colClass = -1;
     let colNumber = -1;
     let colStudentCode = -1;
     let colName = -1;
-    const colSubjects = []; // 과목 컬럼 인덱스 목록 (단일 또는 복수 과목 컬럼 지원)
+    const colSubjects = [];
+    let colStatus = -1;
+    let colDay = -1;
+    let colPeriod = -1;
+    let colStartTime = -1;
+    let colEndTime = -1;
+    let colMemo = -1;
 
     // 헤더 행 탐색 (최대 15행 스캔)
     const maxScanRows = Math.min(15, worksheet.rowCount);
@@ -249,15 +295,36 @@ const ExcelService = {
         cellEntries.forEach(c => {
           const t = c.text;
           const lower = t.toLowerCase();
-          if (t === '학년' || lower === 'grade') colGrade = c.colNum;
-          else if (t === '반' || lower === 'class') colClass = c.colNum;
-          else if (t === '번호' || t === '번' || lower === 'number' || lower === 'no') colNumber = c.colNum;
-          else if (t === '학번' || t === '학생번호' || lower === 'studentcode' || lower === 'id') colStudentCode = c.colNum;
-          else if (t === '성명' || t === '이름' || t === '학생명' || lower === 'name') colName = c.colNum;
-          else if (
-            t.includes('과목') || t.includes('교과') || t.includes('신청') || t.includes('수강') || t.includes('희망')
-          ) {
+          if (t === '순번' || lower === 'no' || lower === 'idx' || lower === 'index') {
+            colIndex = c.colNum;
+          } else if (t === '학년도' || t === '연도' || lower === 'year') {
+            colYear = c.colNum;
+          } else if (t === '학기' || lower === 'term' || lower === 'semester') {
+            colSemester = c.colNum;
+          } else if (t === '학년' || lower === 'grade') {
+            colGrade = c.colNum;
+          } else if (t === '반' || lower === 'class') {
+            colClass = c.colNum;
+          } else if (t === '번호' || t === '번' || lower === 'studentnum' || (lower === 'no' && colIndex !== c.colNum)) {
+            colNumber = c.colNum;
+          } else if (t === '학번' || t === '학생번호' || lower === 'studentcode' || lower === 'id') {
+            colStudentCode = c.colNum;
+          } else if (t === '성명' || t === '이름' || t === '학생명' || lower === 'name') {
+            colName = c.colNum;
+          } else if (t.includes('과목') || t.includes('교과') || t.includes('신청') || t.includes('수강') || t.includes('희망')) {
             colSubjects.push(c.colNum);
+          } else if (t === '개설상태' || t === '상태' || t === '구분' || lower === 'status') {
+            colStatus = c.colNum;
+          } else if (t === '배정요일' || t === '요일' || lower === 'day') {
+            colDay = c.colNum;
+          } else if (t === '배정교시' || t === '교시' || t === '교시명' || lower === 'period') {
+            colPeriod = c.colNum;
+          } else if (t === '시작시간' || t === '시작' || lower === 'starttime' || lower === 'start') {
+            colStartTime = c.colNum;
+          } else if (t === '종료시간' || t === '종료' || lower === 'endtime' || lower === 'end') {
+            colEndTime = c.colNum;
+          } else if (t === '비고' || t === '강의실' || t === '개설강의실' || lower === 'memo' || lower === 'room') {
+            colMemo = c.colNum;
           }
         });
         break;
@@ -268,6 +335,7 @@ const ExcelService = {
     if (headerRowIndex === -1) {
       headerRowIndex = 2;
       colSubjects.push(5); // 개설과목(학점)
+      colMemo = 6; // 개설강의실
       colGrade = 3;
       colClass = 8;
       colNumber = 9;
@@ -313,6 +381,63 @@ const ExcelService = {
         studentCode = this.getStudentCode({ grade, classNum, studentNum });
       }
 
+      // 상태 추출
+      const rawStatusVal = colStatus > 0 ? row.getCell(colStatus).value : null;
+      const normStatus = this.normalizeStatus(rawStatusVal);
+
+      // 요일 추출 ('미입력', '-', '미배정' 등은 null 처리)
+      let parsedDay = null;
+      if (colDay > 0) {
+        const rawDayVal = String(row.getCell(colDay).value || '').trim();
+        if (rawDayVal && rawDayVal !== '미입력' && rawDayVal !== '미배정' && rawDayVal !== '-' && rawDayVal !== '없음') {
+          parsedDay = this.dayNameToId(rawDayVal);
+        }
+      }
+
+      // 교시 추출 ('미입력', '-', '미배정' 등은 null 처리)
+      let parsedPeriod = null;
+      let parsedPeriodName = null;
+      if (colPeriod > 0) {
+        const rawPeriodVal = String(row.getCell(colPeriod).value || '').trim();
+        if (rawPeriodVal && rawPeriodVal !== '미입력' && rawPeriodVal !== '미배정' && rawPeriodVal !== '-' && rawPeriodVal !== '없음') {
+          const num = parseInt(rawPeriodVal.replace(/[^0-9]/g, ''), 10);
+          if (!isNaN(num) && num > 0) parsedPeriod = num;
+          parsedPeriodName = rawPeriodVal;
+        }
+      }
+
+      // 시작/종료 시간 추출
+      let parsedStartTime = null;
+      let parsedEndTime = null;
+      if (colStartTime > 0) {
+        const rawST = String(row.getCell(colStartTime).value || '').trim();
+        if (rawST && rawST !== '미입력' && rawST !== '미배정' && rawST !== '-') {
+          parsedStartTime = this.formatTimeString(rawST);
+        }
+      }
+      if (colEndTime > 0) {
+        const rawET = String(row.getCell(colEndTime).value || '').trim();
+        if (rawET && rawET !== '미입력' && rawET !== '미배정' && rawET !== '-') {
+          parsedEndTime = this.formatTimeString(rawET);
+        }
+      }
+
+      // 학년도 / 학기 추출
+      let parsedYear = null;
+      let parsedTerm = null;
+      if (colYear > 0) {
+        const rawY = String(row.getCell(colYear).value || '').replace(/[^0-9]/g, '');
+        if (rawY.length === 4) parsedYear = rawY;
+      }
+      if (colSemester > 0) {
+        const rawT = String(row.getCell(colSemester).value || '').replace(/[^0-9]/g, '');
+        if (rawT === '1' || rawT === '2') parsedTerm = rawT;
+      }
+
+      // 비고 추출
+      let parsedMemo = colMemo > 0 ? String(row.getCell(colMemo).value || '').trim() : '';
+      if (parsedMemo === '-' || parsedMemo === '미입력') parsedMemo = '';
+
       const uniqueKey = `${studentCode}_${rawName}`;
 
       // 과목 컬럼들에서 과목명 추출
@@ -321,7 +446,7 @@ const ExcelService = {
         const val = row.getCell(colIdx).value;
         if (!val) return;
         const text = String(val).trim();
-        if (!text || text === '-' || text === '미배정' || text === '없음') return;
+        if (!text || text === '-' || text === '미배정' || text === '없음' || text === '미입력') return;
 
         // 쉼표, 슬래시, 플러스, 개행 등으로 복수 과목 구분
         const tokens = text.split(/[,/+\n\r]/);
@@ -330,34 +455,78 @@ const ExcelService = {
           if (!cleanSub) return;
           // 뒤쪽의 학점 표기 (예: (3), (3학점), [3학점]) 제거
           cleanSub = cleanSub.replace(/[\(\[]\s*\d+\s*(?:학점)?\s*[\)\]]$/, '').trim();
-          if (cleanSub && cleanSub !== '-' && !rowSubjects.includes(cleanSub)) {
+          if (cleanSub && cleanSub !== '-' && cleanSub !== '미입력' && !rowSubjects.includes(cleanSub)) {
             rowSubjects.push(cleanSub);
           }
         });
       });
 
-      if (studentMap.has(uniqueKey)) {
-        const existing = studentMap.get(uniqueKey);
-        rowSubjects.forEach(sub => {
-          if (!existing.subjects.includes(sub)) {
-            existing.subjects.push(sub);
+      if (rowSubjects.length > 0) {
+        rowSubjects.forEach(cleanSub => {
+          const scheduleEntry = {
+            subject: cleanSub,
+            status: normStatus.scheduleStatus,
+            courseStatus: normStatus.courseStatus,
+            statusLabel: normStatus.label,
+            day: parsedDay,
+            period: parsedPeriod,
+            periodName: parsedPeriodName,
+            startTime: parsedStartTime,
+            endTime: parsedEndTime,
+            year: parsedYear,
+            semester: parsedTerm,
+            memo: parsedMemo
+          };
+
+          if (studentMap.has(uniqueKey)) {
+            const existing = studentMap.get(uniqueKey);
+            if (!existing.subjects.includes(cleanSub)) {
+              existing.subjects.push(cleanSub);
+            }
+            if (!existing.schedules) existing.schedules = [];
+            existing.schedules.push(scheduleEntry);
+          } else {
+            studentMap.set(uniqueKey, {
+              id: `s_${Date.now()}_${r}_${Math.random().toString(36).substr(2, 4)}`,
+              grade: grade,
+              classNum: classNum,
+              studentNum: studentNum,
+              studentCode: studentCode,
+              name: rawName,
+              subject: cleanSub,
+              subjects: [cleanSub],
+              schedules: [scheduleEntry],
+              day: parsedDay,
+              period: parsedPeriod,
+              periodId: null,
+              status: normStatus.scheduleStatus,
+              year: parsedYear,
+              semester: parsedTerm,
+              memo: parsedMemo
+            });
           }
         });
       } else {
-        studentMap.set(uniqueKey, {
-          id: `s_${Date.now()}_${r}_${Math.random().toString(36).substr(2, 4)}`,
-          grade: grade,
-          classNum: classNum,
-          studentNum: studentNum,
-          studentCode: studentCode,
-          name: rawName,
-          subject: rowSubjects[0] || '',
-          subjects: rowSubjects,
-          day: null,
-          period: null,
-          periodId: null,
-          status: 'confirmed'
-        });
+        if (!studentMap.has(uniqueKey)) {
+          studentMap.set(uniqueKey, {
+            id: `s_${Date.now()}_${r}_${Math.random().toString(36).substr(2, 4)}`,
+            grade: grade,
+            classNum: classNum,
+            studentNum: studentNum,
+            studentCode: studentCode,
+            name: rawName,
+            subject: '',
+            subjects: [],
+            schedules: [],
+            day: null,
+            period: null,
+            periodId: null,
+            status: 'confirmed',
+            year: parsedYear,
+            semester: parsedTerm,
+            memo: parsedMemo
+          });
+        }
       }
     }
 
@@ -553,28 +722,30 @@ const ExcelService = {
     });
   },
 
-  // 6. 결괏값 형태 2: 엑셀데이터 형태 (원천 데이터 테이블)
+  // 6. 결괏값 형태 2: 엑셀데이터 형태 (원천 데이터 테이블 / 통합 데이터 내보내기)
   async exportDataExcel(students, periods, days, academicYear = '2026', semester = '1', schoolName = '강원온라인학교') {
     const workbook = new ExcelJS.Workbook();
     const yearLabel = `${academicYear}학년도 ${semester}학기`;
     const filePrefix = `${academicYear}학년도_${semester}학기_${schoolName}`;
     workbook.creator = `${schoolName} 시간표 시스템`;
-    const worksheet = workbook.addWorksheet(`${academicYear}학년도_${semester}학기_원천데이터`, { views: [{ showGridLines: true }] });
+    const worksheet = workbook.addWorksheet(`${academicYear}학년도_${semester}학기_통합데이터`, { views: [{ showGridLines: true }] });
 
     worksheet.columns = [
       { header: '순번', key: 'index', width: 8 },
+      { header: '학년도', key: 'year', width: 10 },
+      { header: '학기', key: 'term', width: 8 },
       { header: '학년', key: 'grade', width: 8 },
       { header: '반', key: 'classNum', width: 8 },
       { header: '번호', key: 'studentNum', width: 8 },
       { header: '학번', key: 'studentCode', width: 12 },
       { header: '성명', key: 'name', width: 14 },
-      { header: '학번성명', key: 'codeName', width: 16 },
       { header: '과목명', key: 'subject', width: 22 },
-      { header: '시간표 표기', key: 'timetableLabel', width: 26 },
-      { header: '상태', key: 'statusText', width: 14 },
+      { header: '개설상태', key: 'status', width: 12 },
       { header: '배정요일', key: 'day', width: 12 },
       { header: '배정교시', key: 'periodName', width: 14 },
-      { header: '수업시간', key: 'timeRange', width: 18 },
+      { header: '시작시간', key: 'startTime', width: 12 },
+      { header: '종료시간', key: 'endTime', width: 12 },
+      { header: '비고', key: 'memo', width: 16 },
     ];
 
     const headerRow = worksheet.getRow(1);
@@ -591,28 +762,31 @@ const ExcelService = {
     students.forEach((s, idx) => {
       const isAssigned = s.day && (s.periodId || s.period);
       const periodObj = periods.find(p => p.id === s.periodId || (!s.periodId && p.period === s.period));
-      const periodName = periodObj ? periodObj.name : (s.period ? `${s.period}교시` : '-');
-      const timeRange = periodObj ? `${periodObj.startTime} ~ ${periodObj.endTime}` : '-';
+      const periodName = isAssigned ? (periodObj ? periodObj.name : (s.period ? `${s.period}교시` : '미입력')) : '미입력';
+      const startTime = isAssigned ? (periodObj ? periodObj.startTime : '미입력') : '미입력';
+      const endTime = isAssigned ? (periodObj ? periodObj.endTime : '미입력') : '미입력';
+      const dayText = isAssigned ? (dayNameMap[s.day] || s.day) : '미입력';
 
       const studentCode = this.getStudentCode(s);
-      const codeName = this.getStudentCodeName(s);
-      const timetableLabel = isAssigned ? this.getTimetableCardLabel(s) : '-';
-      const statusText = isAssigned ? this.getStatusText(s.status) : '미배정';
+      const normStatus = this.normalizeStatus(s.status);
+      const statusLabel = normStatus.label;
 
       const row = worksheet.addRow({
         index: idx + 1,
-        grade: s.grade ? `${s.grade}` : '-',
-        classNum: s.classNum ? `${s.classNum}` : '-',
-        studentNum: s.studentNum ? `${s.studentNum}` : '-',
+        year: academicYear,
+        term: `${semester}학기`,
+        grade: s.grade ? `${s.grade}` : '1',
+        classNum: s.classNum ? `${s.classNum}` : '1',
+        studentNum: s.studentNum ? `${s.studentNum}` : '',
         studentCode: studentCode,
         name: s.name,
-        codeName: codeName,
-        subject: s.subject || '-',
-        timetableLabel: timetableLabel,
-        statusText: statusText,
-        day: isAssigned ? (dayNameMap[s.day] || s.day) : '-',
-        periodName: isAssigned ? periodName : '-',
-        timeRange: isAssigned ? timeRange : '-'
+        subject: s.subject || '미입력',
+        status: statusLabel,
+        day: dayText,
+        periodName: periodName,
+        startTime: startTime,
+        endTime: endTime,
+        memo: s.memo || ''
       });
 
       row.height = 24;
@@ -621,27 +795,30 @@ const ExcelService = {
         cell.font = { name: '맑은 고딕', size: 10 };
         this.applyBorder(cell);
 
-        // 상태 열 하이라이트
+        // 개설상태 열 (col 10)
         if (colNum === 10) {
-          if (!isAssigned) {
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
-            cell.font = { color: { argb: 'FF64748B' } };
-          } else if (s.status === 'confirmed') {
+          if (statusLabel === '확정') {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
             cell.font = { bold: true, color: { argb: 'FF065F46' } };
-          } else if (s.status === 'adjust') {
+          } else if (statusLabel === '조정') {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
             cell.font = { bold: true, color: { argb: 'FFB45309' } };
-          } else if (s.status === 'canceled') {
+          } else if (statusLabel === '폐강') {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
             cell.font = { strike: true, color: { argb: 'FF64748B' } };
           }
+        }
+
+        // 미입력 셀 하이라이트 (배정요일, 배정교시, 시작시간, 종료시간)
+        if ([11, 12, 13, 14].includes(colNum) && cell.value === '미입력') {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+          cell.font = { color: { argb: 'FF94A3B8' } };
         }
       });
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
-    this.saveFile(buffer, `${filePrefix}_수강데이터_원천목록_${this.getTimestamp()}.xlsx`);
+    this.saveFile(buffer, `${filePrefix}_시간표_통합데이터_${this.getTimestamp()}.xlsx`);
   },
 
   applyBorder(cell) {
