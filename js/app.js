@@ -49,6 +49,7 @@ class TimetableApp {
     this.undoStack = []; // 실행 취소(되돌리기) 스냅샷 스택
     this.redoStack = []; // 다시 실행(재실행) 스냅샷 스택
     this.maxUndoDepth = 15;
+    this.highlightedSubject = null; // 과목 팔레트에서 선택하여 시간표에 하이라이트할 과목명
 
     this.init();
   }
@@ -664,6 +665,12 @@ class TimetableApp {
             }
           }
         }
+      }
+
+      // ESC 키 입력 시 과목 하이라이트 해제
+      if (e.key === 'Escape' && this.highlightedSubject) {
+        this.clearSubjectHighlight();
+        return;
       }
 
       if (e.key === 'Control' || e.key === 'Meta') {
@@ -3043,21 +3050,51 @@ class TimetableApp {
     }
 
     let html = '';
+
+    // 과목 하이라이트 활성화 알림 바
+    if (this.highlightedSubject) {
+      html += `
+        <div class="p-2.5 mb-2 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between shadow-2xs">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-indigo-600 animate-ping shrink-0"></span>
+            <span class="text-xs font-bold text-indigo-950 truncate">
+              [${this.highlightedSubject}] 시간표 하이라이트 중
+            </span>
+          </div>
+          <button type="button" 
+                  onclick="event.stopPropagation(); window.app.clearSubjectHighlight()"
+                  class="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-white hover:bg-indigo-100 px-2 py-0.5 rounded-lg border border-indigo-300 transition shrink-0 flex items-center gap-0.5"
+                  title="강조 표시 해제 (단축키: ESC)">
+            <span>해제</span>
+            <span>✕</span>
+          </button>
+        </div>
+      `;
+    }
+
     this.offeredSubjects.forEach(sub => {
       const color = this.getSubjectColor(sub);
       const studentIds = this.courseEnrollments[sub] || [];
       const schedules = this.courseSchedules[sub] || [];
       const safeSub = sub.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
       const status = this.getSubjectStatus(sub);
+      const isSelected = this.highlightedSubject === sub;
+      const isDimmed = Boolean(this.highlightedSubject && !isSelected);
 
       html += `
         <div class="draggable-palette-subject p-3 rounded-xl border transition-all hover:scale-[1.01] shadow-2xs cursor-grab active:cursor-grabbing select-none ${
           status === 'closed' ? 'opacity-60 bg-slate-100 border-slate-300' : ''
+        } ${
+          isSelected 
+            ? 'ring-2 ring-indigo-600 ring-offset-2 border-indigo-600 shadow-md scale-[1.02]' 
+            : (isDimmed ? 'opacity-40 hover:opacity-80' : '')
         }"
-             style="background-color: ${status === 'closed' ? '#F8FAFC' : color.bg}; border-color: ${status === 'closed' ? '#CBD5E1' : color.border};"
+             style="background-color: ${status === 'closed' ? '#F8FAFC' : color.bg}; border-color: ${isSelected ? '#4F46E5' : (status === 'closed' ? '#CBD5E1' : color.border)};"
              draggable="true"
+             onclick="window.app.toggleHighlightSubject('${safeSub}')"
              ondragstart="window.app.handlePaletteDragStart(event, '${safeSub}')"
-             ondragend="window.app.handlePaletteDragEnd(event)">
+             ondragend="window.app.handlePaletteDragEnd(event)"
+             title="클릭: 오른쪽 시간표에서 이 과목 하이라이트 (토글) / 드래그: 시간표에 배치">
           
           <div class="flex items-center justify-between gap-1 mb-1.5 pointer-events-none">
             <div class="flex items-center gap-1.5 min-w-0">
@@ -3065,6 +3102,9 @@ class TimetableApp {
               <span class="font-bold text-xs truncate ${status === 'closed' ? 'line-through text-slate-400' : ''}" style="color: ${status === 'closed' ? '#64748B' : color.text};">${sub}</span>
             </div>
             <div class="flex items-center gap-1">
+              ${isSelected ? `
+                <span class="text-[10px] font-black px-1.5 py-0.2 rounded bg-indigo-600 text-white shadow-2xs">✨ 선택됨</span>
+              ` : ''}
               ${status === 'closed' ? `
                 <span class="text-[10px] font-black px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 border border-rose-300">✖️ 폐강</span>
               ` : (status === 'adjust' ? `
@@ -3095,6 +3135,24 @@ class TimetableApp {
 
     container.innerHTML = html;
     if (window.lucide) window.lucide.createIcons();
+  }
+
+  // 과목 팔레트 선택 시 오른쪽 시간표 하이라이트 토글
+  toggleHighlightSubject(subjectName) {
+    if (this.highlightedSubject === subjectName) {
+      this.highlightedSubject = null;
+    } else {
+      this.highlightedSubject = subjectName;
+    }
+    this.renderStep2Palette();
+    this.renderTimetable();
+  }
+
+  // 과목 하이라이트 즉시 해제
+  clearSubjectHighlight() {
+    this.highlightedSubject = null;
+    this.renderStep2Palette();
+    this.renderTimetable();
   }
 
   handlePaletteDragStart(e, subjectName) {
@@ -3265,11 +3323,18 @@ class TimetableApp {
                 conflictTooltip = lines.join('\n').replace(/"/g, '&quot;');
               }
 
+              const isCardHighlighted = Boolean(this.highlightedSubject && this.highlightedSubject === subject);
+              const isCardDimmed = Boolean(this.highlightedSubject && this.highlightedSubject !== subject);
+
               bodyHtml += `
-                <div class="subject-card p-2 rounded-lg border text-xs transition-all relative select-none cursor-grab active:cursor-grabbing ${
+                <div class="subject-card p-2 rounded-lg border text-xs transition-all duration-150 relative select-none cursor-grab active:cursor-grabbing ${
                   isCanceled ? 'is-canceled' : ''
-                } ${isAdjust ? 'is-adjust' : ''}"
-                     style="background-color: ${isCanceled ? '#E2E8F0' : color.bg}; border-color: ${isCanceled ? '#CBD5E1' : color.border};"
+                } ${isAdjust ? 'is-adjust' : ''} ${
+                  isCardHighlighted 
+                    ? 'ring-4 ring-indigo-500 ring-offset-2 shadow-2xl scale-[1.04] z-20 font-black' 
+                    : (isCardDimmed ? 'opacity-25 grayscale-[30%] blur-[0.3px] hover:opacity-75 transition-opacity' : '')
+                }"
+                     style="background-color: ${isCanceled ? '#E2E8F0' : color.bg}; border-color: ${isCardHighlighted ? '#4F46E5' : (isCanceled ? '#CBD5E1' : color.border)};"
                      draggable="true"
                      ondragstart="window.app.handleTimetableCardDragStart(event, '${safeSub}', '${day.id}', '${period.id}')"
                      ondragend="window.app.handleTimetableCardDragEnd(event)">
@@ -3277,6 +3342,7 @@ class TimetableApp {
                   <!-- 카드 상단: 상태 기호 + 과목명 + 충돌 경고 + 삭제 버튼 -->
                   <div class="flex items-center justify-between gap-1 mb-1 pointer-events-auto">
                     <div class="flex items-center gap-1 min-w-0 flex-wrap">
+                      ${isCardHighlighted ? '<span class="text-xs text-amber-500 font-extrabold animate-bounce shrink-0" title="선택된 과목">⭐</span>' : ''}
                       <!-- 상태 토글 버튼 (확정 -> 조정 -> 폐강) -->
                       <button type="button" 
                               onclick="event.stopPropagation(); window.app.toggleCourseScheduleStatus('${safeSub}', '${schedule.id || (day.id + '_' + period.id)}')"
