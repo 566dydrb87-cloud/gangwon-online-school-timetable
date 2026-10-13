@@ -732,6 +732,14 @@ class TimetableApp {
       }
     });
 
+    // 창 전환 시 Ctrl 상태 고착 방지
+    window.addEventListener('blur', () => {
+      this.isCtrlPressed = false;
+      const banner = document.getElementById('ctrl-copy-indicator');
+      if (banner) banner.classList.add('hidden');
+      document.body.classList.remove('is-copy-mode');
+    });
+
     // 2. 탭 1 퀵 학생 직접 등록
     document.getElementById('form-quick-add-student')?.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -3891,16 +3899,14 @@ class TimetableApp {
   }
 
   // ==========================================
-  // 시간표 카드 드래그 & 셀 드롭 (이동 & Ctrl 복사)
+  // 시간표 카드 드래그 & 셀 드롭 (기본: 이동, Ctrl 누른 채 드래그 시: 복사)
   // ==========================================
   handleTimetableCardDragStart(e, subjectName, fromDay, fromPeriodId) {
-    const isCopy = e.ctrlKey || e.metaKey || this.isCtrlPressed;
     this.dragData = {
       type: 'timetable-subject',
       subjectName: subjectName,
       fromDay: fromDay,
-      fromPeriodId: fromPeriodId,
-      isCtrlCopy: isCopy
+      fromPeriodId: fromPeriodId
     };
 
     try {
@@ -3910,7 +3916,7 @@ class TimetableApp {
     e.dataTransfer.effectAllowed = 'copyMove';
     e.currentTarget.classList.add('is-dragging');
 
-    if (isCopy) {
+    if (e.ctrlKey || e.metaKey || this.isCtrlPressed) {
       const banner = document.getElementById('ctrl-copy-indicator');
       if (banner) banner.classList.remove('hidden');
     }
@@ -3920,12 +3926,15 @@ class TimetableApp {
     this.dragData = null;
     if (e.currentTarget) e.currentTarget.classList.remove('is-dragging');
     document.querySelectorAll('.timetable-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
+    const banner = document.getElementById('ctrl-copy-indicator');
+    if (banner && !e.ctrlKey && !e.metaKey) banner.classList.add('hidden');
   }
 
   handleTimetableCellDragOver(e) {
     e.preventDefault();
     const isPalette = this.dragData && this.dragData.type === 'palette-subject';
-    const isCopy = isPalette || e.ctrlKey || e.metaKey || this.isCtrlPressed || (this.dragData && this.dragData.isCtrlCopy);
+    // 시간표 카드는 오직 Ctrl/Meta 키가 실제로 눌려있을 때만 copy 효과 적용
+    const isCopy = isPalette || Boolean(e.ctrlKey || e.metaKey);
     e.dataTransfer.dropEffect = isCopy ? 'copy' : 'move';
     const cell = e.currentTarget;
     if (cell && !cell.classList.contains('drag-over')) {
@@ -3952,12 +3961,11 @@ class TimetableApp {
 
     if (!data) return;
 
-    const isCopyMode = (data.type === 'palette-subject') || e.ctrlKey || e.metaKey || this.isCtrlPressed || data.isCtrlCopy;
     const targetPeriod = this.periods.find(p => p.id === targetPeriodId);
     const dayName = ExcelService.dayIdToName(targetDay);
     const periodName = targetPeriod ? targetPeriod.name : `${targetPeriodId}교시`;
 
-    // 1. 좌측 과목 팔레트에서 새 과목을 끌고 온 경우
+    // 1. 좌측 과목 팔레트에서 새 과목을 끌고 온 경우 (신규 배치)
     if (data.type === 'palette-subject') {
       const added = this.addCourseSchedule(data.subjectName, targetDay, targetPeriodId, 'confirmed');
       if (added) {
@@ -3978,16 +3986,21 @@ class TimetableApp {
         return;
       }
 
+      // 사용자가 드롭할 때 실제로 Ctrl 또는 Meta(Cmd) 키를 누르고 있는 경우에만 '복사', 그렇지 않으면 기본 '이동'
+      const isCopyMode = Boolean(e.ctrlKey || e.metaKey);
+
       if (isCopyMode) {
-        // [복사 (Copy)]: 기존 슬롯은 유지하고 새 슬롯 추가!
+        // [복사 (Copy)]: 기존 슬롯은 그대로 유지하고 대상 위치에 추가!
         const added = this.addCourseSchedule(subjectName, targetDay, targetPeriodId, 'confirmed');
         if (added) {
-          this.showToast(`[복사 완료] '${subjectName}' 과목이 ${dayName} ${periodName}에 추가 배치되었습니다.`);
+          this.showToast(`[Ctrl 복사] '${subjectName}' 과목이 ${dayName} ${periodName}에 추가 배치되었습니다.`);
         }
       } else {
-        // [이동 (Move)]: 기존 위치 슬롯을 새 위치로 변경!
-        this.moveCourseSchedule(subjectName, fromDay, fromPeriodId, targetDay, targetPeriodId);
-        this.showToast(`'${subjectName}' 과목이 ${dayName} ${periodName}으로 이동되었습니다.`);
+        // [이동 (Move)]: 기존 위치 슬롯을 대상 위치로 옮김!
+        const moved = this.moveCourseSchedule(subjectName, fromDay, fromPeriodId, targetDay, targetPeriodId);
+        if (moved) {
+          this.showToast(`'${subjectName}' 과목이 ${dayName} ${periodName}으로 이동되었습니다.`);
+        }
       }
       this.dragData = null;
     }
