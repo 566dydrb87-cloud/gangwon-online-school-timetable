@@ -214,39 +214,33 @@ const ExcelService = {
       this.applyBorder(cell);
     });
 
-    const samples = [
-      { index: 1, year: 2026, term: '1학기', grade: 1, classNum: 1, studentNum: 1, studentCode: '10101', name: '홍길동', subject: '인공지능 기초', status: '확정', day: '월요일', periodName: '1교시', startTime: '09:00', endTime: '09:50', memo: '온라인1실' },
-      { index: 2, year: 2026, term: '1학기', grade: 1, classNum: 1, studentNum: 1, studentCode: '10101', name: '홍길동', subject: '정보과학', status: '확정', day: '수요일', periodName: '3교시', startTime: '11:00', endTime: '11:50', memo: '온라인2실' },
-      { index: 3, year: 2026, term: '1학기', grade: 1, classNum: 1, studentNum: 2, studentCode: '10102', name: '이순신', subject: '인공지능 기초', status: '확정', day: '월요일', periodName: '1교시', startTime: '09:00', endTime: '09:50', memo: '온라인1실' },
-      { index: 4, year: 2026, term: '1학기', grade: 2, classNum: 1, studentNum: 5, studentCode: '20105', name: '강감찬', subject: '빅데이터 분석', status: '조정', day: '미입력', periodName: '미입력', startTime: '미입력', endTime: '미입력', memo: '시간표 배치 대기' },
-      { index: 5, year: 2026, term: '1학기', grade: 2, classNum: 2, studentNum: 12, studentCode: '20212', name: '신사임당', subject: '한국사 탐구', status: '확정', day: '금요일', periodName: '4교시', startTime: '12:00', endTime: '12:50', memo: '' },
-    ];
-
-    samples.forEach((row) => {
-      const addedRow = worksheet.addRow(row);
+    // 과목명 및 학생 데이터 예시 행을 넣지 않고 깨끗한 빈 표준 양식으로 제공
+    // 사용자가 즉시 입력할 수 있도록 서식이 적용된 빈 행 10줄 제공
+    for (let i = 1; i <= 10; i++) {
+      const addedRow = worksheet.addRow({
+        index: i,
+        year: '',
+        term: '',
+        grade: '',
+        classNum: '',
+        studentNum: '',
+        studentCode: '',
+        name: '',
+        subject: '',
+        status: '',
+        day: '',
+        periodName: '',
+        startTime: '',
+        endTime: '',
+        memo: ''
+      });
       addedRow.height = 24;
-      addedRow.eachCell((cell, colNum) => {
+      addedRow.eachCell({ includeEmpty: true }, (cell) => {
         cell.alignment = { vertical: 'middle', horizontal: 'center' };
         cell.font = { name: '맑은 고딕', size: 10 };
         this.applyBorder(cell);
-
-        // 개설상태 열 (col 10)
-        if (colNum === 10) {
-          if (row.status === '확정') {
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
-            cell.font = { bold: true, color: { argb: 'FF065F46' } };
-          } else if (row.status === '조정') {
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
-            cell.font = { bold: true, color: { argb: 'FFB45309' } };
-          }
-        }
-        // 미입력 셀 스타일
-        if ([11, 12, 13, 14].includes(colNum) && cell.value === '미입력') {
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
-          cell.font = { color: { argb: 'FF94A3B8' } };
-        }
       });
-    });
+    }
 
     const buffer = await workbook.xlsx.writeBuffer();
     this.saveFile(buffer, '시간표_통합데이터_표준양식.xlsx');

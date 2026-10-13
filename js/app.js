@@ -135,8 +135,8 @@ class TimetableApp {
     if (!d.days || !Array.isArray(d.days) || d.days.length === 0) {
       d.days = JSON.parse(JSON.stringify(DEFAULT_DAYS));
     }
-    if (!d.offeredSubjects || d.offeredSubjects.length === 0) {
-      d.offeredSubjects = [...DEFAULT_OFFERED_SUBJECTS];
+    if (!d.offeredSubjects) {
+      d.offeredSubjects = [];
     }
     if (!d.subjectColorMap) d.subjectColorMap = {};
     if (d.showWeekends === undefined) d.showWeekends = true;

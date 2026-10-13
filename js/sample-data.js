@@ -46,5 +46,5 @@ const PASTEL_PALETTE = [
 // 기존 예시 학생 데이터 삭제 - 빈 목록으로 시작
 const INITIAL_STUDENTS = [];
 
-// 기본 개설 추천 과목
-const DEFAULT_OFFERED_SUBJECTS = ['인공지능', '빅데이터 분석', '프로그래밍'];
+// 기본 개설 과목 - 빈 목록으로 시작 (사용자 정의 또는 엑셀 업로드로 구성)
+const DEFAULT_OFFERED_SUBJECTS = [];
