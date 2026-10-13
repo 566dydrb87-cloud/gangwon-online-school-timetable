@@ -46,6 +46,8 @@ class TimetableApp {
     this.excelStudentPool = []; // 업로드된 전체 학생 명부 풀 (검색 및 선택 등록용)
     this.isCtrlPressed = false;
     this.dragData = null; // { type, studentId, studentIds, subjectName, fromDay, fromPeriodId }
+    this.undoStack = []; // 실행 취소(되돌리기) 스냅샷 스택
+    this.maxUndoDepth = 15;
 
     this.init();
   }
@@ -562,6 +564,8 @@ class TimetableApp {
       return;
     }
 
+    this.pushUndoSnapshot(`'${yearToDelete}학년도' 삭제`);
+
     delete this.yearsData[yearToDelete];
     this.academicYears = this.academicYears.filter(y => y !== yearToDelete);
     if (this.activeYear === yearToDelete) {
@@ -570,7 +574,7 @@ class TimetableApp {
     this.loadActiveYearSemesterData();
     this.saveState();
     this.render();
-    this.showToast(`'${yearToDelete}학년도'가 삭제되었습니다.`);
+    this.showToast(`'${yearToDelete}학년도'가 삭제되었습니다.`, true);
   }
 
   // ==========================================
@@ -624,8 +628,19 @@ class TimetableApp {
   // 이벤트 바인딩
   // ==========================================
   bindEvents() {
-    // 1. 키보드 Ctrl/Cmd 키 추적 (복사 모드 토글)
+    // 1. 키보드 Ctrl/Cmd 키 추적 (복사 모드 토글) 및 Ctrl+Z 실행 취소
     window.addEventListener('keydown', (e) => {
+      // Ctrl + Z (또는 Cmd + Z) 실행 취소 (입력창 내부가 아닐 때 동작)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        const isInput = activeTag === 'input' || activeTag === 'textarea' || document.activeElement.isContentEditable;
+        if (!isInput) {
+          e.preventDefault();
+          this.handleUndo();
+          return;
+        }
+      }
+
       if (e.key === 'Control' || e.key === 'Meta') {
         this.isCtrlPressed = true;
         const banner = document.getElementById('ctrl-copy-indicator');
@@ -820,12 +835,84 @@ class TimetableApp {
   }
 
   // ==========================================
+  // 실행 취소 (되돌리기 / Undo) 시스템
+  // ==========================================
+  pushUndoSnapshot(description = '작업 변경') {
+    try {
+      this.saveActiveYearSemesterData();
+      const snapshot = {
+        description: description,
+        timestamp: Date.now(),
+        activeYear: this.activeYear,
+        activeSemester: this.activeSemester,
+        academicYears: JSON.parse(JSON.stringify(this.academicYears)),
+        yearsData: JSON.parse(JSON.stringify(this.yearsData))
+      };
+      this.undoStack.push(snapshot);
+      if (this.undoStack.length > this.maxUndoDepth) {
+        this.undoStack.shift();
+      }
+      this.updateUndoButtonUI();
+    } catch (e) {
+      console.error('Failed to create undo snapshot:', e);
+    }
+  }
+
+  handleUndo() {
+    if (!this.undoStack || this.undoStack.length === 0) {
+      this.showToast('되돌릴 이전 작업 내역이 없습니다.');
+      return;
+    }
+
+    const snapshot = this.undoStack.pop();
+    if (!snapshot) return;
+
+    this.activeYear = snapshot.activeYear;
+    this.activeSemester = snapshot.activeSemester;
+    this.academicYears = snapshot.academicYears;
+    this.yearsData = snapshot.yearsData;
+
+    this.loadActiveYearSemesterData();
+    this.sortPeriods();
+    this.buildSubjectColorMap();
+    this.saveState();
+    this.render();
+    this.updateUndoButtonUI();
+
+    this.showToast(`[실행 취소 완료] '${snapshot.description}' 이전 상태로 되돌렸습니다.`, false);
+  }
+
+  updateUndoButtonUI() {
+    const btn = document.getElementById('btn-app-undo');
+    const countBadge = document.getElementById('app-undo-count-badge');
+    if (!btn) return;
+
+    const count = this.undoStack ? this.undoStack.length : 0;
+    if (count > 0) {
+      const lastAction = this.undoStack[this.undoStack.length - 1].description;
+      btn.disabled = false;
+      btn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0';
+      btn.title = `클릭 시 실행 취소: '${lastAction}' 이전 상태로 복구 (Ctrl+Z)`;
+      if (countBadge) {
+        countBadge.textContent = `${count}`;
+        countBadge.classList.remove('hidden');
+      }
+    } else {
+      btn.disabled = true;
+      btn.className = 'px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-400 border border-slate-200 transition flex items-center gap-1.5 cursor-not-allowed opacity-60 shadow-2xs shrink-0';
+      btn.title = '되돌릴 이전 작업 내역이 없습니다 (Ctrl+Z)';
+      if (countBadge) countBadge.classList.add('hidden');
+    }
+  }
+
+  // ==========================================
   // 렌더링 총괄
   // ==========================================
   render() {
     this.updateStats();
     this.renderAcademicYearTabs();
     this.updateWeekendToggleBtn();
+    this.updateUndoButtonUI();
 
     if (this.currentWorkflowTab === 'step1') {
       this.renderStep1StudentList();
@@ -1665,19 +1752,25 @@ class TimetableApp {
       }
     });
 
+    if (addedCount > 0) {
+      this.pushUndoSnapshot(`학생 ${addedCount}명 '${targetSubject}' 바구니 담기`);
+    }
+
     this.selectedStep1StudentIds.clear();
     this.rebuildStudentAssignments();
     this.saveState();
     this.render();
-    this.showToast(`선택한 ${addedCount}명의 학생이 '${targetSubject}' 바구니에 담겼습니다.`);
+    this.showToast(`선택한 ${addedCount}명의 학생이 '${targetSubject}' 바구니에 담겼습니다.`, addedCount > 0);
   }
 
-  deleteMasterStudent(studentId) {
+  deleteMasterStudent(studentId, skipConfirm = false) {
     const st = this.masterStudents.find(s => s.id === studentId);
     if (!st) return;
-    if (!confirm(`'${st.studentCode} ${st.name}' 학생을 명단에서 삭제하시겠습니까?\n(모든 과목 편제 및 시간표에서도 제외됩니다)`)) {
+    if (!skipConfirm && !confirm(`'${st.studentCode} ${st.name}' 학생을 명단에서 삭제하시겠습니까?\n(모든 과목 편제 및 시간표에서도 제외됩니다)`)) {
       return;
     }
+
+    this.pushUndoSnapshot(`학생 '${st.name}' 삭제`);
 
     this.masterStudents = this.masterStudents.filter(s => s.id !== studentId);
     this.selectedStep1StudentIds.delete(studentId);
@@ -1690,7 +1783,7 @@ class TimetableApp {
     this.rebuildStudentAssignments();
     this.saveState();
     this.render();
-    this.showToast(`${st.name} 학생이 삭제되었습니다.`);
+    this.showToast(`${st.name} 학생이 삭제되었습니다.`, true);
   }
 
   // ==========================================
@@ -1724,6 +1817,8 @@ class TimetableApp {
       return;
     }
 
+    this.pushUndoSnapshot(`과목 '${subjectName}' 바구니 삭제`);
+
     this.offeredSubjects = this.offeredSubjects.filter(s => s !== subjectName);
     delete this.courseEnrollments[subjectName];
     delete this.courseSchedules[subjectName];
@@ -1731,7 +1826,7 @@ class TimetableApp {
     this.rebuildStudentAssignments();
     this.saveState();
     this.render();
-    this.showToast(`'${subjectName}' 과목 바구니가 삭제되었습니다.`);
+    this.showToast(`'${subjectName}' 과목 바구니가 삭제되었습니다.`, true);
   }
 
   // ==========================================
@@ -2154,20 +2249,22 @@ class TimetableApp {
 
   handleRemoveStudentFromCourse(subjectName, studentId) {
     if (!this.courseEnrollments[subjectName]) return;
+    this.pushUndoSnapshot(`'${subjectName}' 과목에서 학생 제외`);
     this.courseEnrollments[subjectName] = this.courseEnrollments[subjectName].filter(id => id !== studentId);
     this.rebuildStudentAssignments();
     this.saveState();
     this.render();
-    this.showToast(`학생이 '${subjectName}' 과목에서 제외되었습니다.`);
+    this.showToast(`학생이 '${subjectName}' 과목에서 제외되었습니다.`, true);
   }
 
   handleClearBucketStudents(subjectName) {
     if (!confirm(`'${subjectName}' 과목의 모든 수강생 편제를 비우시겠습니까?`)) return;
+    this.pushUndoSnapshot(`'${subjectName}' 수강생 전체 비우기`);
     this.courseEnrollments[subjectName] = [];
     this.rebuildStudentAssignments();
     this.saveState();
     this.render();
-    this.showToast(`'${subjectName}' 과목의 편제 학생이 모두 비워졌습니다.`);
+    this.showToast(`'${subjectName}' 과목의 편제 학생이 모두 비워졌습니다.`, true);
   }
 
   handleAddBucketSchedule(subjectName) {
@@ -2951,8 +3048,9 @@ class TimetableApp {
       return;
     }
 
-    // 1. 현재 학년도/학기 상태 저장
+    // 1. 현재 학년도/학기 상태 저장 및 실행 취소 스냅샷 저장
     this.saveActiveYearSemesterData();
+    this.pushUndoSnapshot(`학기 전송 (${this.activeYear}년 ${this.activeSemester}학기 -> ${targetYear}년 ${targetSemester}학기, ${mode === 'move' ? '이동' : '복사'})`);
 
     // 2. 대상 학년도 및 학기 데이터 준비
     if (!this.academicYears.includes(targetYear)) {
@@ -3117,9 +3215,9 @@ class TimetableApp {
       this.buildSubjectColorMap();
       this.saveState();
       this.render();
-      this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 화면으로 전환되었습니다.`);
+      this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 화면으로 전환되었습니다.`, true);
     } else {
-      this.showToast(summaryMsg);
+      this.showToast(summaryMsg, true);
     }
   }
 
@@ -3348,8 +3446,9 @@ class TimetableApp {
       return;
     }
 
-    // 1. 현재 학년도/학기 상태 저장
+    // 1. 현재 학년도/학기 상태 저장 및 실행 취소 스냅샷 저장
     this.saveActiveYearSemesterData();
+    this.pushUndoSnapshot(`과목 '${subjectName}' ${mode === 'move' ? '이동' : '복사'} (${this.activeYear}년 ${this.activeSemester}학기 -> ${targetYear}년 ${targetSemester}학기)`);
 
     // 2. 대상 학년도 및 학기 데이터 준비
     if (!this.academicYears.includes(targetYear)) {
@@ -3439,9 +3538,9 @@ class TimetableApp {
       this.buildSubjectColorMap();
       this.saveState();
       this.render();
-      this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 화면으로 전환되었습니다.`);
+      this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 화면으로 전환되었습니다.`, true);
     } else {
-      this.showToast(summaryMsg);
+      this.showToast(summaryMsg, true);
     }
   }
 
@@ -3589,7 +3688,7 @@ class TimetableApp {
       return;
     }
 
-    this.deleteMasterStudent(studentId);
+    this.deleteMasterStudent(studentId, true);
     this.closeEditStudentModal();
   }
 
@@ -3704,25 +3803,42 @@ class TimetableApp {
     this.showToast(`'${val}학년도'가 성공적으로 추가되었습니다.`);
   }
 
-  showToast(message) {
+  showToast(message, allowUndo = false) {
     let toast = document.getElementById('app-toast');
     if (!toast) {
       toast = document.createElement('div');
       toast.id = 'app-toast';
-      toast.className = 'fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2 transform transition-all duration-300 opacity-0 translate-y-3';
+      toast.className = 'fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3.5 transform transition-all duration-300 opacity-0 translate-y-3 border border-slate-700 max-w-lg';
       document.body.appendChild(toast);
     }
-    toast.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> <span>${message}</span>`;
+
+    const hasUndo = allowUndo && this.undoStack && this.undoStack.length > 0;
+    toast.innerHTML = `
+      <div class="flex items-center gap-2 min-w-0">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+        <span class="font-medium leading-relaxed">${message}</span>
+      </div>
+      ${hasUndo ? `
+        <button type="button" 
+                onclick="window.app.handleUndo()" 
+                class="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-600 active:scale-95 text-white transition flex items-center gap-1 shadow-xs shrink-0 cursor-pointer whitespace-nowrap ml-1"
+                title="방금 수행한 작업을 즉시 취소하고 되돌립니다 (Ctrl+Z)">
+          <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
+          <span>실행 취소(되돌리기)</span>
+        </button>
+      ` : ''}
+    `;
     if (window.lucide) window.lucide.createIcons();
 
     toast.classList.remove('opacity-0', 'translate-y-3');
     toast.classList.add('opacity-100', 'translate-y-0');
 
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    const duration = hasUndo ? 6500 : 3000;
     this.toastTimeout = setTimeout(() => {
       toast.classList.remove('opacity-100', 'translate-y-0');
       toast.classList.add('opacity-0', 'translate-y-3');
-    }, 2800);
+    }, duration);
   }
 }
 
