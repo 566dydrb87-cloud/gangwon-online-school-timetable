@@ -3227,6 +3227,44 @@ class TimetableApp {
                 }
               }
 
+              // 동일 시간(day.id, period.id)에 다른 유효 과목에도 편성된 학생 검사 (시간 중복)
+              const conflictStudents = [];
+              if (!isCanceled && enrolledIds.length > 0) {
+                enrolledIds.forEach(stId => {
+                  const overlappingSubjects = [];
+                  scheduledEntries.forEach(other => {
+                    if (other.subject === subject) return;
+                    const otherStatus = other.schedule.status || 'confirmed';
+                    if (otherStatus === 'canceled') return; // 폐강 과목 제외
+                    const otherEnrolledIds = this.courseEnrollments[other.subject] || [];
+                    if (otherEnrolledIds.includes(stId)) {
+                      overlappingSubjects.push(other.subject);
+                    }
+                  });
+
+                  if (overlappingSubjects.length > 0) {
+                    const st = masterMap.get(stId);
+                    const stName = st ? st.name : '학생';
+                    const stCode = st ? (st.studentCode || ExcelService.getStudentCode(st)) : '';
+                    conflictStudents.push({
+                      name: stName,
+                      code: stCode,
+                      subjects: overlappingSubjects
+                    });
+                  }
+                });
+              }
+
+              const conflictCount = conflictStudents.length;
+              let conflictTooltip = '';
+              if (conflictCount > 0) {
+                const lines = [
+                  `⚠️ 시간 중복 수강생 (${conflictCount}명):`,
+                  ...conflictStudents.map(c => `• ${c.name}${c.code ? `(${c.code})` : ''}: [${c.subjects.join(', ')}] 과목과 동시 배정`)
+                ];
+                conflictTooltip = lines.join('\n').replace(/"/g, '&quot;');
+              }
+
               bodyHtml += `
                 <div class="subject-card p-2 rounded-lg border text-xs transition-all relative select-none cursor-grab active:cursor-grabbing ${
                   isCanceled ? 'is-canceled' : ''
@@ -3236,9 +3274,9 @@ class TimetableApp {
                      ondragstart="window.app.handleTimetableCardDragStart(event, '${safeSub}', '${day.id}', '${period.id}')"
                      ondragend="window.app.handleTimetableCardDragEnd(event)">
                   
-                  <!-- 카드 상단: 상태 기호 + 과목명 + 삭제 버튼 -->
+                  <!-- 카드 상단: 상태 기호 + 과목명 + 충돌 경고 + 삭제 버튼 -->
                   <div class="flex items-center justify-between gap-1 mb-1 pointer-events-auto">
-                    <div class="flex items-center gap-1 min-w-0">
+                    <div class="flex items-center gap-1 min-w-0 flex-wrap">
                       <!-- 상태 토글 버튼 (확정 -> 조정 -> 폐강) -->
                       <button type="button" 
                               onclick="event.stopPropagation(); window.app.toggleCourseScheduleStatus('${safeSub}', '${schedule.id || (day.id + '_' + period.id)}')"
@@ -3248,6 +3286,13 @@ class TimetableApp {
                       <span class="font-extrabold truncate" style="color: ${isCanceled ? '#64748B' : color.text};">
                         ${subject}
                       </span>
+                      ${conflictCount > 0 ? `
+                        <span class="inline-flex items-center gap-0.5 text-[11px] font-black text-rose-700 bg-rose-100 hover:bg-rose-200 border border-rose-300 px-1 py-0.2 rounded shadow-2xs cursor-help transition shrink-0" 
+                              title="${conflictTooltip}">
+                          <span>⚠️</span>
+                          <span>${conflictCount}</span>
+                        </span>
+                      ` : ''}
                     </div>
 
                     <!-- 이 시간표 셀에서만 삭제 -->
@@ -3511,16 +3556,42 @@ class TimetableApp {
         const m = masterMap.get(id);
         if (!m) return '';
         const code = m.studentCode || ExcelService.getStudentCode(m);
+
+        // 동일 시간(dayId, periodId)에 다른 유효 과목 수강 중인지 확인
+        const conflictingSubjects = [];
+        if (dayId && periodId) {
+          Object.entries(this.courseSchedules).forEach(([otherSub, schList]) => {
+            if (otherSub === subjectName) return;
+            const hasSlot = schList.some(sch => {
+              if (sch.status === 'canceled') return false;
+              return sch.day === dayId && (sch.periodId === periodId || (!sch.periodId && sch.period === periodObj?.period));
+            });
+            if (hasSlot) {
+              const otherEnrolled = this.courseEnrollments[otherSub] || [];
+              if (otherEnrolled.includes(m.id)) {
+                conflictingSubjects.push(otherSub);
+              }
+            }
+          });
+        }
+
         return `
-          <div class="py-2.5 px-3 flex items-center justify-between text-xs hover:bg-slate-50">
-            <div class="flex items-center gap-3">
+          <div class="py-2.5 px-3 flex items-center justify-between text-xs hover:bg-slate-50 ${conflictingSubjects.length > 0 ? 'bg-rose-50/40' : ''}">
+            <div class="flex items-center gap-2.5 flex-wrap">
               <span class="w-5 text-center text-slate-400 font-mono text-[11px]">${idx + 1}</span>
               <span class="font-mono font-bold text-slate-900">${code}</span>
               <span class="font-bold text-slate-800">${m.name}</span>
+              ${conflictingSubjects.length > 0 ? `
+                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-100/80 border border-rose-300 px-1.5 py-0.5 rounded shadow-2xs" 
+                      title="동일 시간 타 과목 [${conflictingSubjects.join(', ')}] 동시 배정됨">
+                  <span>⚠️ 중복:</span>
+                  <span class="font-extrabold">${conflictingSubjects.join(', ')}</span>
+                </span>
+              ` : ''}
             </div>
             <button type="button" 
                     onclick="window.app.handleRemoveStudentFromCourse('${subjectName}', '${m.id}'); window.app.openCourseRosterModal('${subjectName}', '${dayId}', '${periodId}');" 
-                    class="text-xs text-slate-400 hover:text-red-600 font-medium transition" title="수강 제외">
+                    class="text-xs text-slate-400 hover:text-red-600 font-medium transition shrink-0 ml-2" title="수강 제외">
               제외
             </button>
           </div>

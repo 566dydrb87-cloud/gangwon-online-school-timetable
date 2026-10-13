@@ -203,6 +203,7 @@ const ExcelService = {
       { header: '배정교시', key: 'periodName', width: 14 },
       { header: '시작시간', key: 'startTime', width: 12 },
       { header: '종료시간', key: 'endTime', width: 12 },
+      { header: '시간중복', key: 'conflict', width: 22 },
       { header: '비고', key: 'memo', width: 16 },
     ];
 
@@ -232,6 +233,7 @@ const ExcelService = {
         periodName: '',
         startTime: '',
         endTime: '',
+        conflict: '',
         memo: ''
       });
       addedRow.height = 24;
@@ -263,6 +265,7 @@ const ExcelService = {
         periodName: '',
         startTime: '',
         endTime: '',
+        conflict: '',
         memo: ''
       });
       addedRow.height = 24;
@@ -352,6 +355,8 @@ const ExcelService = {
             colStartTime = c.colNum;
           } else if (t === '종료시간' || t === '종료' || lower === 'endtime' || lower === 'end') {
             colEndTime = c.colNum;
+          } else if (t.includes('중복') || lower.includes('conflict')) {
+            // 시간중복 열은 안내용이므로 과목명이나 기타 항목으로 오인되지 않도록 안전하게 분기
           } else if (t === '비고' || t === '강의실' || t === '개설강의실' || lower === 'memo' || lower === 'room') {
             colMemo = c.colNum;
           }
@@ -751,6 +756,45 @@ const ExcelService = {
     });
   },
 
+  // -------------------------------------------------------------
+  // 시간 중복 판별 헬퍼 (동일 요일/교시에 2개 이상의 유효 과목 수강 판정)
+  // 반환: Map<number, string[]> (행 인덱스 -> 충돌 상대 과목명 배열)
+  // -------------------------------------------------------------
+  buildConflictMap(students) {
+    const conflictMap = new Map();
+    const slotMap = new Map(); // key -> Array<{ subject, idx }>
+
+    (students || []).forEach((s, idx) => {
+      const isAssigned = s.day && (s.periodId || s.period);
+      if (!isAssigned) return;
+      const normStatus = this.normalizeStatus(s.status);
+      if (normStatus.label === '폐강') return; // 폐강 과목은 제외
+
+      const studentKey = s.studentCode || this.getStudentCode(s) || s.studentMasterId || `${s.grade}_${s.classNum}_${s.studentNum}_${s.name}`;
+      const periodKey = s.periodId || s.period;
+      const slotKey = `${studentKey}__${s.day}__${periodKey}`;
+
+      if (!slotMap.has(slotKey)) {
+        slotMap.set(slotKey, []);
+      }
+      slotMap.get(slotKey).push({ subject: s.subject, idx });
+    });
+
+    slotMap.forEach((entries) => {
+      if (entries.length > 1) {
+        entries.forEach(curr => {
+          const others = entries.filter(e => e.subject !== curr.subject).map(e => e.subject);
+          const uniqueOthers = Array.from(new Set(others.filter(Boolean)));
+          if (uniqueOthers.length > 0) {
+            conflictMap.set(curr.idx, uniqueOthers);
+          }
+        });
+      }
+    });
+
+    return conflictMap;
+  },
+
   // 6. 결괏값 형태 2: 엑셀데이터 형태 (원천 데이터 테이블 / 통합 데이터 내보내기)
   async exportDataExcel(students, periods, days, academicYear = '2026', semester = '1', schoolName = '강원온라인학교') {
     const workbook = new ExcelJS.Workbook();
@@ -774,6 +818,7 @@ const ExcelService = {
       { header: '배정교시', key: 'periodName', width: 14 },
       { header: '시작시간', key: 'startTime', width: 12 },
       { header: '종료시간', key: 'endTime', width: 12 },
+      { header: '시간중복', key: 'conflict', width: 22 },
       { header: '비고', key: 'memo', width: 16 },
     ];
 
@@ -787,6 +832,7 @@ const ExcelService = {
     });
 
     const dayNameMap = { mon: '월요일', tue: '화요일', wed: '수요일', thu: '목요일', fri: '금요일', sat: '토요일', sun: '일요일' };
+    const conflictMap = this.buildConflictMap(students);
 
     students.forEach((s, idx) => {
       const isAssigned = s.day && (s.periodId || s.period);
@@ -799,6 +845,9 @@ const ExcelService = {
       const studentCode = this.getStudentCode(s);
       const normStatus = this.normalizeStatus(s.status);
       const statusLabel = normStatus.label;
+
+      const conflicting = conflictMap.get(idx) || [];
+      const conflictText = conflicting.length > 0 ? `⚠️ 중복: ${conflicting.join(', ')}` : '';
 
       const row = worksheet.addRow({
         index: idx + 1,
@@ -815,6 +864,7 @@ const ExcelService = {
         periodName: periodName,
         startTime: startTime,
         endTime: endTime,
+        conflict: conflictText,
         memo: s.memo || ''
       });
 
@@ -842,6 +892,12 @@ const ExcelService = {
         if ([11, 12, 13, 14].includes(colNum) && cell.value === '미입력') {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
           cell.font = { color: { argb: 'FF94A3B8' } };
+        }
+
+        // 시간중복 열 (col 15)
+        if (colNum === 15 && conflictText) {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFE4E6' } };
+          cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFE11D48' }, size: 9 };
         }
       });
     });
@@ -872,6 +928,7 @@ const ExcelService = {
       { header: '배정교시', key: 'periodName', width: 14 },
       { header: '시작시간', key: 'startTime', width: 12 },
       { header: '종료시간', key: 'endTime', width: 12 },
+      { header: '시간중복', key: 'conflict', width: 22 },
       { header: '비고', key: 'memo', width: 16 },
     ];
 
@@ -889,7 +946,9 @@ const ExcelService = {
     let globalRowIdx = 1;
 
     semesterList.forEach(({ semester, students, periods }) => {
-      (students || []).forEach((s) => {
+      const conflictMap = this.buildConflictMap(students);
+
+      (students || []).forEach((s, sIdx) => {
         const isAssigned = s.day && (s.periodId || s.period);
         const periodObj = (periods || []).find(p => p.id === s.periodId || (!s.periodId && p.period === s.period));
         const periodName = isAssigned ? (periodObj ? periodObj.name : (s.period ? `${s.period}교시` : '미입력')) : '미입력';
@@ -900,6 +959,9 @@ const ExcelService = {
         const studentCode = this.getStudentCode(s);
         const normStatus = this.normalizeStatus(s.status);
         const statusLabel = normStatus.label;
+
+        const conflicting = conflictMap.get(sIdx) || [];
+        const conflictText = conflicting.length > 0 ? `⚠️ 중복: ${conflicting.join(', ')}` : '';
 
         const row = worksheet.addRow({
           index: globalRowIdx++,
@@ -916,6 +978,7 @@ const ExcelService = {
           periodName: periodName,
           startTime: startTime,
           endTime: endTime,
+          conflict: conflictText,
           memo: s.memo || ''
         });
 
@@ -954,6 +1017,12 @@ const ExcelService = {
           if ([11, 12, 13, 14].includes(colNum) && cell.value === '미입력') {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
             cell.font = { color: { argb: 'FF94A3B8' } };
+          }
+
+          // 시간중복 열 (col 15)
+          if (colNum === 15 && conflictText) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFE4E6' } };
+            cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFE11D48' }, size: 9 };
           }
         });
       });
