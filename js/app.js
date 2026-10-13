@@ -1512,7 +1512,7 @@ class TimetableApp {
         }
       }
 
-      // 3. 학년도 및 학기별 분기 저장 실행
+      // 3. 학년도 및 학기별 분기 저장 실행 (해당 학년도/학기의 기존 데이터는 비우고 새 파일 내용으로 완전 갱신)
       const termSummaryList = [];
 
       for (const [termKey, bucket] of termBuckets.entries()) {
@@ -1526,11 +1526,15 @@ class TimetableApp {
         this.ensureYearSemesterData(bYear, bSemester);
         const semData = this.yearsData[bYear][bSemester];
 
+        // ★ 요청 사항 반영: 해당 학년도·학기의 기존 데이터 초기화 (새로운 파일의 내용으로 전면 갱신)
+        semData.masterStudents = [];
+        semData.courseEnrollments = {};
+        semData.courseSchedules = {};
+        semData.courseStatus = {};
+        semData.offeredSubjects = [];
+        semData.students = [];
+
         const semMasterMap = new Map();
-        (semData.masterStudents || []).forEach(st => {
-          const c = st.studentCode || ExcelService.getStudentCode(st);
-          semMasterMap.set(`${c}_${st.name}`, st);
-        });
 
         let semEnrolled = 0;
         let semScheduled = 0;
@@ -1675,7 +1679,7 @@ class TimetableApp {
         });
       } else {
         const summaryStr = termSummaryList.length > 0 ? termSummaryList.join(', ') : '시간표 데이터';
-        this.showToast(`🎉 통합 엑셀 반영 완료: [${summaryStr}] 학기 구분이 자동 적용되었습니다.`, true);
+        this.showToast(`🎉 통합 엑셀 갱신 완료: [${summaryStr}] 기존 데이터를 새 파일 내용으로 완전 갱신하였습니다.`, true);
       }
 
       // 검색창에 포커스
