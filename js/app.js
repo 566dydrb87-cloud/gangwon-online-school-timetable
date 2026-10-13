@@ -859,17 +859,126 @@ class TimetableApp {
   }
 
   // ==========================================
-  // 통합 엑셀 받기 (작성된 데이터가 있으면 데이터 포함, 없으면 표준 양식 다운로드)
+  // 통합 엑셀 받기 (해당 학기뿐 아니라 1·2학기 전체 데이터를 포함하여 다운로드)
   // ==========================================
   handleDownloadUnifiedExcel() {
-    if (this.students && this.students.length > 0) {
-      const activeDays = this.showWeekends ? this.days : this.days.filter(d => !d.isWeekend);
-      ExcelService.exportDataExcel(this.students, this.periods, activeDays, this.activeYear, this.activeSemester);
-      this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 현재 작성된 통합 데이터 엑셀이 다운로드되었습니다.`);
+    // 1. 현재 작업 중인 활성 학기 데이터를 먼저 저장
+    this.saveActiveYearSemesterData();
+
+    const targetYear = this.activeYear || '2026';
+    this.ensureYearSemesterData(targetYear, '1');
+    this.ensureYearSemesterData(targetYear, '2');
+
+    const sem1Data = this.yearsData[targetYear]['1'];
+    const sem2Data = this.yearsData[targetYear]['2'];
+
+    const sem1Students = this.buildFlatStudentListFromSemesterData(sem1Data);
+    const sem2Students = this.buildFlatStudentListFromSemesterData(sem2Data);
+
+    const totalStudentsCount = sem1Students.length + sem2Students.length;
+
+    if (totalStudentsCount > 0) {
+      ExcelService.exportYearFullDataExcel(targetYear, [
+        { semester: '1', students: sem1Students, periods: sem1Data.periods || this.periods },
+        { semester: '2', students: sem2Students, periods: sem2Data.periods || this.periods }
+      ]);
+      this.showToast(`[${targetYear}학년도 전체(1·2학기)] 시간표 통합 엑셀이 다운로드되었습니다. (1학기 ${sem1Students.length}건, 2학기 ${sem2Students.length}건)`, true);
     } else {
-      ExcelService.downloadStudentTemplate();
-      this.showToast('시간표·수강편성 통합 표준 양식(샘플)이 다운로드되었습니다.');
+      // 1·2학기 모두 작성된 데이터가 없는 경우 -> 1학기 10행, 2학기 10행의 표준 빈 양식 다운로드
+      ExcelService.downloadStudentTemplate(targetYear);
+      this.showToast(`[${targetYear}학년도 1·2학기] 시간표 통합 표준 빈 양식이 다운로드되었습니다.`, true);
     }
+  }
+
+  /**
+   * 임의의 학기 데이터(semData)로부터 flat student 목록을 완벽하게 생성하는 헬퍼
+   */
+  buildFlatStudentListFromSemesterData(semData) {
+    if (!semData) return [];
+    const list = [];
+    const masterStudents = semData.masterStudents || [];
+    const courseEnrollments = semData.courseEnrollments || {};
+    const courseSchedules = semData.courseSchedules || {};
+    const offeredSubjects = semData.offeredSubjects || [];
+    const periods = semData.periods || [];
+
+    const masterMap = new Map(masterStudents.map(s => [s.id, s]));
+
+    // 1. 과목별 편성 및 시간표 슬롯 매핑
+    offeredSubjects.forEach(subject => {
+      const studentIds = courseEnrollments[subject] || [];
+      const schedules = courseSchedules[subject] || [];
+
+      if (schedules.length === 0) {
+        studentIds.forEach(stId => {
+          const m = masterMap.get(stId);
+          if (m) {
+            list.push({
+              id: `assign_${subject}_unassigned_${m.id}`,
+              studentMasterId: m.id,
+              grade: m.grade,
+              classNum: m.classNum,
+              studentNum: m.studentNum,
+              studentCode: m.studentCode || ExcelService.getStudentCode(m),
+              name: m.name,
+              subject: subject,
+              day: null,
+              periodId: null,
+              period: null,
+              status: 'confirmed'
+            });
+          }
+        });
+      } else {
+        schedules.forEach(slot => {
+          const periodObj = periods.find(p => p.id === slot.periodId || (!slot.periodId && p.period === slot.period));
+          studentIds.forEach(stId => {
+            const m = masterMap.get(stId);
+            if (m) {
+              list.push({
+                id: `assign_${subject}_${slot.id || (slot.day + '_' + slot.periodId)}_${m.id}`,
+                scheduleId: slot.id,
+                studentMasterId: m.id,
+                grade: m.grade,
+                classNum: m.classNum,
+                studentNum: m.studentNum,
+                studentCode: m.studentCode || ExcelService.getStudentCode(m),
+                name: m.name,
+                subject: subject,
+                day: slot.day,
+                periodId: slot.periodId,
+                period: periodObj ? periodObj.period : slot.period,
+                status: slot.status || 'confirmed'
+              });
+            }
+          });
+        });
+      }
+    });
+
+    // 2. 미편제 학생도 등록
+    const enrolledIds = new Set();
+    Object.values(courseEnrollments).forEach(arr => arr.forEach(id => enrolledIds.add(id)));
+    masterStudents.forEach(m => {
+      if (!enrolledIds.has(m.id)) {
+        list.push({
+          id: `master_pure_${m.id}`,
+          studentMasterId: m.id,
+          grade: m.grade,
+          classNum: m.classNum,
+          studentNum: m.studentNum,
+          studentCode: m.studentCode || ExcelService.getStudentCode(m),
+          name: m.name,
+          subject: '',
+          day: null,
+          periodId: null,
+          period: null,
+          status: 'confirmed'
+        });
+      }
+    });
+
+    return list;
   }
 
   // ==========================================

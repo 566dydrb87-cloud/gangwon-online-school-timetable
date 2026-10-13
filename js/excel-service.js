@@ -182,15 +182,16 @@ const ExcelService = {
   },
 
   // 3. 수강생 명단 및 시간표 통합 표준 양식 다운로드 (일원화 양식)
-  async downloadStudentTemplate() {
+  // 3. 수강생 명단 및 시간표 통합 표준 양식 다운로드 (1·2학기 전체 포함 빈 양식)
+  async downloadStudentTemplate(academicYear = '2026') {
     const workbook = new ExcelJS.Workbook();
     workbook.creator = '강원온라인학교 시간표 시스템';
-    const worksheet = workbook.addWorksheet('시간표_통합데이터', { views: [{ showGridLines: true }] });
+    const worksheet = workbook.addWorksheet(`${academicYear}학년도_1·2학기_통합데이터`, { views: [{ showGridLines: true }] });
 
     worksheet.columns = [
       { header: '순번', key: 'index', width: 8 },
       { header: '학년도', key: 'year', width: 10 },
-      { header: '학기', key: 'term', width: 8 },
+      { header: '학기', key: 'term', width: 10 },
       { header: '학년', key: 'grade', width: 8 },
       { header: '반', key: 'classNum', width: 8 },
       { header: '번호', key: 'studentNum', width: 8 },
@@ -214,13 +215,12 @@ const ExcelService = {
       this.applyBorder(cell);
     });
 
-    // 과목명 및 학생 데이터 예시 행을 넣지 않고 깨끗한 빈 표준 양식으로 제공
-    // 사용자가 즉시 입력할 수 있도록 서식이 적용된 빈 행 10줄 제공
+    // 1학기 빈 서식 10줄 (순번 1~10)
     for (let i = 1; i <= 10; i++) {
       const addedRow = worksheet.addRow({
         index: i,
-        year: '',
-        term: '',
+        year: academicYear,
+        term: '1학기',
         grade: '',
         classNum: '',
         studentNum: '',
@@ -235,15 +235,50 @@ const ExcelService = {
         memo: ''
       });
       addedRow.height = 24;
-      addedRow.eachCell({ includeEmpty: true }, (cell) => {
+      addedRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
         cell.alignment = { vertical: 'middle', horizontal: 'center' };
         cell.font = { name: '맑은 고딕', size: 10 };
         this.applyBorder(cell);
+        if (colNum === 3) {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0F2FE' } };
+          cell.font = { bold: true, color: { argb: 'FF0369A1' } };
+        }
+      });
+    }
+
+    // 2학기 빈 서식 10줄 (순번 11~20)
+    for (let i = 11; i <= 20; i++) {
+      const addedRow = worksheet.addRow({
+        index: i,
+        year: academicYear,
+        term: '2학기',
+        grade: '',
+        classNum: '',
+        studentNum: '',
+        studentCode: '',
+        name: '',
+        subject: '',
+        status: '',
+        day: '',
+        periodName: '',
+        startTime: '',
+        endTime: '',
+        memo: ''
+      });
+      addedRow.height = 24;
+      addedRow.eachCell({ includeEmpty: true }, (cell, colNum) => {
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.font = { name: '맑은 고딕', size: 10 };
+        this.applyBorder(cell);
+        if (colNum === 3) {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEDE9FE' } };
+          cell.font = { bold: true, color: { argb: 'FF6D28D9' } };
+        }
       });
     }
 
     const buffer = await workbook.xlsx.writeBuffer();
-    this.saveFile(buffer, '시간표_통합데이터_표준양식.xlsx');
+    this.saveFile(buffer, `${academicYear}학년도_1·2학기_시간표_통합데이터_표준양식.xlsx`);
   },
 
   // 4. 수강생 명단 및 시간표 통합 엑셀 업로드 파싱 (통합 양식 & 나이스 양식 완벽 호환)
@@ -808,6 +843,119 @@ const ExcelService = {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
           cell.font = { color: { argb: 'FF94A3B8' } };
         }
+      });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    this.saveFile(buffer, `${filePrefix}_시간표_통합데이터_${this.getTimestamp()}.xlsx`);
+  },
+
+  // 7. 학년도 전체 (1학기 + 2학기) 통합 엑셀 다운로드 (작성 데이터 포함)
+  async exportYearFullDataExcel(academicYear = '2026', semesterList = [], schoolName = '강원온라인학교') {
+    const workbook = new ExcelJS.Workbook();
+    const filePrefix = `${academicYear}학년도_1·2학기_${schoolName}`;
+    workbook.creator = `${schoolName} 시간표 시스템`;
+    const worksheet = workbook.addWorksheet(`${academicYear}학년도_전체(1·2학기)_통합데이터`, { views: [{ showGridLines: true }] });
+
+    worksheet.columns = [
+      { header: '순번', key: 'index', width: 8 },
+      { header: '학년도', key: 'year', width: 10 },
+      { header: '학기', key: 'term', width: 10 },
+      { header: '학년', key: 'grade', width: 8 },
+      { header: '반', key: 'classNum', width: 8 },
+      { header: '번호', key: 'studentNum', width: 8 },
+      { header: '학번', key: 'studentCode', width: 12 },
+      { header: '성명', key: 'name', width: 14 },
+      { header: '과목명', key: 'subject', width: 22 },
+      { header: '개설상태', key: 'status', width: 12 },
+      { header: '배정요일', key: 'day', width: 12 },
+      { header: '배정교시', key: 'periodName', width: 14 },
+      { header: '시작시간', key: 'startTime', width: 12 },
+      { header: '종료시간', key: 'endTime', width: 12 },
+      { header: '비고', key: 'memo', width: 16 },
+    ];
+
+    const headerRow = worksheet.getRow(1);
+    headerRow.height = 30;
+    headerRow.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+      cell.font = { name: '맑은 고딕', bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      this.applyBorder(cell);
+    });
+
+    const dayNameMap = { mon: '월요일', tue: '화요일', wed: '수요일', thu: '목요일', fri: '금요일', sat: '토요일', sun: '일요일' };
+
+    let globalRowIdx = 1;
+
+    semesterList.forEach(({ semester, students, periods }) => {
+      (students || []).forEach((s) => {
+        const isAssigned = s.day && (s.periodId || s.period);
+        const periodObj = (periods || []).find(p => p.id === s.periodId || (!s.periodId && p.period === s.period));
+        const periodName = isAssigned ? (periodObj ? periodObj.name : (s.period ? `${s.period}교시` : '미입력')) : '미입력';
+        const startTime = isAssigned ? (periodObj ? periodObj.startTime : '미입력') : '미입력';
+        const endTime = isAssigned ? (periodObj ? periodObj.endTime : '미입력') : '미입력';
+        const dayText = isAssigned ? (dayNameMap[s.day] || s.day) : '미입력';
+
+        const studentCode = this.getStudentCode(s);
+        const normStatus = this.normalizeStatus(s.status);
+        const statusLabel = normStatus.label;
+
+        const row = worksheet.addRow({
+          index: globalRowIdx++,
+          year: academicYear,
+          term: `${semester}학기`,
+          grade: s.grade ? `${s.grade}` : '1',
+          classNum: s.classNum ? `${s.classNum}` : '1',
+          studentNum: s.studentNum ? `${s.studentNum}` : '',
+          studentCode: studentCode,
+          name: s.name,
+          subject: s.subject || '미입력',
+          status: statusLabel,
+          day: dayText,
+          periodName: periodName,
+          startTime: startTime,
+          endTime: endTime,
+          memo: s.memo || ''
+        });
+
+        row.height = 24;
+        row.eachCell((cell, colNum) => {
+          cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          cell.font = { name: '맑은 고딕', size: 10 };
+          this.applyBorder(cell);
+
+          // 개설상태 열 (col 10)
+          if (colNum === 10) {
+            if (statusLabel === '확정') {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+              cell.font = { bold: true, color: { argb: 'FF065F46' } };
+            } else if (statusLabel === '조정') {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+              cell.font = { bold: true, color: { argb: 'FFB45309' } };
+            } else if (statusLabel === '폐강') {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+              cell.font = { strike: true, color: { argb: 'FF64748B' } };
+            }
+          }
+
+          // 학기 열 구분 강조 (1학기: 연한 하늘, 2학기: 연한 보라)
+          if (colNum === 3) {
+            if (String(semester) === '1') {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0F2FE' } };
+              cell.font = { bold: true, color: { argb: 'FF0369A1' } };
+            } else {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEDE9FE' } };
+              cell.font = { bold: true, color: { argb: 'FF6D28D9' } };
+            }
+          }
+
+          // 미입력 셀 하이라이트
+          if ([11, 12, 13, 14].includes(colNum) && cell.value === '미입력') {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+            cell.font = { color: { argb: 'FF94A3B8' } };
+          }
+        });
       });
     });
 
