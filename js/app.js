@@ -2100,8 +2100,19 @@ class TimetableApp {
       return true;
     });
 
-    // 정렬 (학번순 / 이름순 / 과목명순)
+    // 정렬: 1순위 - 미편성(미배정) 학생 최상단 배치 (사용자 요청 반영)
     filtered.sort((a, b) => {
+      const subsA = this.getStudentEnrolledCourses(a.id);
+      const subsB = this.getStudentEnrolledCourses(b.id);
+      const isUnassignedA = subsA.length === 0 ? 0 : 1;
+      const isUnassignedB = subsB.length === 0 ? 0 : 1;
+
+      // 미편성 학생(0)이 편성 완료된 학생(1)보다 항상 상단에 먼저 오도록 정렬
+      if (isUnassignedA !== isUnassignedB) {
+        return isUnassignedA - isUnassignedB;
+      }
+
+      // 2순위: 선택된 정렬 기준 적용 (학번순 / 이름순 / 과목명순)
       const codeA = a.studentCode || ExcelService.getStudentCode(a);
       const codeB = b.studentCode || ExcelService.getStudentCode(b);
 
@@ -2112,10 +2123,8 @@ class TimetableApp {
       }
 
       if (this.studentSortKey === 'subject') {
-        const subsA = this.getStudentEnrolledCourses(a.id);
-        const subsB = this.getStudentEnrolledCourses(b.id);
-        const subAStr = subsA.length > 0 ? subsA.sort().join(', ') : 'zzz_미편제';
-        const subBStr = subsB.length > 0 ? subsB.sort().join(', ') : 'zzz_미편제';
+        const subAStr = subsA.length > 0 ? subsA.sort().join(', ') : '';
+        const subBStr = subsB.length > 0 ? subsB.sort().join(', ') : '';
         const subCompare = subAStr.localeCompare(subBStr, 'ko');
         if (subCompare !== 0) return subCompare;
         return (a.name || '').localeCompare(b.name || '', 'ko');
@@ -2205,7 +2214,9 @@ class TimetableApp {
                 </span>
               `;
             }).join('') : `
-              <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-400 font-medium">미편제</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold inline-flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> 미편성
+              </span>
             `}
 
             <!-- 학생 정보 수정 버튼 -->
