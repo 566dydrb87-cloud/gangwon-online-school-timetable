@@ -66,45 +66,7 @@
       <!-- 상단 액션 버튼 그룹 -->
       <div id="header-actions" class="flex flex-wrap items-center gap-2">
 
-        <!-- 1. 양식 다운로드 드롭다운 -->
-        <div class="relative group">
-          <button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition">
-            <i data-lucide="download" class="w-3.5 h-3.5 text-slate-600"></i>
-            <span>양식 다운로드</span>
-            <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500"></i>
-          </button>
-          <div class="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 hidden group-hover:block z-40">
-            <button id="btn-dl-period-template" class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2">
-              <i data-lucide="clock" class="w-3.5 h-3.5"></i> 일과표 설정 양식
-            </button>
-            <button id="btn-dl-student-template" class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 border-t border-slate-100">
-              <i data-lucide="users" class="w-3.5 h-3.5"></i> 편성학생 명단 양식
-            </button>
-          </div>
-        </div>
-
-        <!-- 2. 엑셀 업로드 드롭다운 -->
-        <div class="relative group">
-          <button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-300 transition">
-            <i data-lucide="upload" class="w-3.5 h-3.5 text-blue-600"></i>
-            <span>엑셀 업로드</span>
-            <i data-lucide="chevron-down" class="w-3 h-3 text-blue-500"></i>
-          </button>
-          <div class="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-slate-200 py-1 hidden group-hover:block z-40">
-            <label class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 cursor-pointer">
-              <i data-lucide="file-up" class="w-3.5 h-3.5 text-blue-600"></i>
-              <span>편성 학생 엑셀 업로드 (복수 파일)</span>
-              <input type="file" id="file-upload-student" accept=".xlsx, .xls" multiple class="hidden">
-            </label>
-            <label class="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 cursor-pointer border-t border-slate-100">
-              <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-600"></i>
-              <span>일과표 엑셀 업로드</span>
-              <input type="file" id="file-upload-period" accept=".xlsx, .xls" class="hidden">
-            </label>
-          </div>
-        </div>
-
-        <!-- 3. 개설 과목 관리 버튼 -->
+        <!-- 1. 개설 과목 관리 버튼 -->
         <button id="btn-manage-subjects" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition" title="개설 과목 추가 및 관리">
           <i data-lucide="book-open" class="w-3.5 h-3.5 text-indigo-600"></i>
           <span>과목 관리</span>
@@ -112,15 +74,10 @@
 
         <div class="h-5 w-px bg-slate-200"></div>
 
-        <!-- 4. 결과 엑셀 다운로드 (2종) -->
-        <button id="btn-export-timetable" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition" title="파스텔톤 디자인 멀티시트 학급 시간표 다운로드">
+        <!-- 2. 학급 시간표 엑셀 다운로드 (배포/인쇄용) -->
+        <button id="btn-export-timetable" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition" title="파스텔톤 디자인 멀티시트 학급 시간표 다운로드 (학생/학급 배포용)">
           <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
           <span>학급 시간표 엑셀</span>
-        </button>
-
-        <button id="btn-export-data" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition" title="시간표·수강편성 통합 데이터 엑셀 다운로드 (수정 후 재업로드 완벽 지원)">
-          <i data-lucide="table" class="w-3.5 h-3.5"></i>
-          <span>원천 데이터(통합) 엑셀</span>
         </button>
 
         <!-- 5. 인쇄 및 기타 -->
@@ -340,9 +297,9 @@
                 <span>엑셀 업로드 (다중 선택)</span>
                 <input type="file" id="step1-file-upload-student" accept=".xlsx, .xls" multiple class="hidden">
               </label>
-              <button type="button" onclick="ExcelService.downloadStudentTemplate()" class="px-2 py-1 text-[11px] font-bold text-blue-700 bg-white hover:bg-blue-50 rounded border border-blue-300 transition flex items-center gap-1 shadow-2xs" title="시간표·수강편성 일원화 표준 통합 양식 엑셀 다운로드 (작성 후 업로드)">
-                <i data-lucide="download" class="w-3 h-3 text-blue-600"></i>
-                <span>통합 양식 받기</span>
+              <button type="button" onclick="window.app.handleDownloadUnifiedExcel()" class="px-2.5 py-1 text-[11px] font-bold text-teal-700 bg-white hover:bg-teal-50 rounded border border-teal-300 transition flex items-center gap-1 shadow-2xs" title="작성된 데이터가 포함된 통합 엑셀 다운로드 (데이터가 없으면 표준 샘플 양식 제공)">
+                <i data-lucide="download" class="w-3 h-3 text-teal-600"></i>
+                <span>통합 엑셀 받기</span>
               </button>
             </div>
           </div>

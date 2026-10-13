@@ -776,9 +776,7 @@ class TimetableApp {
     });
 
     document.getElementById('btn-export-data')?.addEventListener('click', () => {
-      const activeDays = this.showWeekends ? this.days : this.days.filter(d => !d.isWeekend);
-      ExcelService.exportDataExcel(this.students, this.periods, activeDays, this.activeYear, this.activeSemester);
-      this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 원천 데이터 엑셀이 다운로드됩니다.`);
+      this.handleDownloadUnifiedExcel();
     });
 
     // 10. 일과표 업로드
@@ -832,6 +830,20 @@ class TimetableApp {
     document.getElementById('btn-reset-data')?.addEventListener('click', () => {
       this.resetToDefaults(true);
     });
+  }
+
+  // ==========================================
+  // 통합 엑셀 받기 (작성된 데이터가 있으면 데이터 포함, 없으면 표준 양식 다운로드)
+  // ==========================================
+  handleDownloadUnifiedExcel() {
+    if (this.students && this.students.length > 0) {
+      const activeDays = this.showWeekends ? this.days : this.days.filter(d => !d.isWeekend);
+      ExcelService.exportDataExcel(this.students, this.periods, activeDays, this.activeYear, this.activeSemester);
+      this.showToast(`[${this.activeYear}학년도 ${this.activeSemester}학기] 현재 작성된 통합 데이터 엑셀이 다운로드되었습니다.`);
+    } else {
+      ExcelService.downloadStudentTemplate();
+      this.showToast('시간표·수강편성 통합 표준 양식(샘플)이 다운로드되었습니다.');
+    }
   }
 
   // ==========================================
