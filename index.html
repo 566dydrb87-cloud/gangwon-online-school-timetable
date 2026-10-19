@@ -80,6 +80,77 @@
           <span>학급 시간표 엑셀</span>
         </button>
 
+        <div class="h-5 w-px bg-slate-200"></div>
+
+        <!-- 3. [JSON 저장] (우측 분할 화살표로 저장 위치 설정) -->
+        <div class="relative inline-flex items-center rounded-lg shadow-2xs">
+          <button id="btn-save-json" 
+                  onclick="window.app.handleSaveJSON()" 
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-l-lg bg-blue-600 hover:bg-blue-700 text-white transition border-r border-blue-500 cursor-pointer shadow-xs" 
+                  title="강원온라인학교 수강신청 현황 및 시간표 전체 데이터 JSON 파일로 저장">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>JSON 저장</span>
+          </button>
+          <button id="btn-save-location-toggle" 
+                  onclick="window.app.toggleSaveLocationDropdown(event)" 
+                  class="inline-flex items-center px-2 py-1.5 text-xs font-bold rounded-r-lg bg-blue-600 hover:bg-blue-700 text-white transition cursor-pointer shadow-xs" 
+                  title="파일 저장 위치(폴더) 설정 및 변경 (모든 다운로드 파일에 적용)">
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+          </button>
+
+          <!-- 저장 위치 설정 드롭다운 팝오버 -->
+          <div id="save-location-dropdown" 
+               class="hidden absolute right-0 top-full mt-1.5 w-80 bg-white rounded-xl shadow-xl border border-slate-200 p-3.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2.5">
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="folder-cog" class="w-4 h-4 text-blue-600"></i>
+                <span class="text-xs font-bold text-slate-800">다운로드 및 파일 저장 위치</span>
+              </div>
+              <button type="button" onclick="window.app.toggleSaveLocationDropdown(event)" class="text-slate-400 hover:text-slate-600 p-0.5">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+            <!-- 현재 저장 위치 상태 표시 -->
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg mb-2.5">
+              <div class="text-[10px] font-semibold text-slate-500 mb-1">현재 기억된 저장 위치:</div>
+              <div id="current-save-location-display" class="text-xs font-bold text-slate-900 flex items-center gap-1.5 truncate">
+                <i data-lucide="folder" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                <span class="truncate">브라우저 기본 다운로드 폴더</span>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 leading-relaxed mb-3">
+              저장 위치를 지정하면 <strong>JSON 파일뿐만 아니라 모든 엑셀 다운로드 파일</strong>이 해당 폴더에 자동으로 저장됩니다.
+            </p>
+
+            <div class="flex flex-col gap-1.5">
+              <button type="button" 
+                      onclick="window.app.handleChangeSaveDirectory()" 
+                      class="w-full py-1.5 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+                <i data-lucide="folder-search" class="w-3.5 h-3.5"></i>
+                <span>저장 폴더 지정/변경하기</span>
+              </button>
+              <button type="button" 
+                      onclick="window.app.handleResetSaveDirectory()" 
+                      class="w-full py-1.5 px-3 bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="rotate-ccw" class="w-3 h-3 text-slate-400"></i>
+                <span>기본 다운로드 폴더로 초기화</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. [JSON 불러오기] (저장 오른쪽에 배치) -->
+        <button id="btn-load-json" 
+                onclick="window.app.triggerLoadJSON()" 
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition cursor-pointer" 
+                title="이전에 저장된 시간표 전체 데이터 JSON 파일 불러오기">
+          <i data-lucide="upload" class="w-3.5 h-3.5 text-slate-600"></i>
+          <span>JSON 불러오기</span>
+        </button>
+        <input type="file" id="input-json-file" accept=".json" class="hidden" onchange="window.app.handleLoadJSONFile(event)">
+
         <!-- 5. 인쇄 및 기타 -->
         <button id="btn-print" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 transition" title="시간표 인쇄 (A4 가로 최적화)">
           <i data-lucide="printer" class="w-3.5 h-3.5"></i>
@@ -1467,9 +1538,10 @@
 
   <!-- Scripts -->
   <script src="js/sample-data.js"></script>
-  <script src="js/excel-service.js?v=20261013_15"></script>
+  <script src="js/file-storage-service.js?v=20261019_01"></script>
+  <script src="js/excel-service.js?v=20261019_01"></script>
   <script src="js/cloud-sync.js"></script>
-  <script src="js/app.js?v=20261013_15"></script>
+  <script src="js/app.js?v=20261019_01"></script>
   <script>
     lucide.createIcons();
 

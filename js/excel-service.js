@@ -1499,7 +1499,15 @@ const ExcelService = {
     };
   },
 
-  saveFile(buffer, fileName) {
+  async saveFile(buffer, fileName) {
+    if (window.FileStorageService && typeof window.FileStorageService.saveFile === 'function') {
+      const res = await window.FileStorageService.saveFile(buffer, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      if (res && res.savedToFolder && window.app && typeof window.app.showToast === 'function') {
+        window.app.showToast(`[${res.folderName}] 폴더에 '${res.fileName}' 엑셀 파일이 저장되었습니다.`, true);
+      }
+      return res;
+    }
+
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

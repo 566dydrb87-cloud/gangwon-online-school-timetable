@@ -66,6 +66,7 @@ class TimetableApp {
     this.buildSubjectColorMap();
     this.bindEvents();
     this.render();
+    this.updateSaveLocationUI();
 
     // 백엔드/클라우드 최신 데이터 자동 동기화
     setTimeout(async () => {
@@ -740,6 +741,17 @@ class TimetableApp {
       document.body.classList.remove('is-copy-mode');
     });
 
+    // 드롭다운 외부 클릭 시 저장 위치 메뉴 닫기
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('save-location-dropdown');
+      const toggleBtn = document.getElementById('btn-save-location-toggle');
+      if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (!dropdown.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
+          dropdown.classList.add('hidden');
+        }
+      }
+    });
+
     // 2. 탭 1 퀵 학생 직접 등록
     document.getElementById('form-quick-add-student')?.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -959,6 +971,231 @@ class TimetableApp {
       ExcelService.downloadStudentTemplate(targetYear);
       this.showToast(`[${targetYear}학년도 1·2학기] 시간표 통합 표준 빈 양식이 다운로드되었습니다.`, true);
     }
+  }
+
+  // ==========================================
+  // [JSON 데이터 관리] 전체 시간표 데이터 JSON 저장 & 불러오기 & 저장 위치 설정
+  // ==========================================
+
+  /**
+   * 전체 데이터 JSON 파일로 저장 (사용자 지정 폴더 또는 브라우저 다운로드)
+   * 파일명 형식: 강원온라인학교 수강신청 현황 및 시간표_날짜_시간.json (초 단위 포함 덮어쓰기 방지)
+   */
+  async handleSaveJSON() {
+    this.saveActiveYearSemesterData();
+    this.saveState();
+
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    const timeStamp = `${y}${m}${d}_${hh}${mm}${ss}`;
+
+    const fileName = `강원온라인학교 수강신청 현황 및 시간표_${timeStamp}.json`;
+
+    const exportData = {
+      title: '강원온라인학교 수강신청 현황 및 시간표 데이터',
+      version: '2.0',
+      exportedAt: now.toISOString(),
+      academicYears: this.academicYears || ['2027', '2026'],
+      activeYear: this.activeYear,
+      activeGrade: this.activeGrade,
+      activeSemester: this.activeSemester,
+      yearsData: this.yearsData,
+      excelStudentPool: this.excelStudentPool || [],
+      showWeekends: this.showWeekends !== undefined ? this.showWeekends : true,
+      subjectColorMap: this.subjectColorMap || {},
+      periods: this.periods,
+      days: this.days,
+      masterStudents: this.masterStudents || [],
+      courseEnrollments: this.courseEnrollments || {},
+      courseSchedules: this.courseSchedules || {},
+      courseStatus: this.courseStatus || {},
+      offeredSubjects: this.offeredSubjects || [],
+      timetableTabs: this.timetableTabs || null,
+      activeTimetableTabId: this.activeTimetableTabId || null
+    };
+
+    const jsonString = JSON.stringify(exportData, null, 2);
+
+    try {
+      if (window.FileStorageService && typeof window.FileStorageService.saveFile === 'function') {
+        const res = await window.FileStorageService.saveFile(jsonString, fileName, 'application/json');
+        if (res && res.savedToFolder) {
+          this.showToast(`[${res.folderName}] 폴더에 '${res.fileName}' JSON 파일이 안전하게 저장되었습니다.`, true);
+        } else {
+          this.showToast(`'${res ? res.fileName : fileName}' JSON 파일이 다운로드되었습니다.`, true);
+        }
+      } else {
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 100);
+        this.showToast(`'${fileName}' JSON 파일이 다운로드되었습니다.`, true);
+      }
+    } catch (err) {
+      console.error('JSON 저장 오류:', err);
+      alert('JSON 저장 실패: ' + err.message);
+    }
+  }
+
+  /**
+   * JSON 파일 불러오기 트리거
+   */
+  triggerLoadJSON() {
+    const input = document.getElementById('input-json-file');
+    if (input) {
+      input.value = '';
+      input.click();
+    }
+  }
+
+  /**
+   * JSON 파일 읽기 및 데이터 복원 처리
+   */
+  handleLoadJSONFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const text = evt.target.result;
+        const parsed = JSON.parse(text);
+
+        if (!parsed || (typeof parsed !== 'object') || (!parsed.yearsData && !parsed.periods && !parsed.students)) {
+          throw new Error('유효한 강원온라인학교 시간표 JSON 데이터 형식이 아닙니다.');
+        }
+
+        if (confirm(`'${file.name}' 시간표 데이터 파일을 불러오시겠습니까?\n\n※ 주의: 현재 화면의 작업 내용이 불러온 파일의 데이터로 완전히 교체됩니다.`)) {
+          this.loadFromJSONData(parsed);
+          this.showToast(`'${file.name}' 데이터를 성공적으로 불러왔습니다.`, true);
+        }
+      } catch (err) {
+        alert('JSON 불러오기 실패: ' + err.message);
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  /**
+   * JSON 객체로부터 전체 시스템 상태 복원
+   */
+  loadFromJSONData(data) {
+    this.pushUndoSnapshot('JSON 데이터 불러오기');
+
+    if (Array.isArray(data.academicYears) && data.academicYears.length > 0) {
+      this.academicYears = data.academicYears;
+    }
+    if (data.yearsData && typeof data.yearsData === 'object') {
+      this.yearsData = data.yearsData;
+    }
+    if (Array.isArray(data.excelStudentPool)) {
+      this.excelStudentPool = data.excelStudentPool;
+      this.saveExcelStudentPool();
+    }
+    if (data.activeYear && this.yearsData[data.activeYear]) {
+      this.activeYear = data.activeYear;
+    }
+    if (data.activeGrade) {
+      this.activeGrade = data.activeGrade;
+    }
+    if (data.activeSemester) {
+      this.activeSemester = data.activeSemester;
+    }
+    if (data.showWeekends !== undefined) {
+      this.showWeekends = data.showWeekends;
+    }
+    if (data.timetableTabs) {
+      this.timetableTabs = data.timetableTabs;
+    }
+    if (data.activeTimetableTabId) {
+      this.activeTimetableTabId = data.activeTimetableTabId;
+    }
+
+    this.loadActiveYearSemesterData();
+    this.saveState();
+    this.render();
+  }
+
+  /**
+   * 저장 위치 설정 메뉴 드롭다운 토글
+   */
+  toggleSaveLocationDropdown(e) {
+    if (e) e.stopPropagation();
+    const dropdown = document.getElementById('save-location-dropdown');
+    if (!dropdown) return;
+    const isHidden = dropdown.classList.contains('hidden');
+    if (isHidden) {
+      this.updateSaveLocationUI();
+      dropdown.classList.remove('hidden');
+    } else {
+      dropdown.classList.add('hidden');
+    }
+  }
+
+  /**
+   * 현재 저장 위치 정보 UI 갱신
+   */
+  updateSaveLocationUI() {
+    const display = document.getElementById('current-save-location-display');
+    const savedName = window.FileStorageService ? window.FileStorageService.getSavedDirectoryName() : null;
+    if (display) {
+      if (savedName) {
+        display.innerHTML = `
+          <i data-lucide="folder-check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+          <span class="truncate text-emerald-950 font-bold">${savedName}</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 shrink-0">지정됨</span>
+        `;
+      } else {
+        display.innerHTML = `
+          <i data-lucide="folder" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+          <span class="truncate text-slate-600 font-medium">브라우저 기본 다운로드 폴더</span>
+        `;
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+  }
+
+  /**
+   * 저장 위치 폴더 선택/변경
+   */
+  async handleChangeSaveDirectory() {
+    if (!window.FileStorageService) return;
+    try {
+      const folderName = await window.FileStorageService.pickDirectory();
+      this.updateSaveLocationUI();
+      this.showToast(`저장 위치가 [${folderName}] 폴더로 설정되었습니다. 앞으로 모든 파일(JSON, 엑셀)이 이 폴더에 저장됩니다.`, true);
+      const dropdown = document.getElementById('save-location-dropdown');
+      if (dropdown) dropdown.classList.add('hidden');
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        alert('저장 위치 설정 중 오류: ' + err.message);
+      }
+    }
+  }
+
+  /**
+   * 저장 위치 기본 다운로드로 초기화
+   */
+  async handleResetSaveDirectory() {
+    if (!window.FileStorageService) return;
+    await window.FileStorageService.clearStoredDirectoryHandle();
+    this.updateSaveLocationUI();
+    this.showToast('저장 위치가 브라우저 기본 다운로드 폴더로 초기화되었습니다.');
+    const dropdown = document.getElementById('save-location-dropdown');
+    if (dropdown) dropdown.classList.add('hidden');
   }
 
   // ==========================================

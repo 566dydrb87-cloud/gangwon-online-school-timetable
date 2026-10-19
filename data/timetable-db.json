@@ -1778,7 +1778,7 @@
               },
               {
                 "id": "sch_1791870290822_xwizl5",
-                "day": "wed",
+                "day": "tue",
                 "periodId": "p7",
                 "period": 7,
                 "status": "confirmed"
@@ -2000,7 +2000,7 @@
               "studentCode": "10221",
               "name": "현표",
               "subject": "고급 지구과학",
-              "day": "wed",
+              "day": "tue",
               "periodId": "p7",
               "period": 7,
               "status": "confirmed"
@@ -3195,7 +3195,7 @@
       "studentCode": "10221",
       "name": "현표",
       "subject": "고급 지구과학",
-      "day": "wed",
+      "day": "tue",
       "periodId": "p7",
       "period": 7,
       "status": "confirmed"
@@ -3937,7 +3937,7 @@
       },
       {
         "id": "sch_1791870290822_xwizl5",
-        "day": "wed",
+        "day": "tue",
         "periodId": "p7",
         "period": 7,
         "status": "confirmed"
@@ -4106,5 +4106,5 @@
     }
   },
   "showWeekends": true,
-  "lastUpdated": "2026-10-13T08:28:52.941Z"
+  "lastUpdated": "2026-10-13T08:31:42.189Z"
 }
